@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.0.0...v1.1.0) (2022-02-12)
+
+
+### Features
+
+* **messaging:** better formatted errors and such ([3d07e0c](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/3d07e0c5f305cbf60fc69684d8108f7a7fa5c2a7))
+
 # 1.0.0 (2022-02-12)
 
 
