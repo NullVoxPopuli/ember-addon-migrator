@@ -3,9 +3,9 @@
  * @typedef {import('../index').Info} Info
  */
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { files } from 'ember-apply';
 
-// @ts-ignore
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
