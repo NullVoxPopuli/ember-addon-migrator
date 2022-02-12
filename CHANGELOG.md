@@ -1,3 +1,12 @@
+## [1.1.2](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.1.1...v1.1.2) (2022-02-12)
+
+
+### Bug Fixes
+
+* add gitignore files for the generated addon directory ([ffe8ea5](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/ffe8ea5ebdc2dcb80fb2ce22961192ac7f3728e4))
+* **deps:** resolve incorrect TS detection ([6e7461c](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/6e7461cc2043660e6a832fc2c69df9231734a450))
+* **ts:** ensure a tsconfig.json is generated ([73c5390](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/73c53902bbb1aeae91684ed5c17cd9a7f43a8197))
+
 ## [1.1.1](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.1.0...v1.1.1) (2022-02-12)
 
 
