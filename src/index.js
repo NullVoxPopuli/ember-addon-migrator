@@ -59,6 +59,7 @@ export default async function run(workingDirectory) {
 
     Next steps:
      - customize the rollup.config.js to suit your needs
+     - audit dependencies of both the new addon and test-app
      - run \`${analysis.packager} install\`
      - run \`${analysis.packager} run lint:fix\` in each workspace
      - test your addon in ./test-app
