@@ -29,6 +29,8 @@
     "bin.js"
   ],
   "scripts": {
+    "publish:dry-run": "yarn publish:release --dry-run",
+    "publish:release": "yarn semantic-release",
     "build:types": "tsc --build",
     "lint": "yarn lint:js",
     "lint:js": "eslint .",
@@ -46,6 +48,8 @@
   },
   "devDependencies": {
     "@nullvoxpopuli/eslint-configs": "^2.1.17",
+    "@semantic-release/changelog": "^6.0.0",
+    "@semantic-release/git": "^10.0.0",
     "@types/fs-extra": "^9.0.13",
     "@types/semver": "^7.3.9",
     "babel-eslint": "^10.1.0",
@@ -64,6 +68,20 @@
   },
   "engines": {
     "node": ">=16.0.0"
+  },
+  "release": {
+    "branches": [
+      "main",
+      "master"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/changelog",
+      "@semantic-release/npm",
+      "@semantic-release/github",
+      "@semantic-release/git"
+    ]
   },
   "volta": {
     "node": "16.14.0",
