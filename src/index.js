@@ -58,12 +58,11 @@ export default async function run(workingDirectory) {
     🎉 Congratulations! Your addon is now formatted as a V2 addon!
 
     Next steps:
+     - customize the rollup.config.js to suit your needs
      - run \`${analysis.packager} install\`
      - run \`${analysis.packager} run lint:fix\` in each workspace
      - test your addon in ./test-app
-     - push up a branch
-     - merge
-     - release
+     - push up a branch, merge, release
      - party 🥳
   `);
 }
