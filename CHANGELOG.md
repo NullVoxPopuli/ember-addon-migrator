@@ -1,3 +1,10 @@
+## [1.1.4](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.1.3...v1.1.4) (2022-02-12)
+
+
+### Bug Fixes
+
+* **js/ts:** __dirname was erroring ([395dd84](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/395dd846d6d0afad1614c702ea91918988703cbb))
+
 ## [1.1.3](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.1.2...v1.1.3) (2022-02-12)
 
 
