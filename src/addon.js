@@ -3,14 +3,11 @@
  * @typedef {import('./index').Info} Info
  */
 import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import fse from 'fs-extra';
 import latestVersion from 'latest-version';
-import { files } from 'ember-apply';
 
-// @ts-ignore
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import { setupJs } from './js/index.js';
+import { setupTs } from './ts/index.js';
 
 /**
  * @param {Info} info
@@ -22,13 +19,9 @@ export async function migrateAddon(info) {
   await writeAddonPackageJson(info);
 
   if (isTs) {
-    let tsFiles = path.join(__dirname, 'ts', 'files');
-
-    await files.applyFolder(tsFiles, workspace);
+    await setupTs(info);
   } else {
-    let jsFiles = path.join(__dirname, 'js', 'files');
-
-    await files.applyFolder(jsFiles, workspace);
+    await setupJs(info);
   }
 }
 

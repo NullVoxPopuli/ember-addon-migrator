@@ -22,7 +22,7 @@
   },
   "include": ["src/**/*"],
   "exclude": [
-    "src/ts/**/*",
-    "src/js/**/*"
+    "src/ts/files/**/*",
+    "src/js/files/**/*"
   ]
 }

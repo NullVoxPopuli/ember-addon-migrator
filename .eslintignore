@@ -1,4 +1,4 @@
-src/js/
-src/ts/
+src/js/files/
+src/ts/files/
 node_modules/
 coverage/
