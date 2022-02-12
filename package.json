@@ -1,7 +1,7 @@
 {
   "name": "ember-addon-migrator",
   "description": "tool for migrating ember addons to the addon v2 format",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "license": "MIT",
   "author": "NullVoxPopuli",
