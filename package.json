@@ -1,0 +1,72 @@
+{
+  "name": "ember-addon-migrator",
+  "description": "tool for migrating ember addons to the addon v2 format",
+  "version": "0.0.0",
+  "type": "module",
+  "license": "MIT",
+  "author": "NullVoxPopuli",
+  "repository": {
+    "url": "https://github.com/NullVoxPopuli/ember-addon-migrator",
+    "type": "https",
+    "directory": "./"
+  },
+  "keywords": [
+    "ember",
+    "embroider",
+    "ember-addon",
+    "blueprint"
+  ],
+  "bin": {
+    "ea2": "./bin.js",
+    "migrate-addon": "./bin.js",
+    "ember-addon-migrator": "./bin.js"
+  },
+  "exports": {
+    "import": "./index.js"
+  },
+  "files": [
+    "src/**/*",
+    "bin.js"
+  ],
+  "scripts": {
+    "build:types": "tsc --build",
+    "lint": "yarn lint:js",
+    "lint:js": "eslint .",
+    "lint:fix": "yarn lint:js --fix",
+    "test": "vitest --coverage --no-watch",
+    "test:watch": "vitest --watch"
+  },
+  "dependencies": {
+    "ember-apply": "2.0.1",
+    "execa": "^6.0.0",
+    "fs-extra": "^10.0.0",
+    "globby": "^13.1.1",
+    "latest-version": "^6.0.0",
+    "semver": "^7.0.0"
+  },
+  "devDependencies": {
+    "@nullvoxpopuli/eslint-configs": "^2.1.17",
+    "@types/fs-extra": "^9.0.13",
+    "@types/semver": "^7.3.9",
+    "babel-eslint": "^10.1.0",
+    "c8": "^7.11.0",
+    "eslint": "^7.0.0",
+    "eslint-plugin-decorator-position": "^4.0.1",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.5.1",
+    "semantic-release": "^19.0.0",
+    "types-package-json": "^2.0.39",
+    "typescript": "4.5.4",
+    "vite": "^2.7.13",
+    "vitest": "^0.3.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "volta": {
+    "node": "16.14.0",
+    "yarn": "1.22.17"
+  }
+}

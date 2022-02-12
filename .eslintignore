@@ -1,0 +1,4 @@
+src/js/
+src/ts/
+node_modules/
+coverage/
