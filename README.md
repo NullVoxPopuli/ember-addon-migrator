@@ -22,3 +22,15 @@ test-app/
 ```
 
 _Additional tweaking may be required after the migrator runs_.
+
+## Compatibility
+
+ - Node 16+
+
+## Contributing
+
+ - clone the repo
+ - `cd ember-addon-migrator`
+ - `yarn`
+ - cd to your v1 addon for testing
+ - run `node ../path/to/ember-addon-migrator/bin.js`

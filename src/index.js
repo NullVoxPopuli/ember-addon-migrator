@@ -30,8 +30,9 @@
  *
  */
 import fse from 'fs-extra';
-
+import semver from 'semver';
 import { packageJson } from 'ember-apply';
+
 import { migrateAddon } from './addon.js';
 import { migrateTestApp } from './test-app.js';
 import { writeRootPackageJson } from './workspaces.js';
@@ -71,7 +72,9 @@ export default async function run(workingDirectory) {
  * @typedef {object} Info
  * @property {boolean} isTs
  * @property {string} workspace
+ * @property {string} testWorkspace
  * @property {string} packageName
+ * @property {string} emberCliVersion
  * @property {'yarn' | 'npm' | 'pnpm'} packager
  * @property {PackageJson} packageInfo
  * @property {boolean} isAddon
@@ -93,12 +96,24 @@ async function analyze() {
   let isNpm = fse.existsSync('package-lock.json');
   const packager = (isYarn && 'yarn') || (isNpm && 'npm') || 'pnpm';
 
+  let emberCli = 'latest';
+
+  if (packageInfo.devDependencies) {
+    let coerced = semver.coerce(packageInfo.devDependencies['ember-cli']);
+
+    if (coerced) {
+      emberCli = `${coerced}`;
+    }
+  }
+
   return {
     isTs,
     packager,
     packageInfo,
     workspace,
+    testWorkspace: 'test-app',
     packageName: name,
+    emberCliVersion: emberCli,
     isAddon: Boolean(packageInfo['ember-addon']),
     isV2: packageInfo['ember-addon']?.version === 2,
   };

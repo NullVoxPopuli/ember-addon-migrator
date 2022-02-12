@@ -2,6 +2,7 @@
  *
  * @typedef {import('./index').Info} Info
  */
+import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fse from 'fs-extra';
@@ -118,6 +119,8 @@ async function writeAddonPackageJson(info) {
       ...(await withVersions(['@rollup/plugin-babel'])),
     };
   }
+
+  await fs.writeFile(`${workspace}/package.json`, JSON.stringify(newInfo, null, 2));
 }
 
 /**
