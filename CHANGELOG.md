@@ -1,3 +1,10 @@
+## [1.1.3](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.1.2...v1.1.3) (2022-02-12)
+
+
+### Bug Fixes
+
+* ignore node_modules, clarify rollup customization needed ([2399cd8](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/2399cd8a01a4ab1e3d05c0924bf78d4aa3722f82))
+
 ## [1.1.2](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.1.1...v1.1.2) (2022-02-12)
 
 
