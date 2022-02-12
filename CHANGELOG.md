@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.1.0...v1.1.1) (2022-02-12)
+
+
+### Bug Fixes
+
+* **addon:** write new package.json to addon directory ([cbdf7bd](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/cbdf7bd9aec2a2eeea755046915f7b963c019555))
+
 # [1.1.0](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.0.0...v1.1.0) (2022-02-12)
 
 
