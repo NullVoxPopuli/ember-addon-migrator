@@ -1568,6 +1568,11 @@
   resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.3.0.tgz#23509ebc1fa32f1b4d50d6a66c4032d5b8eaabdc"
   integrity sha512-/ceqdqeRraGolFTcfoXNiqjyQhZzbINDngeoAq9GoHa8PPK1yNzTaxWjA6BFWp5Ua9JpXEMSS4s5i9tS0hOJtw==
 
+"@types/common-tags@^1.8.1":
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/@types/common-tags/-/common-tags-1.8.1.tgz#a5a49ca5ebbb58e0f8947f3ec98950c8970a68a9"
+  integrity sha512-20R/mDpKSPWdJs5TOpz3e7zqbeCNuMCPhV7Yndk9KU2Rbij2r5W4RzwDPkzC+2lzUqXYu9rFzTktCBnDjHuNQg==
+
 "@types/fs-extra@^9.0.13":
   version "9.0.13"
   resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-9.0.13.tgz#7594fbae04fe7f1918ce8b3d213f74ff44ac1f45"
@@ -2492,6 +2497,11 @@ common-ancestor-path@^1.0.1:
   resolved "https://registry.yarnpkg.com/common-ancestor-path/-/common-ancestor-path-1.0.1.tgz#4f7d2d1394d91b7abdf51871c62f71eadb0182a7"
   integrity sha512-L3sHRo1pXXEqX8VU28kfgUY+YGsk09hPqZiZmLacNib6XNTCM8ubYeT7ryXQw8asB1sKgcU5lkB7ONug08aB8w==
 
+common-tags@^1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/common-tags/-/common-tags-1.8.2.tgz#94ebb3c076d26032745fd54face7f688ef5ac9c6"
+  integrity sha512-gk/Z852D2Wtb//0I+kRFNKKE9dIIVirjoqPoA1wJU+XePVXZfGeBpk45+A1rKO4Q43prqWBNY/MiIeRLbPWUaA==
+
 commondir@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/commondir/-/commondir-1.0.1.tgz#ddd800da0c66127393cca5950ea968a3aaf1253b"
@@ -2866,10 +2876,10 @@ electron-to-chromium@^1.4.17:
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.68.tgz#d79447b6bd1bec9183f166bb33d4bef0d5e4e568"
   integrity sha512-cId+QwWrV8R1UawO6b9BR1hnkJ4EJPCPAr4h315vliHUtVUJDk39Sg1PMNnaWKfj5x+93ssjeJ9LKL6r8LaMiA==
 
-ember-apply@2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/ember-apply/-/ember-apply-2.0.1.tgz#6800632da47591060dc765df3c12034b9b2a1413"
-  integrity sha512-zi/Ucn9QPR+DZTcCZPzNwwZ64VbYGb58+vnb04xazKht3A+tr9LEngZ7BqnxDYy3ZkDCxOImHh4/LLAfud2Igw==
+ember-apply@2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/ember-apply/-/ember-apply-2.0.2.tgz#8686f3a173078e3f20cc3b2357abe74e49fb8734"
+  integrity sha512-c6yvKqkqOfo/aeb26RJ+l56i2udS/bAn3P/xf1PHiIW/9VQvqbZzs64iCoJPgHPNiG9x/i39w0GwGBtTeggq7w==
   dependencies:
     "@babel/core" "^7.16.7"
     "@babel/preset-env" "^7.16.8"
@@ -2878,6 +2888,7 @@ ember-apply@2.0.1:
     execa "^6.0.0"
     fs-extra "^10.0.0"
     jscodeshift "^0.13.1"
+    latest-version "^6.0.0"
     ora "^6.0.1"
     pacote "^12.0.2"
     posthtml "^0.16.5"
