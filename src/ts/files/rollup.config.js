@@ -9,26 +9,20 @@ const addon = new Addon({
   destDir: 'dist',
 });
 
-// these should be JS, even though the authored format is TS
-// Unfortunately, your local project layout has to kind of match what classic ember expects
-// so that all the app-re-exports can be properly generated
-const globallyAvailable = [
-  'components/**/*.{ts,js}',
-  'instance-initializers/*.{ts,js}',
-  'helpers/**/*.{ts,js}',
-];
-
 export default defineConfig({
   output: addon.output(),
   plugins: [
     // These are the modules that users should be able to import from your
     // addon. Anything not listed here may get optimized away.
-    addon.publicEntrypoints(['*.{js,ts}', ...globallyAvailable]),
+    addon.publicEntrypoints(['**/*.{js,ts}']),
 
     // These are the modules that should get reexported into the traditional
     // "app" tree. Things in here should also be in publicEntrypoints above, but
     // not everything in publicEntrypoints necessarily needs to go here.
-    addon.appReexports([...globallyAvailable]),
+    addon.appReexports([
+      'components/**/*.{js,ts}', 'helpers/**/*.{js,ts}', 'modifiers/**/*.{js,ts}',
+      'initializers/**/*.{js,ts}', 'instance-initializers/**/*.{js,ts}'
+    ]),
     // This babel config should *not* apply presets or compile away ES modules.
     // It exists only to provide development niceties for you, like automatic
     // template colocation.
