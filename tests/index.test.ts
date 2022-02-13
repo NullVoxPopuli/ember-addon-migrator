@@ -1,7 +1,9 @@
-import { describe, expect, test } from 'vitest';
+import { describe, test } from 'vitest';
 
-describe('todo', () => {
-  test('placeholder', () => {
-    expect(true).toBe(true);
+import { verify } from './helpers';
+
+describe('basic conversion', () => {
+  test('js addon', async () => {
+    await verify('base-js-v1-addon');
   });
 });

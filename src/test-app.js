@@ -6,6 +6,7 @@ import fs from 'fs/promises';
 import fse from 'fs-extra';
 import { execa } from 'execa';
 import { globby } from 'globby';
+import latestVersion from 'latest-version';
 import { packageJson } from 'ember-apply';
 
 /**
@@ -19,6 +20,16 @@ export async function migrateTestApp(info) {
   await moveFilesToTestApp(info);
   await updateFilesWithinTestApp(info);
   await removeFiles();
+
+  /**
+   * At this point, we're pretty much done.
+   * All steps beyond this point are "nice to have".
+   */
+  await execa(info.packager, ['install'], { preferLocal: true, stdio: 'inherit' });
+
+  if (info.isTs) {
+    await setupTypescript(info);
+  }
 }
 
 /**
@@ -54,6 +65,23 @@ async function updateFilesWithinTestApp(info) {
   // ember-cli-build: 'ember-addon' => 'ember-app'
   await replaceIn(`${testWorkspace}/ember-cli-build.js`, 'EmberAddon', 'EmberApp');
   await replaceIn(`${testWorkspace}/ember-cli-build.js`, '/ember-addon', '/ember-app');
+  await replaceIn(
+    `${testWorkspace}/tests/test-helper.{js,ts}`,
+    'dummy/app',
+    `${testWorkspace}/app`
+  );
+  await replaceIn(
+    `${testWorkspace}/tests/test-helper.{js,ts}`,
+    'dummy/config',
+    `${testWorkspace}/config`
+  );
+
+  await packageJson.addDevDependencies(
+    {
+      '@embroider/test-setup': await latestVersion('@embroider/test-setup'),
+    },
+    testWorkspace
+  );
 }
 
 /**
@@ -78,6 +106,7 @@ async function moveTests(info) {
   let { testWorkspace, isTs } = info;
 
   await fse.remove('tests/dummy');
+  await fse.remove('tests/index.html');
 
   const paths = await globby(['tests/**/*']);
 
@@ -93,6 +122,19 @@ async function moveTests(info) {
       fse.remove(jsSetup);
     }
   }
+}
+
+/**
+ * @param {Info} info
+ */
+async function setupTypescript(info) {
+  await execa('ember', ['install', 'ember-cli-typescript'], {
+    cwd: info.testWorkspace,
+    preferLocal: true,
+    stdio: 'inherit',
+  });
+
+  // TODO: fix tsconfig.json due to ember-cli crashing when errors occur
 }
 
 /**
@@ -124,14 +166,18 @@ async function removeFiles() {
 }
 
 /**
- * @param {string} filePath
+ * @param {string} glob
  * @param {string} toFind
  * @param {string} replaceWith
  */
-async function replaceIn(filePath, toFind, replaceWith) {
-  let buffer = await fs.readFile(filePath);
-  let asString = buffer.toString();
-  let replaced = asString.replaceAll(toFind, replaceWith);
+async function replaceIn(glob, toFind, replaceWith) {
+  let filePaths = await globby(glob);
 
-  await fs.writeFile(filePath, replaced);
+  for (let filePath of filePaths) {
+    let buffer = await fs.readFile(filePath);
+    let asString = buffer.toString();
+    let replaced = asString.replaceAll(toFind, replaceWith);
+
+    await fs.writeFile(filePath, replaced);
+  }
 }

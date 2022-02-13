@@ -39,6 +39,7 @@ async function writeAddonPackageJson(info) {
     repository: old.repository,
     license: old.license,
     author: old.author,
+    exports: {},
     files: ['dist', 'addon-main.cjs', 'CHANGELOG.md', 'README.md'],
     scripts: {
       start: `concurrently 'npm:watch:*'`,
@@ -90,11 +91,21 @@ async function writeAddonPackageJson(info) {
     },
   };
 
+  if (old.engines) {
+    newInfo.engines = old.engines;
+  }
+
   if (old.volta) {
     newInfo.volta = {
       extends: '../package.json',
     };
   }
+
+  // TODO: narrow this down to what was in the original addon
+  newInfo.exports = {
+    '.': './dist/index.js',
+    './*': './dist/*',
+  };
 
   if (isTs) {
     newInfo.devDependencies = {
