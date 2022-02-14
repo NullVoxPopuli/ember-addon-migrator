@@ -1,3 +1,15 @@
+# [1.2.0](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.1.4...v1.2.0) (2022-02-14)
+
+
+### Bug Fixes
+
+* **rollup:** use generalized rollup config ([bca2fc4](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/bca2fc463af484697473122c5b1a68277ebaff33))
+
+
+### Features
+
+* **tests:** ensure that basic transformation works predictably ([387a825](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/387a82512a336610144c7ad7729ecba6bd9a2105))
+
 ## [1.1.4](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.1.3...v1.1.4) (2022-02-12)
 
 
