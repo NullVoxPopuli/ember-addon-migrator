@@ -25,6 +25,7 @@
  * @property {boolean} [private]
  * @property {string[]} [workspaces]
  * @property {Record<string, string>} [ publishConfig ]
+ * @property {Record<string, any>} [ exports ]
  *
  * @typedef {PackageExtras & BasicPackage} PackageJson
  *
@@ -50,9 +51,20 @@ export default async function run(workingDirectory) {
     return;
   }
 
-  await writeRootPackageJson(analysis);
-  await migrateAddon(analysis);
-  await migrateTestApp(analysis);
+  try {
+    await writeRootPackageJson(analysis);
+    await migrateAddon(analysis);
+    await migrateTestApp(analysis);
+  } catch (/** @type {any} */ e) {
+    error(`
+      Error occurred
+        You may want to reset your repository and try again.
+        Errors encountered during migration are likely unrecoverable.
+    `);
+    error(e.message);
+
+    throw e;
+  }
 
   info(`
     🎉 Congratulations! Your addon is now formatted as a V2 addon!
