@@ -35,7 +35,8 @@ function workspacePackageJsonFrom(info) {
     rootJson.scripts = {
       ...rootJson.scripts,
       build: `yarn workspace ${workspace} build`,
-      prepare: `yarn build`,
+      // Do we want this?
+      // prepare: `yarn build`,
     };
   }
 
