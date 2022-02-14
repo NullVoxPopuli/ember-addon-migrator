@@ -74,7 +74,7 @@ export default async function run(workingDirectory) {
      - audit dependencies of both the new addon and test-app
      - run \`${analysis.packager} install\`
      - run \`${analysis.packager} run lint:fix\` in each workspace
-     - test your addon in ./test-app
+     - test your addon \`cd test-app; yarn test\`
      - push up a branch, merge, release
      - party 🥳
   `);

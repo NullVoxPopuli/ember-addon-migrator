@@ -14,7 +14,7 @@ Next steps:
  - audit dependencies of both the new addon and test-app
  - run \`yarn install\`
  - run \`yarn run lint:fix\` in each workspace
- - test your addon in ./test-app
+ - test your addon \`cd test-app; yarn test\`
  - push up a branch, merge, release
  - party 🥳"
 `;
