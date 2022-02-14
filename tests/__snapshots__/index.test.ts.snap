@@ -1,16 +1,6 @@
 // Vitest Snapshot v1
 
 exports[`basic conversion > js addon 1`] = `
-"info No lockfile found.
-[1/5] Validating package.json...
-[2/5] Resolving packages...
-[3/5] Fetching packages...
-[4/5] Linking dependencies...
-[5/5] Building fresh packages...
-success Saved lockfile."
-`;
-
-exports[`basic conversion > js addon 2`] = `
 "[1/5] Validating package.json...
 [2/5] Resolving packages...
 [3/5] Fetching packages...
@@ -27,46 +17,4 @@ Next steps:
  - test your addon in ./test-app
  - push up a branch, merge, release
  - party 🥳"
-`;
-
-exports[`basic conversion > js addon 3`] = `
-"[1/5] Validating package.json...
-[2/5] Resolving packages...
-success Already up-to-date."
-`;
-
-exports[`basic conversion > js addon 4`] = `
-"$ concurrently 'npm:build:*'
-[build:*js] 
-[build:*js] > base-v1-addon@0.0.0 build:js
-[build:*js] > rollup -c ./rollup.config.js
-[build:*js] 
-[build:*docs] 
-[build:*docs] > base-v1-addon@0.0.0 build:docs
-[build:*docs] > cp ../README.md ./README.md
-[build:*docs] 
-[build:*docs] npm run build:docs exited with code 0
-[build:*js] [36m
-[build:*js]  → [1mdist[22m...[39m
-[build:*js] [32mcreated [1mdist[22m in [1m221ms[22m[39m
-[build:*js] npm run build:js exited with code 0"
-`;
-
-exports[`basic conversion > js addon 5`] = `
-"$ /tmp/tmp-1929936pdF04mveVeBh/node_modules/.bin/ember test
-Building into /tmp/embroider/92d890
-Environment: test
-cleaning up...
-Built project successfully. Stored in \\"/tmp/tests-dist-2022113-1936430-6fgot2.2larl\\".
-ok 1 Chrome 96.0 - [76 ms] - sample: it works
-ok 2 Chrome 96.0 - [0 ms] - ember-qunit: Ember.onerror validation: Ember.onerror is functioning properly
-
-1..2
-# tests 2
-# pass  2
-# skip  0
-# todo  0
-# fail  0
-
-# ok"
 `;

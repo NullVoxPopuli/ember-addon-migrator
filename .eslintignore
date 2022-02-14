@@ -1,4 +1,11 @@
+# Blueprint files
 src/js/files/
 src/ts/files/
+
+# Generated files
 node_modules/
 coverage/
+
+# Fixtures
+tests/fixtures/
+tests/fixtures/**/node_modules/
