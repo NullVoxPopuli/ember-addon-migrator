@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.2.0...v1.2.1) (2022-02-15)
+
+
+### Bug Fixes
+
+* **ts:** ensure that types is specified in package.json ([05eb990](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/05eb9905199e65f469351e53ab1205c2d0b665c5))
+
 # [1.2.0](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.1.4...v1.2.0) (2022-02-14)
 
 
