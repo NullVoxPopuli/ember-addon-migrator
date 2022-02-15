@@ -24,6 +24,7 @@
  * @property {EmberAddon} [ember-addon]
  * @property {boolean} [private]
  * @property {string[]} [workspaces]
+ * @property {string} [types]
  * @property {Record<string, string>} [ publishConfig ]
  * @property {Record<string, any>} [ exports ]
  *

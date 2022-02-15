@@ -18,3 +18,36 @@ Next steps:
  - push up a branch, merge, release
  - party 🥳"
 `;
+
+exports[`basic conversion > ts addon 1`] = `
+"[1/5] Validating package.json...
+[2/5] Resolving packages...
+[3/5] Fetching packages...
+[4/5] Linking dependencies...
+[5/5] Building fresh packages...
+success Saved lockfile.
+
+Installing packages... This might take a couple of minutes.
+yarn: Installed ember-cli-typescript
+installing ember-cli-typescript
+  install packages typescript, ember-cli-typescript-blueprints, @types/ember-resolver, @types/ember__test-helpers, @types/ember__object, @types/ember__service, @types/ember__controller, @types/ember__string, @types/ember__template, @types/ember__polyfills, @types/ember__utils, @types/ember__runloop, @types/ember__debug, @types/ember__engine, @types/ember__application, @types/ember__test, @types/ember__array, @types/ember__error, @types/ember__component, @types/ember__routing, @types/rsvp, @types/htmlbars-inline-precompile, @types/ember-data, @types/ember-data__adapter, @types/ember-data__model, @types/ember-data__serializer, @types/ember-data__store, @types/ember-qunit, @types/qunit
+
+Installing packages... This might take a couple of minutes.
+yarn: Installed typescript@latest, ember-cli-typescript-blueprints@latest and 27 other packages
+  create app/config/environment.d.ts
+  create tsconfig.json
+  create types/test-app/index.d.ts
+  create types/ember-data/types/registries/model.d.ts
+  create types/global.d.ts
+Installed addon package.
+🎉 Congratulations! Your addon is now formatted as a V2 addon!
+
+Next steps:
+ - customize the rollup.config.js to suit your needs
+ - audit dependencies of both the new addon and test-app
+ - run \`yarn install\`
+ - run \`yarn run lint:fix\` in each workspace
+ - test your addon \`cd test-app; yarn test\`
+ - push up a branch, merge, release
+ - party 🥳"
+`;
