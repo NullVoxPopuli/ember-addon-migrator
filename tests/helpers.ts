@@ -52,7 +52,7 @@ export const binPath = join(__dirname, '..', 'bin.js');
 export async function migrate(project: Pick<Project, 'baseDir'>) {
   let { stdout } = await execa('node', [binPath], { cwd: project.baseDir });
 
-  expect(stdout, 'running the migrator').toMatchSnapshot();
+  expect(stdout).toMatch(`🎉 Congratulations! Your addon is now formatted as a V2 addon!`);
 }
 
 export async function install(project: Pick<Project, 'baseDir'>) {
