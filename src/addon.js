@@ -108,6 +108,7 @@ async function writeAddonPackageJson(info) {
   };
 
   if (isTs) {
+    newInfo.types = 'dist';
     newInfo.devDependencies = {
       ...newInfo.devDependencies,
       ...(await withVersions([
