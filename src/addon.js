@@ -15,6 +15,18 @@ import { setupTs } from './ts/index.js';
 export async function migrateAddon(info) {
   let { workspace, isTs } = info;
 
+  if (!fse.existsSync('addon')) {
+    fse.mkdirSync('addon');
+    console.info('Unable to find "addon" folder, empty folder created');
+  }
+
+  const entryFilePath = isTs ? 'addon/index.ts' : 'addon/index.js';
+
+  if (!fse.existsSync(entryFilePath)) {
+    fse.writeFileSync(entryFilePath, '', 'utf8');
+    console.info(`Unable to find "${entryFilePath}" entrypoint, empty entrypoint created`);
+  }
+
   await fse.move('addon', `${workspace}/src`);
   await writeAddonPackageJson(info);
 
@@ -61,6 +73,7 @@ async function writeAddonPackageJson(info) {
         '@babel/core',
         '@babel/plugin-proposal-class-properties',
         '@babel/plugin-syntax-decorators',
+        '@babel/plugin-proposal-decorators',
         '@embroider/addon-dev',
         '@nullvoxpopuli/eslint-configs',
         'concurrently',
