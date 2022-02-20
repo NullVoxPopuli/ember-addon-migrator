@@ -1,16 +1,38 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { execa } from 'execa';
+import fs from 'fs';
 import { dirname, join } from 'path';
 import { Project } from 'scenario-tester';
 import { fileURLToPath } from 'url';
 import { expect } from 'vitest';
 
+import { restoreAddon } from './../src/captured-addon/utils/fs-helpers';
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export async function addonFrom(fixture: string): Promise<Project> {
-  let originalPackageJsonPath = require.resolve(
-    join(__dirname, 'fixtures', fixture, 'package.json')
-  );
+  let packagePath = join(__dirname, 'fixtures', fixture, 'package.json');
+  let sampleAddon: null | { path: string; destroy: () => Promise<void> } = null;
+
+  if (!fs.existsSync(packagePath)) {
+    let sample = join(__dirname, 'samples', fixture, 'input.json');
+
+    if (!fs.existsSync(sample)) {
+      throw new Error(`Unable to resolve fixture ${fixture}`);
+    }
+
+    let addonObject = JSON.parse(fs.readFileSync(sample, 'utf8'));
+
+    sampleAddon = await restoreAddon(addonObject);
+
+    if (!sampleAddon) {
+      throw new Error(`Unable to restore sample addon: ${fixture}`);
+    }
+
+    packagePath = join(sampleAddon.path, 'package.json');
+  }
+
+  let originalPackageJsonPath = require.resolve(packagePath);
 
   // This TS is compiled to CJS, so require is fine
   // eslint-disable-next-line @typescript-eslint/no-var-requires
