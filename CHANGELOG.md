@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.2.1...v1.3.0) (2022-02-20)
+
+
+### Features
+
+* addons serialization / capture logic ([8d505f6](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/8d505f634a7b2ab2d5be80c2fdbcc7e95be63225))
+
 ## [1.2.1](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.2.0...v1.2.1) (2022-02-15)
 
 
