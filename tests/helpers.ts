@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { execa } from 'execa';
 import fs from 'fs';
+import fse from 'fs-extra';
 import { dirname, join } from 'path';
 import { Project } from 'scenario-tester';
 import { fileURLToPath } from 'url';
@@ -18,7 +19,24 @@ export function sampleAddons() {
     .filter((el) => fs.existsSync(join(samplesDir, el, 'input.json')));
 }
 
-export async function addonFrom(fixture: string): Promise<Project> {
+/**
+ * @description function created to workaround fixturify issue, where all mentioned in project package.json deps should exists in node_modules
+ */
+function addFakeDependency(nodeModulesPath: string, name: string, version: string) {
+  try {
+    fse.outputFileSync(
+      join(nodeModulesPath, name, 'package.json'),
+      JSON.stringify({
+        name,
+        version,
+      })
+    );
+  } catch (e) {
+    // FINE
+  }
+}
+
+export async function addonFrom(fixture: string, skipInstall = false): Promise<Project> {
   let packagePath = join(__dirname, 'fixtures', fixture, 'package.json');
   let sampleAddon: null | { path: string; destroy: () => Promise<void> } = null;
 
@@ -29,7 +47,7 @@ export async function addonFrom(fixture: string): Promise<Project> {
       throw new Error(`Unable to resolve fixture ${fixture}`);
     }
 
-    let addonObject = JSON.parse(fs.readFileSync(sample, 'utf8'));
+    let addonObject = fse.readJSONSync(sample);
 
     sampleAddon = await restoreAddon(addonObject);
 
@@ -41,15 +59,32 @@ export async function addonFrom(fixture: string): Promise<Project> {
   }
 
   let originalPackageJsonPath = require.resolve(packagePath);
+  const nodeModulesPath = join(dirname(originalPackageJsonPath), 'node_modules');
+
+  if (skipInstall) {
+    await fse.mkdirp(nodeModulesPath);
+
+    const pkg: Record<string, Record<string, string>> = fse.readJSONSync(packagePath);
+
+    Object.keys(pkg).forEach((key) => {
+      if (key.toLocaleLowerCase().includes('dependencies')) {
+        Object.keys(pkg[key]).forEach((depName) => {
+          addFakeDependency(nodeModulesPath, depName, pkg[key][depName]);
+        });
+      }
+    });
+  }
 
   // This TS is compiled to CJS, so require is fine
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   let originalPackageJson = require(originalPackageJsonPath);
   let fixturePath = dirname(originalPackageJsonPath);
 
-  // all node_modules need to exist due to bug in fixturify
-  // project where it assumes that node_modules exists
-  await install({ baseDir: fixturePath });
+  if (!skipInstall) {
+    // all node_modules need to exist due to bug in fixturify
+    // project where it assumes that node_modules exists
+    await install({ baseDir: fixturePath });
+  }
 
   let project = Project.fromDir(fixturePath);
 
@@ -57,22 +92,31 @@ export async function addonFrom(fixture: string): Promise<Project> {
 
   project.writeSync();
 
-  await install(project);
-  await execa('git', ['init'], { cwd: project.baseDir });
-  await execa('git', ['add', '.'], { cwd: project.baseDir });
-  await execa(
-    'git',
-    [
-      '-c',
-      "user.name='test-user'",
-      '-c',
-      "user.email='test@email.org'",
-      'commit',
-      '-m',
-      '"initial commit"',
-    ],
-    { cwd: project.baseDir }
-  );
+  if (!skipInstall) {
+    await install(project);
+    await execa('git', ['init'], { cwd: project.baseDir });
+    await execa('git', ['add', '.'], { cwd: project.baseDir });
+    await execa(
+      'git',
+      [
+        '-c',
+        "user.name='test-user'",
+        '-c',
+        "user.email='test@email.org'",
+        'commit',
+        '-m',
+        '"initial commit"',
+      ],
+      { cwd: project.baseDir }
+    );
+  } else {
+    try {
+      // we need this to not resolve ember-cli from addon itself (all deps is mocked)
+      fse.rmSync(join(project.baseDir, 'node_modules', 'ember-cli'), { recursive: true });
+    } catch (e) {
+      // FINE
+    }
+  }
 
   return project;
 }
@@ -86,7 +130,10 @@ export async function migrate(project: Pick<Project, 'baseDir'>) {
 }
 
 export async function install(project: Pick<Project, 'baseDir'>) {
-  let { stdout } = await execa('yarn', ['install'], { cwd: project.baseDir, preferLocal: true });
+  let { stdout } = await execa('yarn', ['install'], {
+    cwd: project.baseDir,
+    preferLocal: true,
+  });
 
   // yarn-specific in-progress message
   expect(stdout).toMatch('Resolving packages...');
@@ -138,7 +185,7 @@ export async function verify(fixtureName: string) {
 }
 
 export async function fastVerify(fixtureName: string) {
-  let project = await addonFrom(fixtureName);
+  let project = await addonFrom(fixtureName, true);
 
   await migrate(project);
 
@@ -149,7 +196,7 @@ export async function fastVerify(fixtureName: string) {
   const outputPath = join(fixturePath, 'output.json');
 
   if (fs.existsSync(outputPath)) {
-    const prevResult = JSON.parse(fs.readFileSync(outputPath, 'utf8'));
+    const prevResult = fse.readJSONSync(outputPath);
 
     Object.keys(result).forEach((fPath) => {
       const lines = (result[fPath] || '').split(/\r?\n/);

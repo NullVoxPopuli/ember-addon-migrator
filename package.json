@@ -42,6 +42,7 @@
     "chalk": "^5.0.0",
     "common-tags": "^1.8.2",
     "ember-apply": "2.0.3",
+    "ember-cli": "^4.1.1",
     "execa": "^6.0.0",
     "fs-extra": "^10.0.0",
     "globby": "^13.1.1",
