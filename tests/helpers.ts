@@ -191,6 +191,8 @@ export async function fastVerify(fixtureName: string) {
 
   const result = await captureAddon(project.baseDir);
 
+  console.debug(`fastVerify: ${project.baseDir}`);
+
   const fixturePath = join(__dirname, 'samples', fixtureName);
   const outputPath = join(fixturePath, 'output.json');
 

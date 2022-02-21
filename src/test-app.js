@@ -86,7 +86,7 @@ async function updateFilesWithinTestApp(info) {
     testWorkspace
   );
 
-  await packageJson.removeDevDependencies(['ember-welcome-page']);
+  await packageJson.removeDevDependencies(['ember-welcome-page'], testWorkspace);
 }
 
 /**
