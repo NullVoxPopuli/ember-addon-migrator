@@ -192,18 +192,20 @@ export async function fastVerify(fixtureName: string) {
   const result = await captureAddon(project.baseDir);
 
   const fixturePath = join(__dirname, 'samples', fixtureName);
-
   const outputPath = join(fixturePath, 'output.json');
 
   if (fs.existsSync(outputPath)) {
-    const prevResult = fse.readJSONSync(outputPath);
+    const expectedResult = fse.readJSONSync(outputPath);
 
     Object.keys(result).forEach((fPath) => {
       const lines = (result[fPath] || '').split(/\r?\n/);
-      const prevLines = (prevResult[fPath] || '').split(/\r?\n/);
+      const expectedLines = (expectedResult[fPath] || '').split(/\r?\n/);
 
       lines.forEach((line, index) => {
-        expect(line, `${fPath}:${index}`).toBe(prevLines[index]);
+        let expected = expectedLines[index] || '';
+        let actual = line || '';
+
+        expect(actual).toEqual(expected);
       });
     });
   } else {
