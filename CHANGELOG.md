@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.3.0...v1.4.0) (2022-02-21)
+
+
+### Features
+
+* fast verify for snapshoted addons ([1c9c5c0](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/1c9c5c0cf6db0ff6bcccfe8f0123aaef7e95e69f))
+
 # [1.3.0](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.2.1...v1.3.0) (2022-02-20)
 
 
