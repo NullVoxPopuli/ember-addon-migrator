@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.4.0...v1.5.0) (2022-02-21)
+
+
+### Features
+
+* fast verify without actual npm install ([5e0c79a](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/5e0c79aa5516b80ca37f87f1049626e345fb7ad4))
+
 # [1.4.0](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.3.0...v1.4.0) (2022-02-21)
 
 
