@@ -1,13 +1,16 @@
 /**
  * @typedef {import('./index').Info} Info
  */
-import path from 'path';
+import path, { dirname, join } from 'path';
 import fs from 'fs/promises';
+import { createRequire } from 'module';
 import fse from 'fs-extra';
 import { execa } from 'execa';
 import { globby } from 'globby';
 import latestVersion from 'latest-version';
 import { packageJson } from 'ember-apply';
+
+const require = createRequire(import.meta.url);
 
 /**
  * @param {Info} info
@@ -85,17 +88,30 @@ async function updateFilesWithinTestApp(info) {
 }
 
 /**
+ * @param {string} pkgName
+ */
+function packagePath(pkgName) {
+  return dirname(require.resolve(pkgName + '/package.json'));
+}
+
+/**
  * @param {Info} info
  */
 async function createTestApp(info) {
   let { packageName, testWorkspace } = info;
   let testAppLocation = path.join(process.cwd(), testWorkspace);
 
+  const emberCliPath = packagePath('ember-cli');
+
   await fs.mkdir(testAppLocation, { recursive: true });
-  await execa('ember', ['init', '--skip-npm', '--skip-git', '--embroider'], {
-    cwd: testAppLocation,
-    preferLocal: true,
-  });
+  await execa(
+    'node',
+    [join(emberCliPath, 'bin', 'ember'), 'init', '--skip-npm', '--skip-git', '--embroider'],
+    {
+      cwd: testAppLocation,
+      preferLocal: true,
+    }
+  );
   await packageJson.addDevDependencies({ [packageName]: '*' }, testAppLocation);
 }
 

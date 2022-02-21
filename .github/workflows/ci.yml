@@ -25,6 +25,7 @@ jobs:
         path: ${{ env.CACHE_PATH }}
         key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
         restore-keys: "${{ runner.os }}-modules-"
+    - run: yarn global add pnpm
     - run: yarn install
 
   tests:
@@ -41,6 +42,7 @@ jobs:
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
       - run: |
           yarn install
+          yarn global add pnpm
           yarn global add ember-cli
       - name: Tests
         run: yarn test
