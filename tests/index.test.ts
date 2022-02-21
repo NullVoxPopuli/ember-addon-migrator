@@ -1,6 +1,6 @@
 import { describe, test } from 'vitest';
 
-import { verify } from './helpers';
+import { fastVerify, sampleAddons, verify } from './helpers';
 
 describe('basic conversion', () => {
   test('js addon', async () => {
@@ -13,5 +13,15 @@ describe('basic conversion', () => {
 
   test('sample addon [ember-addon-output_4.2.0]', async () => {
     await verify('ember-addon-output_4.2.0');
+  });
+});
+
+describe('snapshots conversion', () => {
+  const addons = sampleAddons();
+
+  addons.forEach((addonName) => {
+    test(`sample addon [${addonName}]`, async () => {
+      await fastVerify(addonName);
+    });
   });
 });
