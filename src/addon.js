@@ -148,13 +148,16 @@ async function withVersions(packageList) {
   /** @type {Record<string, string>} */
   let mapped = {};
 
-  await Promise.all(
-    packageList.map(async (name) => {
-      let version = await latestVersion(name);
-
-      mapped[name] = `^${version}`;
+  const versions = await Promise.all(
+    packageList.map((name) => {
+      return latestVersion(name);
     })
   );
+
+  // keep ordering consistent between migration
+  packageList.forEach((name, index) => {
+    mapped[name] = versions[index];
+  });
 
   return mapped;
 }

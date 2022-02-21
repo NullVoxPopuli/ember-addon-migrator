@@ -64,8 +64,13 @@ export function fsProjectToObject(projectRoot) {
     'gitkeep',
   ];
   const ignoredDirs = ['.git', 'node_modules', 'dist', 'tmp'];
+  const ignoredFiles = ['yarn.lock', 'package-lock.json'];
 
   folder.forEach((file) => {
+    if (ignoredFiles.includes(file.name)) {
+      return;
+    }
+
     const fsPath = path.join(projectRoot, file.name);
 
     if (file.isDirectory()) {

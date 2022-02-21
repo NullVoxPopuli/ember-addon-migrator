@@ -6,9 +6,21 @@ import { Project } from 'scenario-tester';
 import { fileURLToPath } from 'url';
 import { expect } from 'vitest';
 
-import { restoreAddon } from './../src/captured-addon/utils/fs-helpers';
+import { captureAddon, restoreAddon } from './../src/captured-addon/utils/fs-helpers';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+export async function snapshotFrom(addonPath: string) {
+  return captureAddon(addonPath);
+}
+
+export function sampleAddons() {
+  const samplesDir = join(__dirname, 'samples');
+
+  return fs
+    .readdirSync(samplesDir)
+    .filter((el) => fs.existsSync(join(samplesDir, el, 'input.json')));
+}
 
 export async function addonFrom(fixture: string): Promise<Project> {
   let packagePath = join(__dirname, 'fixtures', fixture, 'package.json');
@@ -127,4 +139,32 @@ export async function verify(fixtureName: string) {
   await install(project);
   await build(project);
   await emberTest(project);
+}
+
+export async function fastVerify(fixtureName: string) {
+  let project = await addonFrom(fixtureName);
+
+  await migrate(project);
+
+  const result = await snapshotFrom(project.baseDir);
+
+  const fixturePath = join(__dirname, 'samples', fixtureName);
+
+  const outputPath = join(fixturePath, 'output.json');
+
+  if (fs.existsSync(outputPath)) {
+    const prevResult = JSON.parse(fs.readFileSync(outputPath, 'utf8'));
+
+    Object.keys(result).forEach((fPath) => {
+      const lines = (result[fPath] || '').split(/\r?\n/);
+      const prevLines = (prevResult[fPath] || '').split(/\r?\n/);
+
+      lines.forEach((line, index) => {
+        expect(line, `${fPath}:${index}`).toBe(prevLines[index]);
+      });
+    });
+  } else {
+    fs.writeFileSync(outputPath, JSON.stringify(result, null, 2));
+    expect(Object.keys(result).length).toBeGreaterThan(0);
+  }
 }
