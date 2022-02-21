@@ -3941,10 +3941,10 @@ electron-to-chromium@^1.4.17:
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.68.tgz#d79447b6bd1bec9183f166bb33d4bef0d5e4e568"
   integrity sha512-cId+QwWrV8R1UawO6b9BR1hnkJ4EJPCPAr4h315vliHUtVUJDk39Sg1PMNnaWKfj5x+93ssjeJ9LKL6r8LaMiA==
 
-ember-apply@2.0.4:
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/ember-apply/-/ember-apply-2.0.4.tgz#6189653ef035dc44b9794dff8519287147692afb"
-  integrity sha512-5dJ6SVaHKdEiXFp8fsMIC1W2nVR/6twG47sJ9CEEpoRpXO9YeltBXazt+f+DP4XovXkW3ZE+59bzgzN5DS8Fvw==
+ember-apply@2.2.0:
+  version "2.2.0"
+  resolved "https://registry.npmjs.org/ember-apply/-/ember-apply-2.2.0.tgz#de939343cd39ba0cc8f773c832d180a114c835d7"
+  integrity sha512-tFgMQsk2TU7Z4ZDZied6penkW5QM8n77mywNwdCKEu0zAeUfQwen97qZ1z42vkh02EQD/QjKQuzBfg1sU7VVCQ==
   dependencies:
     "@babel/core" "^7.16.7"
     "@babel/preset-env" "^7.16.8"
