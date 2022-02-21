@@ -10,10 +10,6 @@ import { captureAddon, restoreAddon } from './../src/captured-addon/utils/fs-hel
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-export async function snapshotFrom(addonPath: string) {
-  return captureAddon(addonPath);
-}
-
 export function sampleAddons() {
   const samplesDir = join(__dirname, 'samples');
 
@@ -146,7 +142,7 @@ export async function fastVerify(fixtureName: string) {
 
   await migrate(project);
 
-  const result = await snapshotFrom(project.baseDir);
+  const result = await captureAddon(project.baseDir);
 
   const fixturePath = join(__dirname, 'samples', fixtureName);
 
