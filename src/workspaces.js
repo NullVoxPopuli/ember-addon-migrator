@@ -3,6 +3,14 @@
  * @typedef {import('./index').PackageJson} PackageJson
  */
 import fs from 'fs/promises';
+import { execa } from 'execa';
+
+/**
+ * @param {Info} info
+ */
+export async function install(info) {
+  await execa(info.packager, ['install'], { preferLocal: true, stdio: 'inherit' });
+}
 
 /**
  * @param {Info} info

@@ -6,14 +6,14 @@ import fs from 'fs/promises';
 import fse from 'fs-extra';
 import latestVersion from 'latest-version';
 
-import {setupJs} from './js/index.js';
-import {setupTs} from './ts/index.js';
+import { setupJs } from './js/index.js';
+import { setupTs } from './ts/index.js';
 
 /**
  * @param {Info} info
  */
 export async function migrateAddon(info) {
-  let {workspace, isTs} = info;
+  let { workspace, isTs } = info;
 
   if (!fse.existsSync('addon')) {
     fse.mkdirSync('addon');
@@ -38,8 +38,8 @@ export async function migrateAddon(info) {
 }
 
 /*
-  * Common dependencies in v1 addons that we don't need in v2 addons
-  * */
+ * Common dependencies in v1 addons that we don't need in v2 addons
+ * */
 const NO_LONGER_NEEDED = [
   'ember-auto-import',
   'ember-cli-babel',
@@ -54,7 +54,7 @@ const NO_LONGER_NEEDED = [
  * @param {Info} info
  */
 async function writeAddonPackageJson(info) {
-  let {workspace, isTs, packageInfo: old, packager} = info;
+  let { workspace, isTs, packageInfo: old, packager } = info;
 
   /** @type {Partial<import('./index').PackageJson>} */
   let newInfo = {
@@ -128,7 +128,7 @@ async function writeAddonPackageJson(info) {
   }
 
   if (old.release) {
-    newInfo.release = old.release
+    newInfo.release = old.release;
   }
 
   if (old.peerDependencies) {
@@ -166,9 +166,6 @@ async function writeAddonPackageJson(info) {
       ...(await withVersions(['@rollup/plugin-babel'])),
     };
   }
-
-
-
 
   await fs.writeFile(`${workspace}/package.json`, JSON.stringify(newInfo, null, 2));
 }

@@ -5507,7 +5507,7 @@ global-prefix@^1.0.1:
 
 global@^4.4.0:
   version "4.4.0"
-  resolved "https://registry.npmjs.org/global/-/global-4.4.0.tgz#3e7b105179006a323ed71aafca3e9c57a5cc6406"
+  resolved "https://registry.yarnpkg.com/global/-/global-4.4.0.tgz#3e7b105179006a323ed71aafca3e9c57a5cc6406"
   integrity sha512-wv/LAoHdRE3BeTGz53FAamhGlPLhlssK45usmGFThIi4XqnBmjKQ16u+RNbP7WvigRZDxUsM0J3gcQ5yicaL0w==
   dependencies:
     min-document "^2.19.0"
@@ -8571,10 +8571,10 @@ pkg-up@^3.1.0:
   dependencies:
     find-up "^3.0.0"
 
-pnpm@^6.31.0:
-  version "6.31.0"
-  resolved "https://registry.npmjs.org/pnpm/-/pnpm-6.31.0.tgz#3b7cb0bfee9d621fdff3526a7e68799a9f7fbe83"
-  integrity sha512-YUCyLI2J2wQsHWgcRYR8wUrTWsE0E8GX46XKtdXcUiE0GJJYi5saRy2Y8BMfLtlDHshHLs2U/KO1e5gsftJTFA==
+pnpm@^6.32.0:
+  version "6.32.0"
+  resolved "https://registry.yarnpkg.com/pnpm/-/pnpm-6.32.0.tgz#3ee9f5d2537f04bdd8fb0bcae4f604a886a647b1"
+  integrity sha512-04KwsfhUfc6+at4gQVD848R7/bj2lvweh1ZcE0BDlDvBNlvxpYz+ZbRRkS+lInG5vz95cOybnyNO55dxvsARWA==
 
 portfinder@^1.0.28:
   version "1.0.28"

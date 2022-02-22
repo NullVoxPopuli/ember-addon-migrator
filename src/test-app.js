@@ -10,6 +10,8 @@ import { globby } from 'globby';
 import latestVersion from 'latest-version';
 import { packageJson } from 'ember-apply';
 
+import { install } from './workspaces.js';
+
 const require = createRequire(import.meta.url);
 
 /**
@@ -28,7 +30,7 @@ export async function migrateTestApp(info) {
    * At this point, we're pretty much done.
    * All steps beyond this point are "nice to have".
    */
-  await execa(info.packager, ['install'], { preferLocal: true, stdio: 'inherit' });
+  await install(info);
 
   if (info.isTs) {
     await setupTypescript(info);
@@ -88,7 +90,6 @@ async function updateFilesWithinTestApp(info) {
 
   await packageJson.removeDevDependencies(['ember-welcome-page'], testWorkspace);
 
-
   let current = await packageJson.read(testWorkspace);
 
   /** @type Record<string, string> */
@@ -100,6 +101,9 @@ async function updateFilesWithinTestApp(info) {
 
     for (let [depName, range] of Object.entries(devDeps)) {
       if (newDevDeps.includes(depName)) continue;
+      // these will be re-added byb the ember-cli-typescript install,
+      // if needed
+      if (depName.startsWith('@types/ember')) continue;
 
       toAdd[depName] = range;
     }
