@@ -6,14 +6,14 @@ import fs from 'fs/promises';
 import fse from 'fs-extra';
 import latestVersion from 'latest-version';
 
-import { setupJs } from './js/index.js';
-import { setupTs } from './ts/index.js';
+import {setupJs} from './js/index.js';
+import {setupTs} from './ts/index.js';
 
 /**
  * @param {Info} info
  */
 export async function migrateAddon(info) {
-  let { workspace, isTs } = info;
+  let {workspace, isTs} = info;
 
   if (!fse.existsSync('addon')) {
     fse.mkdirSync('addon');
@@ -37,11 +37,24 @@ export async function migrateAddon(info) {
   }
 }
 
+/*
+  * Common dependencies in v1 addons that we don't need in v2 addons
+  * */
+const NO_LONGER_NEEDED = [
+  'ember-auto-import',
+  'ember-cli-babel',
+  'ember-cli-htmlbars',
+  'ember-cli-typescript',
+  // Fake modules, listing them did nothing
+  '@glimmer/tracking',
+  '@glimmer/component',
+];
+
 /**
  * @param {Info} info
  */
 async function writeAddonPackageJson(info) {
-  let { workspace, isTs, packageInfo: old, packager } = info;
+  let {workspace, isTs, packageInfo: old, packager} = info;
 
   /** @type {Partial<import('./index').PackageJson>} */
   let newInfo = {
@@ -114,6 +127,22 @@ async function writeAddonPackageJson(info) {
     };
   }
 
+  if (old.release) {
+    newInfo.release = old.release
+  }
+
+  if (old.peerDependencies) {
+    newInfo.peerDependencies = old.peerDependencies;
+  }
+
+  if (old.dependencies && newInfo.dependencies) {
+    for (let [depName, range] of Object.entries(old.dependencies)) {
+      if (NO_LONGER_NEEDED.includes(depName)) continue;
+
+      newInfo.dependencies[depName] = range;
+    }
+  }
+
   // TODO: narrow this down to what was in the original addon
   newInfo.exports = {
     '.': './dist/index.js',
@@ -137,6 +166,9 @@ async function writeAddonPackageJson(info) {
       ...(await withVersions(['@rollup/plugin-babel'])),
     };
   }
+
+
+
 
   await fs.writeFile(`${workspace}/package.json`, JSON.stringify(newInfo, null, 2));
 }
