@@ -87,6 +87,27 @@ async function updateFilesWithinTestApp(info) {
   );
 
   await packageJson.removeDevDependencies(['ember-welcome-page'], testWorkspace);
+
+
+  let current = await packageJson.read(testWorkspace);
+
+  /** @type Record<string, string> */
+  let toAdd = {};
+
+  if (info.packageInfo.devDependencies && current.devDependencies) {
+    let devDeps = info.packageInfo.devDependencies;
+    let newDevDeps = Object.keys(current.devDependencies);
+
+    for (let [depName, range] of Object.entries(devDeps)) {
+      if (newDevDeps.includes(depName)) continue;
+
+      toAdd[depName] = range;
+    }
+  }
+
+  if (Object.keys(toAdd).length > 0) {
+    await packageJson.addDevDependencies(toAdd);
+  }
 }
 
 /**
