@@ -25,6 +25,8 @@
  * @property {boolean} [private]
  * @property {string[]} [workspaces]
  * @property {string} [types]
+ * @property {any} [release]
+ * @property {any} [msw]
  * @property {Record<string, string>} [ publishConfig ]
  * @property {Record<string, any>} [ exports ]
  *

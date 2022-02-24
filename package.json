@@ -48,7 +48,7 @@
     "global": "^4.4.0",
     "globby": "^13.1.1",
     "latest-version": "^6.0.0",
-    "pnpm": "^6.31.0",
+    "pnpm": "^6.32.0",
     "semver": "^7.0.0"
   },
   "devDependencies": {

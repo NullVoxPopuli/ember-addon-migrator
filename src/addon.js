@@ -37,6 +37,19 @@ export async function migrateAddon(info) {
   }
 }
 
+/*
+ * Common dependencies in v1 addons that we don't need in v2 addons
+ * */
+const NO_LONGER_NEEDED = [
+  'ember-auto-import',
+  'ember-cli-babel',
+  'ember-cli-htmlbars',
+  'ember-cli-typescript',
+  // Fake modules, listing them did nothing
+  '@glimmer/tracking',
+  '@glimmer/component',
+];
+
 /**
  * @param {Info} info
  */
@@ -112,6 +125,22 @@ async function writeAddonPackageJson(info) {
     newInfo.volta = {
       extends: '../package.json',
     };
+  }
+
+  if (old.release) {
+    newInfo.release = old.release;
+  }
+
+  if (old.peerDependencies) {
+    newInfo.peerDependencies = old.peerDependencies;
+  }
+
+  if (old.dependencies && newInfo.dependencies) {
+    for (let [depName, range] of Object.entries(old.dependencies)) {
+      if (NO_LONGER_NEEDED.includes(depName)) continue;
+
+      newInfo.dependencies[depName] = range;
+    }
   }
 
   // TODO: narrow this down to what was in the original addon
