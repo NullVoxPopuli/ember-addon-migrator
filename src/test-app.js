@@ -110,7 +110,7 @@ async function updateFilesWithinTestApp(info) {
   }
 
   if (Object.keys(toAdd).length > 0) {
-    await packageJson.addDevDependencies(toAdd);
+    await packageJson.addDevDependencies(toAdd, testWorkspace);
   }
 }
 

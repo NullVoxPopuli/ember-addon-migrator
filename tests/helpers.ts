@@ -208,7 +208,7 @@ export async function fastVerify(fixtureName: string) {
         let actual = line || '';
 
         // TODO: how do we handle package.json and version differences?
-        expect(actual).toEqual(expected);
+        expect(`${fPath}@${index}: ${actual}`).toEqual(`${fPath}@${index}: ${expected}`);
       });
     });
   } else {
