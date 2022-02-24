@@ -1,3 +1,11 @@
+# [1.6.0](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.5.0...v1.6.0) (2022-02-24)
+
+
+### Features
+
+* migrate dependencies to v2 addon ([4d59c1c](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/4d59c1c64dd2f3266fd85e663e7c0c47e00b0c58))
+* transfer devDeps to test app ([3a4bbc7](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/3a4bbc775a592f387ef729e2549d510accec8e36))
+
 # [1.5.0](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.4.0...v1.5.0) (2022-02-21)
 
 
