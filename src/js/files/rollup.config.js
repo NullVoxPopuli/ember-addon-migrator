@@ -21,6 +21,7 @@ export default {
     // not everything in publicEntrypoints necessarily needs to go here.
     addon.appReexports([
       'components/**/*.js', 'helpers/**/*.js', 'modifiers/**/*.js',
+      'services/**/*.js',
       'initializers/**/*.js', 'instance-initializers/**/*.js'
     ]),
 

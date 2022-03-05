@@ -21,6 +21,7 @@ export default defineConfig({
     // not everything in publicEntrypoints necessarily needs to go here.
     addon.appReexports([
       'components/**/*.{js,ts}', 'helpers/**/*.{js,ts}', 'modifiers/**/*.{js,ts}',
+      'services/**/*.js',
       'initializers/**/*.{js,ts}', 'instance-initializers/**/*.{js,ts}'
     ]),
     // This babel config should *not* apply presets or compile away ES modules.
