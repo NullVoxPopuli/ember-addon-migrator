@@ -140,6 +140,8 @@ async function createTestApp(info) {
     }
   );
   await packageJson.addDevDependencies({ [packageName]: '*' }, testAppLocation);
+  await packageJson.removeDevDependencies(['ember-welcome-page']);
+  await fse.remove('app/templates/application.hbs');
 }
 
 /**
