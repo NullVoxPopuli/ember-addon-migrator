@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.6.0...v1.7.0) (2022-03-09)
+
+
+### Features
+
+* improve asserts in package.json level ([5a7feae](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/5a7feaedd9c5e0d9b41c64645d475a0669db30e1))
+
 # [1.6.0](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.5.0...v1.6.0) (2022-02-24)
 
 
