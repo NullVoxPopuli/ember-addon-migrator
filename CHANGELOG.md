@@ -1,3 +1,13 @@
+## [1.7.1](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.7.0...v1.7.1) (2022-03-09)
+
+
+### Bug Fixes
+
+* **addon:** move addon-test-support folder ([3dba20f](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/3dba20faaeb531b2ee7edc9d92f13c6bca1e254c))
+* remove ember-welcome-page ([7756587](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/775658792d79f412668e1ae89b2e2fb48d372633))
+* remove ember-welcome-page ([ffef0fd](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/ffef0fdb7922a9000be0f3f75731d63b0723a3ea))
+* **rollup:** add services to default re-exports ([4f17080](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/4f170809cc973f82cd21ae729e1c01c2d8300dd8))
+
 # [1.7.0](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.6.0...v1.7.0) (2022-03-09)
 
 
