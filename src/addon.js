@@ -28,6 +28,11 @@ export async function migrateAddon(info) {
   }
 
   await fse.move('addon', `${workspace}/src`);
+
+  if (await fse.pathExists('addon-test-support')) {
+    await fse.move('addon-test-support', `${workspace}/src/test-support`);
+  }
+
   await writeAddonPackageJson(info);
 
   if (isTs) {

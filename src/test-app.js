@@ -89,6 +89,7 @@ async function updateFilesWithinTestApp(info) {
   );
 
   await packageJson.removeDevDependencies(['ember-welcome-page'], testWorkspace);
+  await fse.remove(path.join(testWorkspace, 'app/templates/application.hbs'));
 
   let current = await packageJson.read(testWorkspace);
 
