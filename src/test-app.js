@@ -18,23 +18,12 @@ const require = createRequire(import.meta.url);
  * @param {Info} info
  */
 export async function migrateTestApp(info) {
-  await createTestApp(info);
   await moveTests(info);
   // TODO: update in-test imports to use the test-app name instead of "dummy"
 
   await moveFilesToTestApp(info);
   await updateFilesWithinTestApp(info);
   await removeFiles();
-
-  /**
-   * At this point, we're pretty much done.
-   * All steps beyond this point are "nice to have".
-   */
-  await install(info);
-
-  if (info.isTs) {
-    await setupTypescript(info);
-  }
 }
 
 /**
@@ -125,37 +114,18 @@ function packagePath(pkgName) {
 /**
  * @param {Info} info
  */
-async function createTestApp(info) {
-  let { packageName, testWorkspace } = info;
-  let testAppLocation = path.join(process.cwd(), testWorkspace);
-
-  const emberCliPath = packagePath('ember-cli');
-
-  await fs.mkdir(testAppLocation, { recursive: true });
-  await execa(
-    'node',
-    [join(emberCliPath, 'bin', 'ember'), 'init', '--skip-npm', '--skip-git', '--embroider'],
-    {
-      cwd: testAppLocation,
-      preferLocal: true,
-    }
-  );
-  await packageJson.addDevDependencies({ [packageName]: '*' }, testAppLocation);
-}
-
-/**
- * @param {Info} info
- */
 async function moveTests(info) {
   let { testWorkspace, isTs } = info;
 
   await fse.remove('tests/dummy');
   await fse.remove('tests/index.html');
 
-  const paths = await globby(['tests/**/*']);
+  const paths = await globby([path.join(info.tmpAddonLocation, 'tests/**/*')]);
 
   for (let filePath of paths) {
-    await fse.move(filePath, `${testWorkspace}/${filePath}`, { overwrite: true });
+    let localFile = filePath.replace(info.tmpAddonLocation, '');
+
+    await fse.move(filePath, path.join(info.testAppLocation, localFile), { overwrite: true });
   }
 
   if (isTs) {
@@ -166,19 +136,6 @@ async function moveTests(info) {
       fse.remove(jsSetup);
     }
   }
-}
-
-/**
- * @param {Info} info
- */
-async function setupTypescript(info) {
-  await execa('ember', ['install', 'ember-cli-typescript'], {
-    cwd: info.testWorkspace,
-    preferLocal: true,
-    stdio: 'inherit',
-  });
-
-  // TODO: fix tsconfig.json due to ember-cli crashing when errors occur
 }
 
 /**

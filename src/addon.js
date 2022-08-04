@@ -2,12 +2,10 @@
  *
  * @typedef {import('./index').Info} Info
  */
-import fs from 'fs/promises';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import fse from 'fs-extra';
 import latestVersion from 'latest-version';
-
-import { setupJs } from './js/index.js';
-import { setupTs } from './ts/index.js';
 
 /**
  * @param {Info} info
@@ -27,19 +25,19 @@ export async function migrateAddon(info) {
     console.info(`Unable to find "${entryFilePath}" entrypoint, empty entrypoint created`);
   }
 
-  await fse.move('addon', `${workspace}/src`);
+  await fse.move(path.join(info.tmpAddonLocation, 'addon'), path.join(info.addonLocation, 'src'), {
+    overwrite: true,
+  });
 
   if (await fse.pathExists('addon-test-support')) {
-    await fse.move('addon-test-support', `${workspace}/src/test-support`);
+    await fse.move(
+      path.join(info.tmpAddonLocation, 'addon-test-support'),
+      path.join(info.addonLocation, 'src/test-support'),
+      { overwrite: true }
+    );
   }
 
-  await writeAddonPackageJson(info);
-
-  if (isTs) {
-    await setupTs(info);
-  } else {
-    await setupJs(info);
-  }
+  await updateAddonPackageJson(info);
 }
 
 /*
@@ -58,106 +56,53 @@ const NO_LONGER_NEEDED = [
 /**
  * @param {Info} info
  */
-async function writeAddonPackageJson(info) {
+async function updateAddonPackageJson(info) {
+  /** @type {Partial<import('./index').PackageJson>} */
+  let pJson = await fse.readJSON(path.join(info.addonLocation, 'package.json'));
+
   let { workspace, isTs, packageInfo: old, packager } = info;
 
-  /** @type {Partial<import('./index').PackageJson>} */
-  let newInfo = {
-    name: info.packageName,
-    version: old.version,
-    description: old.description,
-    repository: old.repository,
-    license: old.license,
-    author: old.author,
-    exports: {},
-    files: ['dist', 'addon-main.cjs', 'CHANGELOG.md', 'README.md'],
-    scripts: {
-      start: `concurrently 'npm:watch:*'`,
-      build: `concurrently 'npm:build:*'`,
-      'build:js': 'rollup -c ./rollup.config.js',
-      'build:docs': 'cp ../README.md ./README.md',
-      'watch:js': 'rollup -c --watch --no-watch.clearScreen',
-      lint: `concurrently 'npm:lint:js'`,
-      'lint:fix': `concurrently 'npm:lint:js:fix'`,
-      'lint:js': 'eslint . --cache',
-      'lint:js:fix': 'eslint . --fix',
-      test: "echo 'Addon does not have tests, run tests in test-app'",
-      prepare: `${packager} run build`,
-      prepublishOnly: `${packager} run build`,
-    },
-    dependencies: await withVersions(['@embroider/addon-shim']),
-    devDependencies: {
-      ...(await withVersions([
-        '@babel/core',
-        '@babel/plugin-proposal-class-properties',
-        '@babel/plugin-syntax-decorators',
-        '@babel/plugin-proposal-decorators',
-        '@embroider/addon-dev',
-        '@nullvoxpopuli/eslint-configs',
-        'concurrently',
-        'eslint-config-prettier',
-        'eslint-plugin-decorator-position',
-        'eslint-plugin-ember',
-        'eslint-plugin-import',
-        'eslint-plugin-json',
-        'eslint-plugin-node',
-        'eslint-plugin-prettier',
-        'eslint-plugin-simple-import-sort',
-        'rollup',
-        'babel-eslint',
-      ])),
-      eslint: '^7.0.0',
-    },
-    publishConfig: {
-      registry: 'https://registry.npmjs.org',
-    },
-    ember: {
-      edition: 'octane',
-    },
-    'ember-addon': {
-      version: 2,
-      type: 'addon',
-      main: './addon-main.cjs',
-      'app-js': {},
-    },
-  };
+  pJson.version = old.version;
+  pJson.license = old.license;
+  pJson.description = old.description;
+  pJson.repository = old.repository;
+  pJson.author = old.author;
 
-  if (old.engines) {
-    newInfo.engines = old.engines;
+  if (pJson.scripts) {
+    pJson.scripts.prepare = `${packager} run build`;
+    pJson.scripts.prepack = `${packager} run build`;
+  }
+
+  if (old.publishConfig) {
+    pJson.publishConfig = old.publishConfig;
   }
 
   if (old.volta) {
-    newInfo.volta = {
-      extends: '../package.json',
+    pJson.volta = {
+      extends: path.join(path.relative(info.addonLocation, info.packagerRoot), 'package.json'),
     };
   }
 
   if (old.release) {
-    newInfo.release = old.release;
+    pJson.release = old.release;
   }
 
   if (old.peerDependencies) {
-    newInfo.peerDependencies = old.peerDependencies;
+    pJson.peerDependencies = old.peerDependencies;
   }
 
-  if (old.dependencies && newInfo.dependencies) {
+  if (old.dependencies && pJson.dependencies) {
     for (let [depName, range] of Object.entries(old.dependencies)) {
       if (NO_LONGER_NEEDED.includes(depName)) continue;
 
-      newInfo.dependencies[depName] = range;
+      pJson.dependencies[depName] = range;
     }
   }
 
-  // TODO: narrow this down to what was in the original addon
-  newInfo.exports = {
-    '.': './dist/index.js',
-    './*': './dist/*',
-  };
-
   if (isTs) {
-    newInfo.types = 'dist';
-    newInfo.devDependencies = {
-      ...newInfo.devDependencies,
+    pJson.types = 'dist';
+    pJson.devDependencies = {
+      ...pJson.devDependencies,
       ...(await withVersions([
         '@babel/plugin-transform-typescript',
         '@babel/preset-typescript',
@@ -165,14 +110,9 @@ async function writeAddonPackageJson(info) {
         'typescript',
       ])),
     };
-  } else {
-    newInfo.devDependencies = {
-      ...newInfo.devDependencies,
-      ...(await withVersions(['@rollup/plugin-babel'])),
-    };
   }
 
-  await fs.writeFile(`${workspace}/package.json`, JSON.stringify(newInfo, null, 2));
+  await fs.writeFile(`${workspace}/package.json`, JSON.stringify(pJson, null, 2));
 }
 
 /**

@@ -2,7 +2,10 @@
  * @typedef {import('./index').Info} Info
  * @typedef {import('./index').PackageJson} PackageJson
  */
+import path from 'path';
 import fs from 'fs/promises';
+import fse from 'fs-extra';
+import deepMerge from 'merge';
 import { execa } from 'execa';
 
 /**
@@ -15,38 +18,51 @@ export async function install(info) {
 /**
  * @param {Info} info
  */
-export async function writeRootPackageJson(info) {
-  let rootJson = workspacePackageJsonFrom(info);
+export async function updateRootFiles(info) {
+  /**
+   * If we're in a bigger monorepo, we need to remove the
+   * known monorepeo root files, because they likely exist elsewhere.
+   */
+  if (info.isBiggerMonorepo) {
+    await fse.rm(path.join(info.directory, 'package.json'));
 
-  // root package.json must not contain 'ember-cli',
-  // otherwise ember-cli doesn't work :(
-  await fs.writeFile('package.json', JSON.stringify(rootJson, null, 2));
+    if (info.isPnpm) {
+      await fse.rm(path.join(info.directory, 'pnpm-workspace.yaml'));
+    }
+
+    return;
+  }
+
+  await updatePackageJson(info);
+}
+
+/**
+ * @param {Info} info
+ */
+async function updatePackageJson(info) {
+  let packageJsonPath = path.join(info.directory, 'package.json');
+  let generated = await fse.readJSON(packageJsonPath);
+
+  let newInfo = workspacePackageJsonFrom(info);
+
+  let nextPackageJson = deepMerge(generated, newInfo);
+
+  await fs.writeFile(packageJsonPath, JSON.stringify(nextPackageJson, null, 2));
 }
 
 /**
  * @param {Info} info
  */
 function workspacePackageJsonFrom(info) {
-  let { workspace, packageInfo: old, packager } = info;
+  let { packageInfo: old } = info;
 
   /** @type {Partial<PackageJson>} */
   let rootJson = {
     private: true,
-    workspaces: [workspace, 'test-app'],
     repository: old.repository,
     license: old.license,
     author: old.author,
-    scripts: {},
   };
-
-  if (packager === 'yarn') {
-    rootJson.scripts = {
-      ...rootJson.scripts,
-      build: `yarn workspace ${workspace} build`,
-      // Do we want this?
-      // prepare: `yarn build`,
-    };
-  }
 
   if (old.volta) {
     rootJson.volta = old.volta;
