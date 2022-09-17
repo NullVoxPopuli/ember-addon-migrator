@@ -9,43 +9,91 @@ on:
 
 env:
   CI: true
-  CACHE_PATH: '**/node_modules'
 
 jobs:
   install_dependencies:
-    name: Install Dependencies
+    name: Install
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/pnpm
+
+  lint_js:
+    name: Lint JS
+    runs-on: ubuntu-latest
+    needs: [install_dependencies]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/pnpm
+      - name: ESLint
+        run: pnpm lint
+
+  lint_tests:
+    name: Lint Tests
+    runs-on: ubuntu-latest
+    needs: [install_dependencies]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/pnpm
+      - name: ESLint
+        run: pnpm lint
+        working-directory: tests
+
+  commits:
+    name: Commit Messages
+    runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: volta-cli/action@v1
-    - uses: actions/cache@v2
-      with:
-        path: ${{ env.CACHE_PATH }}
-        key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: "${{ runner.os }}-modules-"
-    - run: yarn global add pnpm
-    - run: yarn install
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: volta-cli/action@v1
+      - uses: wagoid/commitlint-github-action@v4.1.9
+
+  types_library:
+    name: "Types: Library"
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    needs: [install_dependencies]
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/pnpm
+      - run: tsc --build --clean && tsc --build
+        continue-on-error: true
+
+  types_tests:
+    name: "Types: Tests"
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    needs: [install_dependencies]
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/pnpm
+      - run: tsc --build --clean && tsc --build
+        continue-on-error: true
+        working-directory: tests
 
   tests:
     name: "Tests"
     runs-on: ubuntu-latest
     needs: [install_dependencies]
+    strategy:
+      matrix:
+        # all tests like this are slow
+        slow-test:
+          - basic conversion
+          - snapshots conversion
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
-      - uses: actions/cache@v2.1.7
-        with:
-          path: ${{ env.CACHE_PATH }}
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/pnpm
       - run: |
-          yarn install
-          yarn global add pnpm
-          yarn global add ember-cli
+          pnpm add --global ember-cli
       - name: Tests
-        run: yarn test
+        working-directory: 'tests'
+        run: pnpm vitest --testNamePattern "${{ matrix.slow-test }}"
 
   tooling:
     name: Tooling
@@ -55,16 +103,10 @@ jobs:
     needs: [install_dependencies]
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: volta-cli/action@v1
-      - uses: actions/cache@v2.1.7
-        with:
-          path: ${{ env.CACHE_PATH }}
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-
-      - run: yarn install
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/pnpm
       - name: Semantic Release
-        run: yarn publish:dry-run
+        run: pnpm publish:dry-run
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -76,12 +118,10 @@ jobs:
     needs: [tests]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           persist-credentials: false
-      - uses: volta-cli/action@v1
-      - run: yarn install
-
+      - uses: ./.github/actions/pnpm
       - name: Release
         run: yarn publish:release
         env:
