@@ -1,6 +1,7 @@
 import type { PackageJson as BasicPackage } from 'types-package-json';
 
 export interface Options {
+  analysisOnly: boolean;
   addonLocation: string;
   testAppLocation: string;
   testAppName: string;
@@ -47,3 +48,9 @@ interface PackageExtras {
 }
 
 export type PackageJson = PackageExtras & BasicPackage;
+
+export interface ImportedDependencies {
+  addon: Set<string>;
+  testSupport: Set<string>;
+  tests: Set<string>;
+}

@@ -30,7 +30,7 @@ export async function guessPackageManager(root, options) {
       break;
     }
 
-    dir = path.dirname(dir);
+    dir = path.resolve(path.join(dir, '..'));
   }
 
   if (!isYarn && !isNpm && !isPnpm) {

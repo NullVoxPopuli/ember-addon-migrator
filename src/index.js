@@ -1,7 +1,9 @@
 // @ts-check
 
-import path from 'path';
-import assert from 'assert';
+import path from 'node:path';
+import assert from 'node:assert';
+import util from 'node:util';
+
 import Listr from 'listr';
 
 import { migrateAddon } from './addon.js';
@@ -19,6 +21,10 @@ import { resolvedDirectory } from './analysis/paths.js';
 export default async function run(options) {
   await verifyOptions(options);
 
+  let targetAddon = resolvedDirectory(options.directory);
+
+  process.chdir(targetAddon);
+
   /** @type {AddonInfo} */
   let analysis;
 
@@ -28,10 +34,15 @@ export default async function run(options) {
         title: `Analyzing the addon`,
         task: async () => {
           analysis = await AddonInfo.create(options);
+
+          if (options.analysisOnly) {
+            console.debug(util.inspect(analysis, { showHidden: true, getters: true }));
+          }
         },
       },
       {
         title: 'Running Migrator',
+        skip: () => options.analysisOnly,
         task: () => {
           return new Listr([
             {
@@ -60,8 +71,10 @@ export default async function run(options) {
     ]);
 
     await tasks.run().then(() => {
+      if (options.analysisOnly) return;
+
       info(
-        `\n` +
+        `\n\n` +
           `🎉 Congratulations! Your addon is now formatted as a V2 addon!\n` +
           `\n` +
           `Next steps:\n` +
@@ -76,7 +89,11 @@ export default async function run(options) {
       );
     });
   } catch (/** @type {any} */ e) {
-    error(`
+    if (process.env.DEBUG) {
+      console.info('Detected options: ', util.inspect(options));
+      throw e;
+    } else {
+      error(`
       Error occurred
         You may want to reset your repository and try again.
         Errors encountered during migration are likely unrecoverable.
@@ -89,8 +106,11 @@ export default async function run(options) {
           ea2 reset
           ember-addon-migrator reset
     `);
-    error(e.message);
-    throw e;
+      error(e.message);
+    }
+
+    // eslint-disable-next-line no-process-exit
+    process.exit(1);
   }
 }
 
