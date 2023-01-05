@@ -4,6 +4,7 @@ import { findRoot } from './git.js';
 import { guessPackageManager } from './package-manager.js';
 import { createTmp } from './paths.js';
 import { NothingToDoError, tryOrFail } from './error.js';
+import { analyzeImports } from './imports.js';
 
 /**
  * Type imports!
@@ -43,6 +44,10 @@ export class AddonInfo {
       `Could not determine package manager. Only npm, yarn, and pnpm are supported at this time.`
     );
 
+    // At this point, the CWD *is* the addon.
+    // Verified by the above not erroring.
+    let importedDependencies = await analyzeImports(process.cwd());
+
     let tmpDirectory = await createTmp();
 
     let info = new AddonInfo({
@@ -52,6 +57,7 @@ export class AddonInfo {
       packageManagerRoot: packageManager.root,
       repoRoot,
       tmpDirectory,
+      importedDependencies,
     });
 
     if (info.isV2Addon) {
@@ -77,6 +83,9 @@ export class AddonInfo {
   /** @type {'npm' | 'yarn' | 'pnpm'} */
   packageManager;
 
+  /** @type {import('./types').ImportedDependencies} */
+  importedDependencies;
+
   /**
    * @typedef {object}  ResolvedInfo
    * @property {PackageJson} packageJson
@@ -85,6 +94,7 @@ export class AddonInfo {
    * @property {string} packageManagerRoot
    * @property {string} repoRoot
    * @property {string} tmpDirectory
+   * @property {import('./types').ImportedDependencies} importedDependencies
    *
    * @param {ResolvedInfo} resolvedInfo;
    */
@@ -95,6 +105,7 @@ export class AddonInfo {
     this.packageManagerRoot = resolvedInfo.packageManagerRoot;
     this.gitRoot = resolvedInfo.repoRoot;
     this.#tmpDirectory = resolvedInfo.tmpDirectory;
+    this.importedDependencies = resolvedInfo.importedDependencies;
   }
 
   /**

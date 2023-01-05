@@ -52,6 +52,11 @@ yargs(hideBin(process.argv))
         type: 'string',
         default: process.cwd(),
       });
+      yargs.option('analysis-only', {
+        describe: 'inspect the analysis object, skipping migration entirely',
+        type: 'boolean',
+        default: false,
+      });
     },
     (args) => {
       return run(args);
