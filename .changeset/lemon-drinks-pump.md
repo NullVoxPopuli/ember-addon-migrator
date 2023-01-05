@@ -10,3 +10,6 @@ Additionally, support for
 - typescript
 
 (because the migration is now powered by the v2 addon blueprint)
+
+Details:
+ - analyzes imports to more correctly move dependencies from the old package.json to the new locations
