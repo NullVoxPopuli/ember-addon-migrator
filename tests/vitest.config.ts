@@ -8,6 +8,6 @@ export default defineConfig({
     root: __dirname,
     testTimeout: 380_000,
     // https://vitest.dev/config/#configuration
-    include: ['tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    include: ['**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
   },
 });

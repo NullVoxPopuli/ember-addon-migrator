@@ -22,21 +22,27 @@
     "ember-addon-migrator": "./bin.js"
   },
   "exports": {
-    "import": "./index.js"
+    ".": {
+      "import": "./index.js"
+    },
+    "./captured-addon": {
+      "import": "./src/captured-addon/index.js"
+    },
+    "./captured-addon/utils/fs-helpers": {
+      "import": "./src/captured-addon/utils/fs-helpers.js"
+    }
   },
   "files": [
     "src/**/*",
     "bin.js"
   ],
   "scripts": {
-    "publish:dry-run": "yarn publish:release --dry-run",
-    "publish:release": "yarn semantic-release",
+    "release": "changeset publish",
     "build:types": "tsc --build",
-    "lint": "yarn lint:js",
+    "lint": "pnpm lint:js",
     "lint:js": "eslint .",
-    "lint:fix": "yarn lint:js --fix",
-    "test": "vitest --coverage --no-watch",
-    "test:watch": "vitest --watch"
+    "lint:fix": "pnpm lint:js --fix",
+    "test": "pnpm --filter 'tests' test"
   },
   "dependencies": {
     "chalk": "^5.0.0",
@@ -48,22 +54,25 @@
     "global": "^4.4.0",
     "globby": "^13.1.1",
     "latest-version": "^6.0.0",
+    "listr": "^0.14.3",
+    "merge": "^2.1.1",
     "pnpm": "^6.32.0",
-    "semver": "^7.3.5"
+    "semver": "^7.3.5",
+    "yargs": "^17.5.1"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.4.7",
+    "@changesets/cli": "^2.25.2",
     "@nullvoxpopuli/eslint-configs": "^2.1.17",
-    "@semantic-release/changelog": "^6.0.0",
-    "@semantic-release/git": "^10.0.0",
     "@types/adm-zip": "^0.4.34",
     "@types/common-tags": "^1.8.1",
     "@types/fs-extra": "^9.0.13",
+    "@types/listr": "^0.14.4",
     "@types/lodash": "^4.14.178",
     "@types/semver": "^7.3.9",
     "adm-zip": "^0.5.9",
     "babel-eslint": "^10.1.0",
     "broccoli-test-helper": "^2.0.0",
-    "c8": "^7.11.0",
     "eslint": "^7.0.0",
     "eslint-plugin-decorator-position": "^4.0.1",
     "eslint-plugin-import": "^2.25.4",
@@ -72,29 +81,19 @@
     "lodash": "^4.17.21",
     "node-fetch": "^3.2.0",
     "prettier": "^2.5.1",
-    "scenario-tester": "^2.0.1",
-    "semantic-release": "^19.0.0",
     "types-package-json": "^2.0.39",
-    "typescript": "4.5.4",
-    "vite": "^2.7.13",
-    "vitest": "^0.3.0"
+    "typescript": "4.5.4"
   },
   "engines": {
     "node": ">=16.0.0"
   },
-  "release": {
-    "branches": [
-      "main",
-      "master"
-    ],
-    "plugins": [
-      "@semantic-release/commit-analyzer",
-      "@semantic-release/release-notes-generator",
-      "@semantic-release/changelog",
-      "@semantic-release/npm",
-      "@semantic-release/github",
-      "@semantic-release/git"
-    ]
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": [ "ember-cli-htmlbars" ],
+      "ignore-notes": {
+        "ember-cli-htmlbars": "required by ember-template-imports, via eslint-plugin-ember, via @nvp/eslint-configs"
+      }
+    }
   },
   "volta": {
     "node": "16.14.0",

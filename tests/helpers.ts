@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { captureAddon, restoreAddon } from 'ember-addon-migrator/captured-addon/utils/fs-helpers';
 import { execa } from 'execa';
 import fs from 'fs';
 import fse from 'fs-extra';
@@ -7,8 +8,6 @@ import { Project } from 'scenario-tester';
 import semver from 'semver';
 import { fileURLToPath } from 'url';
 import { expect } from 'vitest';
-
-import { captureAddon, restoreAddon } from './../src/captured-addon/utils/fs-helpers';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -91,7 +90,7 @@ export async function addonFrom(fixture: string, skipInstall = false): Promise<P
 
   project.name = originalPackageJson.name;
 
-  project.writeSync();
+  await project.write();
 
   if (!skipInstall) {
     await install(project);
@@ -131,18 +130,15 @@ export async function migrate(project: Pick<Project, 'baseDir'>) {
 }
 
 export async function install(project: Pick<Project, 'baseDir'>) {
-  let { stdout } = await execa('yarn', ['install'], {
+  await execa('pnpm', ['install'], {
     cwd: project.baseDir,
     preferLocal: true,
   });
-
-  // yarn-specific in-progress message
-  expect(stdout).toMatch('Resolving packages...');
 }
 
 export async function build(project: Pick<Project, 'baseDir' | 'name'>) {
   let addonPath = join(project.baseDir, project.name);
-  let { stdout, exitCode } = await execa('yarn', ['run', 'build'], { cwd: addonPath });
+  let { stdout, exitCode } = await execa('pnpm', ['run', 'build'], { cwd: addonPath });
 
   // subset of full stdout
   // can't use snapshot testing due to time taken printed
@@ -161,7 +157,7 @@ export async function build(project: Pick<Project, 'baseDir' | 'name'>) {
 }
 
 export async function emberTest(project: Pick<Project, 'baseDir'>) {
-  let { stdout, exitCode } = await execa('yarn', ['run', 'ember', 'test'], {
+  let { stdout, exitCode } = await execa('pnpm', ['run', 'ember', 'test'], {
     cwd: join(project.baseDir, 'test-app'),
   });
 

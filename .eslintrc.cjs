@@ -6,5 +6,13 @@ const config = configs.nodeTS();
 
 module.exports = {
   ...config,
-  overrides: [...config.overrides],
+  overrides: [
+    ...config.overrides,
+    {
+      files: ['**/*.ts'],
+      rules: {
+        '@typescript-eslint/no-explicit-any': 'off',
+      },
+    },
+  ],
 };

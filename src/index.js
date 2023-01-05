@@ -1,135 +1,133 @@
 // @ts-check
 
-/**
- * @typedef {import('types-package-json').PackageJson} BasicPackage
- *
- * @typedef {object} EmberAddon
- * @property {number} version
- * @property {string} type
- * @property {string} main
- * @property {Record<string, string>} app-js
- *
- * @typedef {object} Ember
- * @property {'octane'} [edition]
- *
- * @typedef {object} Volta
- * @property {string} [ node ]
- * @property {string} [ yarn ]
- * @property {string} [ npm ]
- * @property {string} [ extends ]
- *
- * @typedef {object} PackageExtras
- * @property {Volta} [volta]
- * @property {Ember} [ember]
- * @property {EmberAddon} [ember-addon]
- * @property {boolean} [private]
- * @property {string[]} [workspaces]
- * @property {string} [types]
- * @property {any} [release]
- * @property {any} [msw]
- * @property {Record<string, string>} [ publishConfig ]
- * @property {Record<string, any>} [ exports ]
- *
- * @typedef {PackageExtras & BasicPackage} PackageJson
- *
- */
-import fse from 'fs-extra';
-import semver from 'semver';
-import { packageJson } from 'ember-apply';
+import path from 'path';
+import assert from 'assert';
+import Listr from 'listr';
 
 import { migrateAddon } from './addon.js';
+import { prepare } from './prepare.js';
 import { migrateTestApp } from './test-app.js';
-import { writeRootPackageJson } from './workspaces.js';
+import { updateRootFiles } from './workspaces.js';
 import { error, info } from './log.js';
+import { installV2Blueprint } from './v2-blueprint.js';
+import { AddonInfo } from './analysis/index.js';
+import { resolvedDirectory } from './analysis/paths.js';
 
 /**
- * @param {string} workingDirectory - the directory `npx ember-apply` was invoked fromm
+ * @param {import('./analysis/types').Options} options
  */
-export default async function run(workingDirectory) {
-  let analysis = await analyze();
+export default async function run(options) {
+  await verifyOptions(options);
 
-  if (analysis.isV2 || !analysis.isAddon) {
-    error('Package is either not an addon or is already V2');
-
-    return;
-  }
+  /** @type {AddonInfo} */
+  let analysis;
 
   try {
-    await writeRootPackageJson(analysis);
-    await migrateAddon(analysis);
-    await migrateTestApp(analysis);
+    let tasks = new Listr([
+      {
+        title: `Analyzing the addon`,
+        task: async () => {
+          analysis = await AddonInfo.create(options);
+        },
+      },
+      {
+        title: 'Running Migrator',
+        task: () => {
+          return new Listr([
+            {
+              title: `Copying addon to tmp directory, ${analysis.tmpLocation}`,
+              task: () => prepare(analysis),
+            },
+            {
+              title: 'Installing the V2 Addon Blueprint',
+              task: () => installV2Blueprint(analysis),
+            },
+            {
+              title: 'Updating root files',
+              task: () => updateRootFiles(analysis),
+            },
+            {
+              title: 'Migrating addon files',
+              task: () => migrateAddon(analysis),
+            },
+            {
+              title: 'Migrating test files',
+              task: () => migrateTestApp(analysis),
+            },
+          ]);
+        },
+      },
+    ]);
+
+    await tasks.run().then(() => {
+      info(
+        `\n` +
+          `🎉 Congratulations! Your addon is now formatted as a V2 addon!\n` +
+          `\n` +
+          `Next steps:\n` +
+          ` - customize the rollup.config.js to suit your needs\n` +
+          ` - audit dependencies of both the new addon and test-app\n` +
+          ` - run \`${analysis.packageManager} install\`\n` +
+          ` - run \`${analysis.packageManager} ` +
+          `${analysis.packageManager === 'npm' ? 'run ' : ''}lint:fix\` in each workspace\n` +
+          ` - test your addon \`cd test-app; ${analysis.packageManager} test\`\n` +
+          ` - push up a branch, merge, release\n` +
+          ` - party 🥳\n`
+      );
+    });
   } catch (/** @type {any} */ e) {
     error(`
       Error occurred
         You may want to reset your repository and try again.
         Errors encountered during migration are likely unrecoverable.
+
+        the addon-migrator can do this for you via
+
+        migrate-addon reset
+
+        aliased as both:
+          ea2 reset
+          ember-addon-migrator reset
     `);
     error(e.message);
-
     throw e;
   }
-
-  info(`
-    🎉 Congratulations! Your addon is now formatted as a V2 addon!
-
-    Next steps:
-     - customize the rollup.config.js to suit your needs
-     - audit dependencies of both the new addon and test-app
-     - run \`${analysis.packager} install\`
-     - run \`${analysis.packager} run lint:fix\` in each workspace
-     - test your addon \`cd test-app; yarn test\`
-     - push up a branch, merge, release
-     - party 🥳
-  `);
 }
 
 /**
- * @typedef {object} Info
- * @property {boolean} isTs
- * @property {string} workspace
- * @property {string} testWorkspace
- * @property {string} packageName
- * @property {string} emberCliVersion
- * @property {'yarn' | 'npm' | 'pnpm'} packager
- * @property {PackageJson} packageInfo
- * @property {boolean} isAddon
- * @property {boolean} isV2
- *
- * @returns {Promise<Info>}
+ * @param {import('./analysis/types').Options} options
  */
-async function analyze() {
-  let isTs = await packageJson.hasDependency('typescript');
-  /** @type {any} */
-  let pkgJson = await packageJson.read();
+async function verifyOptions(options) {
+  if (options.addonLocation) {
+    assert(
+      /[-\s/\\]/.test(options.addonLocation),
+      `--addon-location may not contain invisible characters or slashes. Received: ${options.addonLocation}`
+    );
+  }
 
-  /** @type {PackageJson} */
-  let packageInfo = pkgJson;
-  let name = packageInfo.name || '';
-  let workspace = name.split('/')[1] ?? name;
+  if (options.testAppLocation) {
+    assert(
+      /[-\s/\\]/.test(options.testAppLocation),
+      `--test-app-location may not contain invisible characters or slashes. Received: ${options.testAppLocation}`
+    );
+  }
 
-  let isYarn = fse.existsSync('yarn.lock');
-  let isNpm = fse.existsSync('package-lock.json');
-  const packager = (isYarn && 'yarn') || (isNpm && 'npm') || 'pnpm';
-
-  let emberCli = 'latest';
-
-  if (packageInfo.devDependencies) {
-    let coerced = semver.coerce(packageInfo.devDependencies['ember-cli']);
-
-    if (coerced) {
-      emberCli = `${coerced}`;
+  if (options.testAppName) {
+    if (
+      !(
+        (options.testAppName.includes('@') && options.testAppName.startsWith('@')) ||
+        /[a-z-]+/.test(options.testAppName)
+      )
+    ) {
+      console.warn(
+        `--test-app-name may not contain the '@' character in any position other than the first character. Also, a package name may only be kebab-case, using a lowercase latin alphabet.`
+      );
     }
   }
 
-  return {
-    isTs,
-    packager,
-    packageInfo,
-    workspace,
-    testWorkspace: 'test-app',
-    packageName: name,
-    emberCliVersion: emberCli,
-    isAddon: Boolean(packageInfo['ember-addon']),
-    isV2: packageInfo['ember-addon']?.version === 2,
-  };
+  if (options.directory) {
+    let absolute = resolvedDirectory(options.directory);
+
+    assert(path.resolve(absolute), `Directory, ${absolute}, does not exist.`);
+  }
 }

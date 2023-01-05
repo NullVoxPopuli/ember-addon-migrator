@@ -23,6 +23,14 @@ test-app/
 
 _Additional tweaking may be required after the migrator runs_.
 
+## Parameters
+
+Parameters follow naming of args used in the [v2 addon blueprint](https://github.com/embroider-build/addon-blueprint)
+
+### `--addon-location`
+
+Places the addon in `--addon-location` instead of `{addon-name}`
+
 ## Compatibility
 
  - Node 16+
