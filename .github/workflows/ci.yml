@@ -39,17 +39,6 @@ jobs:
         run: pnpm lint
         working-directory: tests
 
-  commits:
-    name: Commit Messages
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - uses: volta-cli/action@v1
-      - uses: wagoid/commitlint-github-action@v4.1.9
-
   types_library:
     name: "Types: Library"
     runs-on: ubuntu-latest
