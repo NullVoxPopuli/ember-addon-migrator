@@ -44,7 +44,9 @@ export class AddonInfo {
       `Could not determine package manager. Only npm, yarn, and pnpm are supported at this time.`
     );
 
-    let importedDependencies = await analyzeImports(options.directory);
+    // At this point, the CWD *is* the addon.
+    // Verified by the above not erroring.
+    let importedDependencies = await analyzeImports(process.cwd());
 
     let tmpDirectory = await createTmp();
 
