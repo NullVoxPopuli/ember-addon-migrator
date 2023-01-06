@@ -46,7 +46,7 @@ export default async function run(options) {
         task: () => {
           return new Listr([
             {
-              title: `Copying addon to tmp directory, ${analysis.tmpLocation}`,
+              title: `Moving addon to tmp directory, ${analysis.tmpLocation}`,
               task: () => prepare(analysis),
             },
             {
@@ -54,7 +54,7 @@ export default async function run(options) {
               task: () => installV2Blueprint(analysis),
             },
             {
-              title: 'Updating root files',
+              title: `Updating addon's root files`,
               task: () => updateRootFiles(analysis),
             },
             {

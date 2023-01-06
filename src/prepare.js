@@ -1,5 +1,5 @@
 /**
- * @typedef {import('./index').Info} Info
+ * @typedef {import('./analysis/index').AddonInfo} Info
  */
 import fs from 'node:fs/promises';
 import os from 'node:os';
@@ -20,7 +20,7 @@ const SKIP = ['.git', '.gitignore'];
  */
 export async function prepare(info) {
   // remove everything except .git* folders
-  let tmp = info.tmpAddonLocation;
+  let tmp = info.tmpLocation;
 
   let topLevelPaths = await fs.readdir(info.directory);
 

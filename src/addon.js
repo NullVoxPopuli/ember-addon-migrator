@@ -1,6 +1,6 @@
 /**
  *
- * @typedef {import('./index').Info} Info
+ * @typedef {import('./analysis/index').AddonInfo} Info
  */
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -11,27 +11,18 @@ import latestVersion from 'latest-version';
  * @param {Info} info
  */
 export async function migrateAddon(info) {
-  let { workspace, isTs } = info;
-
   if (!fse.existsSync('addon')) {
     fse.mkdirSync('addon');
     console.info('Unable to find "addon" folder, empty folder created');
   }
 
-  const entryFilePath = isTs ? 'addon/index.ts' : 'addon/index.js';
-
-  if (!fse.existsSync(entryFilePath)) {
-    fse.writeFileSync(entryFilePath, '', 'utf8');
-    console.info(`Unable to find "${entryFilePath}" entrypoint, empty entrypoint created`);
-  }
-
-  await fse.move(path.join(info.tmpAddonLocation, 'addon'), path.join(info.addonLocation, 'src'), {
+  await fse.move(path.join(info.tmpLocation, 'addon'), path.join(info.addonLocation, 'src'), {
     overwrite: true,
   });
 
   if (await fse.pathExists('addon-test-support')) {
     await fse.move(
-      path.join(info.tmpAddonLocation, 'addon-test-support'),
+      path.join(info.tmpLocation, 'addon-test-support'),
       path.join(info.addonLocation, 'src/test-support'),
       { overwrite: true }
     );
@@ -57,10 +48,10 @@ const NO_LONGER_NEEDED = [
  * @param {Info} info
  */
 async function updateAddonPackageJson(info) {
-  /** @type {Partial<import('./index').PackageJson>} */
+  /** @type {Partial<import('./analysis/types').PackageJson>} */
   let pJson = await fse.readJSON(path.join(info.addonLocation, 'package.json'));
 
-  let { workspace, isTs, packageInfo: old, packager } = info;
+  let { workspace, isTS, packageJson: old, packageManager } = info;
 
   pJson.version = old.version;
   pJson.license = old.license;
@@ -69,8 +60,8 @@ async function updateAddonPackageJson(info) {
   pJson.author = old.author;
 
   if (pJson.scripts) {
-    pJson.scripts.prepare = `${packager} run build`;
-    pJson.scripts.prepack = `${packager} run build`;
+    pJson.scripts.prepare = `${packageManager} run build`;
+    pJson.scripts.prepack = `${packageManager} run build`;
   }
 
   if (old.publishConfig) {
@@ -79,7 +70,10 @@ async function updateAddonPackageJson(info) {
 
   if (old.volta) {
     pJson.volta = {
-      extends: path.join(path.relative(info.addonLocation, info.packagerRoot), 'package.json'),
+      extends: path.join(
+        path.relative(info.addonLocation, info.packageManagerRoot),
+        'package.json'
+      ),
     };
   }
 
@@ -99,7 +93,7 @@ async function updateAddonPackageJson(info) {
     }
   }
 
-  if (isTs) {
+  if (isTS) {
     pJson.types = 'dist';
     pJson.devDependencies = {
       ...pJson.devDependencies,
