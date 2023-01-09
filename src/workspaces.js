@@ -10,9 +10,17 @@ import { execa } from 'execa';
 
 /**
  * @param {Info} info
+ * @param {{ hidden?: boolean }} [options]
  */
-export async function install(info) {
-  await execa(info.packageManager, ['install'], { preferLocal: true, stdio: 'inherit' });
+export async function install(info, options = {}) {
+  let opts = {};
+
+  if (options.hidden) {
+    opts.stdio = '';
+    opts.stdout = 'ignore';
+  }
+
+  await execa(info.packageManager, ['install'], { preferLocal: true, stdio: 'inherit', ...opts });
 }
 
 /**

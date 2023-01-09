@@ -9,7 +9,7 @@ import Listr from 'listr';
 import { migrateAddon } from './addon.js';
 import { prepare } from './prepare.js';
 import { migrateTestApp } from './test-app.js';
-import { updateRootFiles } from './workspaces.js';
+import { updateRootFiles, install } from './workspaces.js';
 import { error, info } from './log.js';
 import { installV2Blueprint } from './v2-blueprint.js';
 import { AddonInfo } from './analysis/index.js';
@@ -68,6 +68,10 @@ export default async function run(options) {
           ]);
         },
       },
+      {
+        title: 'Running package manager',
+        task: () => install(analysis, { hidden: true }),
+      },
     ]);
 
     await tasks.run().then(() => {
@@ -105,8 +109,10 @@ export default async function run(options) {
         aliased as both:
           ea2 reset
           ember-addon-migrator reset
+    
+    -----------------------------------\n
     `);
-      error(e.message);
+      error(e);
     }
 
     // eslint-disable-next-line no-process-exit

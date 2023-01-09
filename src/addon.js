@@ -51,7 +51,7 @@ async function updateAddonPackageJson(info) {
   /** @type {Partial<import('./analysis/types').PackageJson>} */
   let pJson = await fse.readJSON(path.join(info.addonLocation, 'package.json'));
 
-  let { workspace, isTS, packageJson: old, packageManager } = info;
+  let { isTS, packageJson: old, packageManager } = info;
 
   pJson.version = old.version;
   pJson.license = old.license;
@@ -60,7 +60,10 @@ async function updateAddonPackageJson(info) {
   pJson.author = old.author;
 
   if (pJson.scripts) {
-    pJson.scripts.prepare = `${packageManager} run build`;
+    if (!info.isBiggerMonorepo) {
+      pJson.scripts.prepare = `${packageManager} run build`;
+    }
+
     pJson.scripts.prepack = `${packageManager} run build`;
   }
 
@@ -93,20 +96,7 @@ async function updateAddonPackageJson(info) {
     }
   }
 
-  if (isTS) {
-    pJson.types = 'dist';
-    pJson.devDependencies = {
-      ...pJson.devDependencies,
-      ...(await withVersions([
-        '@babel/plugin-transform-typescript',
-        '@babel/preset-typescript',
-        'rollup-plugin-ts',
-        'typescript',
-      ])),
-    };
-  }
-
-  await fs.writeFile(`${workspace}/package.json`, JSON.stringify(pJson, null, 2));
+  await fs.writeFile(`${info.addonLocation}/package.json`, JSON.stringify(pJson, null, 2));
 }
 
 /**
