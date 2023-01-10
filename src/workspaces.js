@@ -16,11 +16,12 @@ export async function install(info, options = {}) {
   let opts = {};
 
   if (options.hidden) {
-    opts.stdio = '';
     opts.stdout = 'ignore';
+  } else {
+    opts.stdio = 'inherit';
   }
 
-  await execa(info.packageManager, ['install'], { preferLocal: true, stdio: 'inherit', ...opts });
+  await execa(info.packageManager, ['install'], { preferLocal: true, ...opts });
 }
 
 /**
