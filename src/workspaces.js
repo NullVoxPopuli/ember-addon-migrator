@@ -1,18 +1,27 @@
 /**
- * @typedef {import('./index').Info} Info
- * @typedef {import('./index').PackageJson} PackageJson
+ * @typedef {import('./analysis/index').AddonInfo} Info
+ * @typedef {import('./analysis/types').PackageJson} PackageJson
  */
-import path from 'path';
-import fs from 'fs/promises';
+import { execa } from 'execa';
 import fse from 'fs-extra';
 import deepMerge from 'merge';
-import { execa } from 'execa';
+import fs from 'node:fs/promises';
+import path from 'path';
 
 /**
  * @param {Info} info
+ * @param {{ hidden?: boolean }} [options]
  */
-export async function install(info) {
-  await execa(info.packager, ['install'], { preferLocal: true, stdio: 'inherit' });
+export async function install(info, options = {}) {
+  let opts = {};
+
+  if (options.hidden) {
+    opts.stdout = 'ignore';
+  } else {
+    opts.stdio = 'inherit';
+  }
+
+  await execa(info.packageManager, ['install'], { preferLocal: true, ...opts });
 }
 
 /**
@@ -54,7 +63,7 @@ async function updatePackageJson(info) {
  * @param {Info} info
  */
 function workspacePackageJsonFrom(info) {
-  let { packageInfo: old } = info;
+  let { packageJson: old } = info;
 
   /** @type {Partial<PackageJson>} */
   let rootJson = {

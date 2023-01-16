@@ -2,6 +2,9 @@
 src/js/files/
 src/ts/files/
 
+# Tests has separate config
+tests/
+
 # Generated files
 node_modules/
 coverage/

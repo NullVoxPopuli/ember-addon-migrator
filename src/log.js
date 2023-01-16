@@ -7,7 +7,7 @@ import { stripIndent } from 'common-tags';
 export function error(msg) {
   if (typeof msg !== 'string') {
     if (msg instanceof Error) {
-      msg = msg.message;
+      msg = msg.message + `\n\n` + msg.stack;
     }
   }
 

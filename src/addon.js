@@ -1,40 +1,28 @@
 /**
  *
- * @typedef {import('./index').Info} Info
+ * @typedef {import('./analysis/index').AddonInfo} Info
  */
+import fse from 'fs-extra';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import fse from 'fs-extra';
-import latestVersion from 'latest-version';
 
 /**
  * @param {Info} info
  */
 export async function migrateAddon(info) {
-  let { workspace, isTs } = info;
+  let addonFolder = path.join(info.tmpLocation, 'addon');
+  let testSupportFolder = path.join(info.tmpLocation, 'addon-test-support');
 
-  if (!fse.existsSync('addon')) {
-    fse.mkdirSync('addon');
-    console.info('Unable to find "addon" folder, empty folder created');
+  if (await fse.pathExists(addonFolder)) {
+    await fse.move(addonFolder, path.join(info.addonLocation, 'src'), {
+      overwrite: true,
+    });
   }
 
-  const entryFilePath = isTs ? 'addon/index.ts' : 'addon/index.js';
-
-  if (!fse.existsSync(entryFilePath)) {
-    fse.writeFileSync(entryFilePath, '', 'utf8');
-    console.info(`Unable to find "${entryFilePath}" entrypoint, empty entrypoint created`);
-  }
-
-  await fse.move(path.join(info.tmpAddonLocation, 'addon'), path.join(info.addonLocation, 'src'), {
-    overwrite: true,
-  });
-
-  if (await fse.pathExists('addon-test-support')) {
-    await fse.move(
-      path.join(info.tmpAddonLocation, 'addon-test-support'),
-      path.join(info.addonLocation, 'src/test-support'),
-      { overwrite: true }
-    );
+  if (await fse.pathExists(testSupportFolder)) {
+    await fse.move(testSupportFolder, path.join(info.addonLocation, 'src/test-support'), {
+      overwrite: true,
+    });
   }
 
   await updateAddonPackageJson(info);
@@ -57,10 +45,10 @@ const NO_LONGER_NEEDED = [
  * @param {Info} info
  */
 async function updateAddonPackageJson(info) {
-  /** @type {Partial<import('./index').PackageJson>} */
+  /** @type {Partial<import('./analysis/types').PackageJson>} */
   let pJson = await fse.readJSON(path.join(info.addonLocation, 'package.json'));
 
-  let { workspace, isTs, packageInfo: old, packager } = info;
+  let { packageJson: old, packageManager } = info;
 
   pJson.version = old.version;
   pJson.license = old.license;
@@ -69,8 +57,11 @@ async function updateAddonPackageJson(info) {
   pJson.author = old.author;
 
   if (pJson.scripts) {
-    pJson.scripts.prepare = `${packager} run build`;
-    pJson.scripts.prepack = `${packager} run build`;
+    if (!info.isBiggerMonorepo) {
+      pJson.scripts.prepare = `${packageManager} run build`;
+    }
+
+    pJson.scripts.prepack = `${packageManager} run build`;
   }
 
   if (old.publishConfig) {
@@ -79,7 +70,10 @@ async function updateAddonPackageJson(info) {
 
   if (old.volta) {
     pJson.volta = {
-      extends: path.join(path.relative(info.addonLocation, info.packagerRoot), 'package.json'),
+      extends: path.join(
+        path.relative(info.addonLocation, info.packageManagerRoot),
+        'package.json'
+      ),
     };
   }
 
@@ -99,39 +93,5 @@ async function updateAddonPackageJson(info) {
     }
   }
 
-  if (isTs) {
-    pJson.types = 'dist';
-    pJson.devDependencies = {
-      ...pJson.devDependencies,
-      ...(await withVersions([
-        '@babel/plugin-transform-typescript',
-        '@babel/preset-typescript',
-        'rollup-plugin-ts',
-        'typescript',
-      ])),
-    };
-  }
-
-  await fs.writeFile(`${workspace}/package.json`, JSON.stringify(pJson, null, 2));
-}
-
-/**
- * @param {string[]} packageList
- */
-async function withVersions(packageList) {
-  /** @type {Record<string, string>} */
-  let mapped = {};
-
-  const versions = await Promise.all(
-    packageList.map((name) => {
-      return latestVersion(name);
-    })
-  );
-
-  // keep ordering consistent between migration
-  packageList.forEach((name, index) => {
-    mapped[name] = versions[index];
-  });
-
-  return mapped;
+  await fs.writeFile(`${info.addonLocation}/package.json`, JSON.stringify(pJson, null, 2));
 }

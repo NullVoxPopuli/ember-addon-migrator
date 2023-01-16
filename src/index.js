@@ -1,19 +1,19 @@
 // @ts-check
 
-import path from 'node:path';
+import Listr from 'listr';
 import assert from 'node:assert';
+import path from 'node:path';
 import util from 'node:util';
 
-import Listr from 'listr';
-
 import { migrateAddon } from './addon.js';
-import { prepare } from './prepare.js';
-import { migrateTestApp } from './test-app.js';
-import { updateRootFiles } from './workspaces.js';
-import { error, info } from './log.js';
-import { installV2Blueprint } from './v2-blueprint.js';
 import { AddonInfo } from './analysis/index.js';
 import { resolvedDirectory } from './analysis/paths.js';
+import { lintFix } from './lint.js';
+import { error, info } from './log.js';
+import { prepare } from './prepare.js';
+import { migrateTestApp } from './test-app.js';
+import { installV2Blueprint } from './v2-blueprint.js';
+import { install,updateRootFiles } from './workspaces.js';
 
 /**
  * @param {import('./analysis/types').Options} options
@@ -46,7 +46,7 @@ export default async function run(options) {
         task: () => {
           return new Listr([
             {
-              title: `Copying addon to tmp directory, ${analysis.tmpLocation}`,
+              title: `Moving addon to tmp directory, ${analysis.tmpLocation}`,
               task: () => prepare(analysis),
             },
             {
@@ -54,16 +54,37 @@ export default async function run(options) {
               task: () => installV2Blueprint(analysis),
             },
             {
-              title: 'Updating root files',
+              title: `Updating addon's root files`,
               task: () => updateRootFiles(analysis),
             },
             {
               title: 'Migrating addon files',
-              task: () => migrateAddon(analysis),
+              task: () => {
+                return migrateAddon(analysis);
+              },
             },
             {
               title: 'Migrating test files',
               task: () => migrateTestApp(analysis),
+            },
+          ]);
+        },
+      },
+      {
+        title: 'Running package manager',
+        task: () => install(analysis, { hidden: true }),
+      },
+      {
+        title: 'Running lint:fix',
+        task: () => {
+          return new Listr([
+            {
+              title: `lint:fix on ${analysis.name}`,
+              task: () => lintFix(analysis, analysis.addonLocation),
+            },
+            {
+              title: `lint:fix on test app`,
+              task: () => lintFix(analysis, analysis.testAppLocation),
             },
           ]);
         },
@@ -105,11 +126,13 @@ export default async function run(options) {
         aliased as both:
           ea2 reset
           ember-addon-migrator reset
+    
+    -----------------------------------\n
     `);
-      error(e.message);
+      error(e);
     }
 
-    // eslint-disable-next-line no-process-exit
+    // eslint-disable-next-line no-process-exit, n/no-process-exit
     process.exit(1);
   }
 }

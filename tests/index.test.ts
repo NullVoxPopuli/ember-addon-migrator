@@ -1,6 +1,6 @@
 import { describe, test } from 'vitest';
 
-import { verify } from './helpers';
+import { verify } from './helpers.js';
 
 describe('basic conversion', () => {
   test('js addon', async () => {

@@ -3,9 +3,9 @@
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
-import { info } from './src/log.js';
-import run from './src/index.js';
 import reset from './src/git-reset.js';
+import run from './src/index.js';
+import { info } from './src/log.js';
 
 /**
  * TODO:

@@ -1,18 +1,12 @@
 /**
- * @typedef {import('./index').Info} Info
+ * @typedef {import('./analysis/index').AddonInfo} Info
  */
-import path, { dirname, join } from 'path';
+import { packageJson } from 'ember-apply';
 import fs from 'fs/promises';
-import { createRequire } from 'module';
 import fse from 'fs-extra';
-import { execa } from 'execa';
 import { globby } from 'globby';
 import latestVersion from 'latest-version';
-import { packageJson } from 'ember-apply';
-
-import { install } from './workspaces.js';
-
-const require = createRequire(import.meta.url);
+import path from 'path';
 
 /**
  * @param {Info} info
@@ -23,14 +17,14 @@ export async function migrateTestApp(info) {
 
   await moveFilesToTestApp(info);
   await updateFilesWithinTestApp(info);
-  await removeFiles();
+  await removeFiles(info);
 }
 
 /**
  * @param {Info} info
  */
 async function moveFilesToTestApp(info) {
-  let { testWorkspace } = info;
+  let { testAppLocation } = info;
 
   // Move useful files to test app
   let toMove = [
@@ -44,7 +38,7 @@ async function moveFilesToTestApp(info) {
 
   await Promise.allSettled([
     ...toMove.map((filePath) =>
-      fse.move(filePath, `${testWorkspace}/${filePath}`, { overwrite: true })
+      fse.move(filePath, `${testAppLocation}/${filePath}`, { overwrite: true })
     ),
   ]);
 }
@@ -53,96 +47,83 @@ async function moveFilesToTestApp(info) {
  * @param {Info} info
  */
 async function updateFilesWithinTestApp(info) {
-  let { testWorkspace } = info;
+  let { testAppLocation } = info;
 
   // ember-cli-build: EmberAddon => EmberApp
   // ember-cli-build: 'ember-addon' => 'ember-app'
-  await replaceIn(`${testWorkspace}/ember-cli-build.js`, 'EmberAddon', 'EmberApp');
-  await replaceIn(`${testWorkspace}/ember-cli-build.js`, '/ember-addon', '/ember-app');
+  await replaceIn(`${testAppLocation}/ember-cli-build.js`, 'EmberAddon', 'EmberApp');
+  await replaceIn(`${testAppLocation}/ember-cli-build.js`, '/ember-addon', '/ember-app');
   await replaceIn(
-    `${testWorkspace}/tests/test-helper.{js,ts}`,
+    `${testAppLocation}/tests/test-helper.{js,ts}`,
     'dummy/app',
-    `${testWorkspace}/app`
+    `${testAppLocation}/app`
   );
   await replaceIn(
-    `${testWorkspace}/tests/test-helper.{js,ts}`,
+    `${testAppLocation}/tests/test-helper.{js,ts}`,
     'dummy/config',
-    `${testWorkspace}/config`
+    `${testAppLocation}/config`
   );
+
+  // TODO: pnpm should use the workspace protocol
+  await packageJson.removeDevDependencies([info.name], testAppLocation);
+  await packageJson.addDependencies({ [info.name]: '*' }, testAppLocation);
 
   await packageJson.addDevDependencies(
     {
       '@embroider/test-setup': await latestVersion('@embroider/test-setup'),
     },
-    testWorkspace
+    testAppLocation
   );
 
-  await packageJson.removeDevDependencies(['ember-welcome-page'], testWorkspace);
-  await fse.remove(path.join(testWorkspace, 'app/templates/application.hbs'));
+  await packageJson.removeDevDependencies(['ember-welcome-page'], testAppLocation);
+  await fse.remove(path.join(testAppLocation, 'app/templates/application.hbs'));
 
-  let current = await packageJson.read(testWorkspace);
+  let current = await packageJson.read(testAppLocation);
 
   /** @type Record<string, string> */
   let toAdd = {};
 
-  if (info.packageInfo.devDependencies && current.devDependencies) {
-    let devDeps = info.packageInfo.devDependencies;
+  if (info.packageJson.devDependencies && current.devDependencies) {
+    let devDeps = info.packageJson.devDependencies;
     let newDevDeps = Object.keys(current.devDependencies);
 
     for (let [depName, range] of Object.entries(devDeps)) {
       if (newDevDeps.includes(depName)) continue;
-      // these will be re-added byb the ember-cli-typescript install,
-      // if needed
-      if (depName.startsWith('@types/ember')) continue;
 
       toAdd[depName] = range;
     }
   }
 
   if (Object.keys(toAdd).length > 0) {
-    await packageJson.addDevDependencies(toAdd, testWorkspace);
+    await packageJson.addDevDependencies(toAdd, testAppLocation);
   }
-}
-
-/**
- * @param {string} pkgName
- */
-function packagePath(pkgName) {
-  return dirname(require.resolve(pkgName + '/package.json'));
 }
 
 /**
  * @param {Info} info
  */
 async function moveTests(info) {
-  let { testWorkspace, isTs } = info;
-
   await fse.remove('tests/dummy');
   await fse.remove('tests/index.html');
 
-  const paths = await globby([path.join(info.tmpAddonLocation, 'tests/**/*')]);
+  const paths = await globby([path.join(info.tmpLocation, 'tests/**/*')]);
 
   for (let filePath of paths) {
-    let localFile = filePath.replace(info.tmpAddonLocation, '');
+    let localFile = filePath.replace(info.tmpLocation, '');
 
     await fse.move(filePath, path.join(info.testAppLocation, localFile), { overwrite: true });
   }
 
-  if (isTs) {
-    let jsSetup = `${testWorkspace}/tests/test-helper.js`;
-    let tsSetup = `${testWorkspace}/tests/test-helper.ts`;
-
-    if ((await fse.pathExists(jsSetup)) && (await fse.pathExists(tsSetup))) {
-      fse.remove(jsSetup);
-    }
-  }
+  await fse.remove(path.join(info.testAppLocation, 'tests', 'dummy'));
 }
 
 /**
  * Before this runs, we need to make sure we move all
  * necessary files (as this deletes all top-level js)
+ *
+ * @param {Info} info
  */
-async function removeFiles() {
+async function removeFiles(info) {
   let unneededPaths = [
     'app',
     'vendor',
@@ -157,6 +138,12 @@ async function removeFiles() {
     'tests/dummy',
     'tests/index.html',
   ];
+
+  let hasEmberData = info.hasDependency('ember-data') || info.hasDevDependency('ember-data');
+
+  if (!hasEmberData) {
+    unneededPaths.push('types/ember-data');
+  }
 
   let topLevelJs = await globby('*.js');
 
