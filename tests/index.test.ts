@@ -17,6 +17,9 @@ describe('fixtures', () => {
       test('migrate & build', async () => {
         await migrate(project);
         await build(project);
+
+        // Yay! no errors!
+        expect(true).toBe(true);
       });
 
       test.concurrent('lint addon', async () => {
