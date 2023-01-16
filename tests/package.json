@@ -8,7 +8,9 @@
     "test:watch": "vitest --watch"
   },
   "devDependencies": {
-    "@nullvoxpopuli/eslint-configs": "^3.0.0",
+    "@nullvoxpopuli/eslint-configs": "^3.0.4",
+    "@typescript-eslint/eslint-plugin": "^5.48.2",
+    "@typescript-eslint/parser": "^5.48.2",
     "@vitest/coverage-c8": "^0.23.2",
     "broccoli-test-helper": "^2.0.0",
     "c8": "^7.11.0",
