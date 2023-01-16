@@ -7,34 +7,14 @@ import { Project } from 'scenario-tester';
 import { fileURLToPath } from 'url';
 import { expect } from 'vitest';
 
+/**
+  * NOTE: these tests *only* use pnpm, becausue npm and yarn are frail 
+  *       and slow.
+  */
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-export function sampleAddons() {
-  const samplesDir = join(__dirname, 'samples');
-
-  return fs
-    .readdirSync(samplesDir)
-    .filter((el) => fs.existsSync(join(samplesDir, el, 'input.json')));
-}
-
-/**
- * @description function created to workaround fixturify issue, where all mentioned in project package.json deps should exists in node_modules
- */
-function addFakeDependency(nodeModulesPath: string, name: string, version: string) {
-  try {
-    fse.outputFileSync(
-      join(nodeModulesPath, name, 'package.json'),
-      JSON.stringify({
-        name,
-        version,
-      })
-    );
-  } catch (e) {
-    // FINE
-  }
-}
-
-export async function addonFrom(fixture: string, skipInstall = false): Promise<Project> {
+export async function addonFrom(fixture: string): Promise<Project> {
   let packagePath = join(__dirname, 'fixtures', fixture, 'package.json');
   let sampleAddon: null | { path: string; destroy: () => Promise<void> } = null;
 
@@ -59,30 +39,10 @@ export async function addonFrom(fixture: string, skipInstall = false): Promise<P
   let originalPackageJsonPath = require.resolve(packagePath);
   const nodeModulesPath = join(dirname(originalPackageJsonPath), 'node_modules');
 
-  if (skipInstall) {
-    await fse.mkdirp(nodeModulesPath);
-
-    const pkg: Record<string, Record<string, string>> = fse.readJSONSync(packagePath);
-
-    Object.keys(pkg).forEach((key) => {
-      if (key.toLocaleLowerCase().includes('dependencies')) {
-        Object.keys(pkg[key]).forEach((depName) => {
-          addFakeDependency(nodeModulesPath, depName, pkg[key][depName]);
-        });
-      }
-    });
-  }
-
   // This TS is compiled to CJS, so require is fine
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   let originalPackageJson = require(originalPackageJsonPath);
   let fixturePath = dirname(originalPackageJsonPath);
-
-  if (!skipInstall) {
-    // all node_modules need to exist due to bug in fixturify
-    // project where it assumes that node_modules exists
-    await install({ baseDir: fixturePath });
-  }
 
   let project = Project.fromDir(fixturePath);
 
@@ -90,31 +50,12 @@ export async function addonFrom(fixture: string, skipInstall = false): Promise<P
 
   await project.write();
 
-  if (!skipInstall) {
-    await install(project);
-    await execa('git', ['init'], { cwd: project.baseDir });
-    await execa('git', ['add', '.'], { cwd: project.baseDir });
-    await execa(
-      'git',
-      [
-        '-c',
-        "user.name='test-user'",
-        '-c',
-        "user.email='test@email.org'",
-        'commit',
-        '-m',
-        '"initial commit"',
-      ],
-      { cwd: project.baseDir }
-    );
-  } else {
     try {
       // we need this to not resolve ember-cli from addon itself (all deps is mocked)
       fse.rmSync(join(project.baseDir, 'node_modules', 'ember-cli'), { recursive: true });
     } catch (e) {
       // FINE
     }
-  }
 
   return project;
 }
