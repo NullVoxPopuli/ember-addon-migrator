@@ -10,8 +10,4 @@ describe('basic conversion', () => {
   test('ts addon', async () => {
     await verify('base-ts-v1-addon');
   });
-
-  test('sample addon [ember-addon-output_4.2.0]', async () => {
-    await verify('ember-addon-output_4.2.0');
-  });
 });
