@@ -2,6 +2,8 @@
   "name": "tests",
   "private": true,
   "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "test": "vitest --coverage --no-watch",
     "test:watch": "vitest --watch"
   },
@@ -10,6 +12,7 @@
     "broccoli-test-helper": "^2.0.0",
     "c8": "^7.11.0",
     "ember-addon-migrator": "workspace:..",
+    "eslint": "^8.26.0",
     "node-fetch": "^3.2.0",
     "scenario-tester": "^2.0.1",
     "tinypool": "^0.3.0",
