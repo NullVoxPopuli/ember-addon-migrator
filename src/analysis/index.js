@@ -230,6 +230,22 @@ export class AddonInfo {
 
     return this.#options.testAppName || 'test-app';
   }
+
+  /**
+   * checks the old package.json
+   * @param {string} dep
+   */
+  hasDependency = (dep) => {
+    return Boolean(this.packageJson.dependencies?.[dep]);
+  };
+
+  /**
+   * checks the old package.json
+   * @param {string} dep
+   */
+  hasDevDependency = (dep) => {
+    return Boolean(this.packageJson.devDependencies?.[dep]);
+  };
 }
 
 /**

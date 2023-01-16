@@ -6,6 +6,7 @@ import util from 'node:util';
 
 import Listr from 'listr';
 
+import { lintFix } from './lint.js';
 import { migrateAddon } from './addon.js';
 import { prepare } from './prepare.js';
 import { migrateTestApp } from './test-app.js';
@@ -73,6 +74,21 @@ export default async function run(options) {
       {
         title: 'Running package manager',
         task: () => install(analysis, { hidden: true }),
+      },
+      {
+        title: 'Running lint:fix',
+        task: () => {
+          return new Listr([
+            {
+              title: `lint:fix on ${analysis.name}`,
+              task: () => lintFix(analysis, analysis.addonLocation),
+            },
+            {
+              title: `lint:fix on test app`,
+              task: () => lintFix(analysis, analysis.testAppLocation),
+            },
+          ]);
+        },
       },
     ]);
 

@@ -23,7 +23,7 @@ export async function migrateTestApp(info) {
 
   await moveFilesToTestApp(info);
   await updateFilesWithinTestApp(info);
-  await removeFiles();
+  await removeFiles(info);
 }
 
 /**
@@ -106,18 +106,9 @@ async function updateFilesWithinTestApp(info) {
 }
 
 /**
- * @param {string} pkgName
- */
-function packagePath(pkgName) {
-  return dirname(require.resolve(pkgName + '/package.json'));
-}
-
-/**
  * @param {Info} info
  */
 async function moveTests(info) {
-  let { testAppLocation } = info;
-
   await fse.remove('tests/dummy');
   await fse.remove('tests/index.html');
 
@@ -128,13 +119,17 @@ async function moveTests(info) {
 
     await fse.move(filePath, path.join(info.testAppLocation, localFile), { overwrite: true });
   }
+
+  await fse.remove(path.join(info.testAppLocation, 'tests', 'dummy'));
 }
 
 /**
  * Before this runs, we need to make sure we move all
  * necessary files (as this deletes all top-level js)
+ *
+ * @param {Info} info
  */
-async function removeFiles() {
+async function removeFiles(info) {
   let unneededPaths = [
     'app',
     'vendor',
@@ -149,6 +144,12 @@ async function removeFiles() {
     'tests/dummy',
     'tests/index.html',
   ];
+
+  let hasEmberData = info.hasDependency('ember-data') || info.hasDevDependency('ember-data');
+
+  if (!hasEmberData) {
+    unneededPaths.push('types/ember-data');
+  }
 
   let topLevelJs = await globby('*.js');
 
