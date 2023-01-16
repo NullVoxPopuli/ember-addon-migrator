@@ -84,22 +84,6 @@ jobs:
         working-directory: 'tests'
         run: pnpm vitest --testNamePattern "${{ matrix.slow-test }}"
 
-  tooling:
-    name: Tooling
-    runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main'
-    timeout-minutes: 2
-    needs: [install_dependencies]
-
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/actions/pnpm
-      - name: Semantic Release
-        run: pnpm publish:dry-run
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   # https://github.com/changesets/action
   release:
     name: Release
