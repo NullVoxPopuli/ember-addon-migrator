@@ -4,6 +4,8 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "fixture:output": "node ./fixture --output",
+    "fixture:adopt": "node ./fixture --adopt",
     "test": "vitest --coverage --no-watch",
     "test:watch": "vitest --watch"
   },
