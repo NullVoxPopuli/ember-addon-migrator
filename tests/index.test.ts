@@ -1,13 +1,14 @@
 import { describe, test } from 'vitest';
 
-import { verify } from './helpers.js';
+import { verify, findFixtures } from './helpers.js';
 
-describe('basic conversion', () => {
-  test('js addon', async () => {
-    await verify('base-js-v1-addon');
-  });
+let fixtures = await findFixtures();
 
-  test('ts addon', async () => {
-    await verify('base-ts-v1-addon');
-  });
-});
+describe('fixtures', () => {
+  for (let fixtureName of fixtures) {
+    test(fixtureName, async () => {
+      await verify(fixtureName);
+    });
+  }
+})
+
