@@ -59,7 +59,9 @@ export default async function run(options) {
             },
             {
               title: 'Migrating addon files',
-              task: () => migrateAddon(analysis),
+              task: () => {
+                return migrateAddon(analysis);
+              },
             },
             {
               title: 'Migrating test files',

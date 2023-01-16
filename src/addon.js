@@ -11,21 +11,19 @@ import latestVersion from 'latest-version';
  * @param {Info} info
  */
 export async function migrateAddon(info) {
-  if (!fse.existsSync('addon')) {
-    fse.mkdirSync('addon');
-    console.info('Unable to find "addon" folder, empty folder created');
+  let addonFolder = path.join(info.tmpLocation, 'addon');
+  let testSupportFolder = path.join(info.tmpLocation, 'addon-test-support');
+
+  if (await fse.pathExists(addonFolder)) {
+    await fse.move(addonFolder, path.join(info.addonLocation, 'src'), {
+      overwrite: true,
+    });
   }
 
-  await fse.move(path.join(info.tmpLocation, 'addon'), path.join(info.addonLocation, 'src'), {
-    overwrite: true,
-  });
-
-  if (await fse.pathExists('addon-test-support')) {
-    await fse.move(
-      path.join(info.tmpLocation, 'addon-test-support'),
-      path.join(info.addonLocation, 'src/test-support'),
-      { overwrite: true }
-    );
+  if (await fse.pathExists(testSupportFolder)) {
+    await fse.move(testSupportFolder, path.join(info.addonLocation, 'src/test-support'), {
+      overwrite: true,
+    });
   }
 
   await updateAddonPackageJson(info);
