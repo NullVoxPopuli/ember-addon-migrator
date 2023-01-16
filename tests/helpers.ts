@@ -29,7 +29,7 @@ export async function findFixtures(): Promise<string[]> {
     .map(stat => stat.name);
 }
 
-async function createTmpDir(prefix) {
+async function createTmpDir(prefix: string) {
   let prefixPath = path.join(os.tmpdir(), prefix);
 
   let tmpDirPath = await fs.mkdtemp(prefixPath);
@@ -38,27 +38,23 @@ async function createTmpDir(prefix) {
 }
 
 export async function addonFrom(fixture: string): Promise<Project> {
-  let packagePath = join(__dirname, 'fixtures', fixture, 'package.json');
+  let fixturePath = path.join(fixturesDir, fixture);
+  let tmp = await createTmpDir(fixture);
+  let originalPackageJsonPath = path.join(fixturePath, 'package.json');
+  let originalPackageJson = await fse.readJSON(originalPackageJsonPath);
 
-  let originalPackageJsonPath = require.resolve(packagePath);
+  let projectName = originalPackageJson.name;
 
-  // This TS is compiled to CJS, so require is fine
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  let originalPackageJson = require(originalPackageJsonPath);
-  let fixturePath = dirname(originalPackageJsonPath);
+  await fse.copy(fixturePath, tmp, { recursive: true });
 
-  let project = Project.fromDir(fixturePath);
+  let project = {
+    rootPath: tmp,
+    addonPath: path.join(tmp, projectName),
+    testAppPath: path.join(tmp, 'test-app'),
+  }
 
-  project.name = originalPackageJson.name;
-
-  await project.write();
-
-    try {
-      // we need this to not resolve ember-cli from addon itself (all deps is mocked)
-      fse.rmSync(join(project.baseDir, 'node_modules', 'ember-cli'), { recursive: true });
-    } catch (e) {
-      // FINE
-    }
+  await execa('git', ['init'], { cwd: tmp });
+  await execa('pnpm', ['install'], { cwd: tmp });
 
   return project;
 }
