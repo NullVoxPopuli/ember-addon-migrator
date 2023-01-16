@@ -1,6 +1,5 @@
-import path from 'node:path';
-
 import fse from 'fs-extra';
+import path from 'node:path';
 
 import { AnalysisError } from './error.js';
 

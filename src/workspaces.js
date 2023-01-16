@@ -2,11 +2,11 @@
  * @typedef {import('./analysis/index').AddonInfo} Info
  * @typedef {import('./analysis/types').PackageJson} PackageJson
  */
-import path from 'path';
-import fs from 'fs/promises';
+import { execa } from 'execa';
 import fse from 'fs-extra';
 import deepMerge from 'merge';
-import { execa } from 'execa';
+import fs from 'node:fs/promises';
+import path from 'path';
 
 /**
  * @param {Info} info

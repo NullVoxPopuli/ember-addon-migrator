@@ -1,18 +1,12 @@
 /**
  * @typedef {import('./analysis/index').AddonInfo} Info
  */
-import path, { dirname, join } from 'path';
+import { packageJson } from 'ember-apply';
 import fs from 'fs/promises';
-import { createRequire } from 'module';
 import fse from 'fs-extra';
-import { execa } from 'execa';
 import { globby } from 'globby';
 import latestVersion from 'latest-version';
-import { packageJson } from 'ember-apply';
-
-import { install } from './workspaces.js';
-
-const require = createRequire(import.meta.url);
+import path from 'path';
 
 /**
  * @param {Info} info

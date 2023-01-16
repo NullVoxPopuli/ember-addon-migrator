@@ -2,10 +2,9 @@
  *
  * @typedef {import('./analysis/index').AddonInfo} Info
  */
+import fse from 'fs-extra';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import fse from 'fs-extra';
-import latestVersion from 'latest-version';
 
 /**
  * @param {Info} info
@@ -49,7 +48,7 @@ async function updateAddonPackageJson(info) {
   /** @type {Partial<import('./analysis/types').PackageJson>} */
   let pJson = await fse.readJSON(path.join(info.addonLocation, 'package.json'));
 
-  let { isTS, packageJson: old, packageManager } = info;
+  let { packageJson: old, packageManager } = info;
 
   pJson.version = old.version;
   pJson.license = old.license;
@@ -95,25 +94,4 @@ async function updateAddonPackageJson(info) {
   }
 
   await fs.writeFile(`${info.addonLocation}/package.json`, JSON.stringify(pJson, null, 2));
-}
-
-/**
- * @param {string[]} packageList
- */
-async function withVersions(packageList) {
-  /** @type {Record<string, string>} */
-  let mapped = {};
-
-  const versions = await Promise.all(
-    packageList.map((name) => {
-      return latestVersion(name);
-    })
-  );
-
-  // keep ordering consistent between migration
-  packageList.forEach((name, index) => {
-    mapped[name] = versions[index];
-  });
-
-  return mapped;
 }

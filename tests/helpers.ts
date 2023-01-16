@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { captureAddon, restoreAddon } from 'ember-addon-migrator/captured-addon/utils/fs-helpers';
 import { execa } from 'execa';
 import fs from 'fs';
 import fse from 'fs-extra';
 import { dirname, join } from 'path';
 import { Project } from 'scenario-tester';
-import semver from 'semver';
 import { fileURLToPath } from 'url';
 import { expect } from 'vitest';
 
@@ -179,87 +177,4 @@ export async function verify(fixtureName: string) {
   await install(project);
   await build(project);
   await emberTest(project);
-}
-
-export async function fastVerify(fixtureName: string) {
-  let project = await addonFrom(fixtureName, true);
-
-  await migrate(project);
-
-  const result = await captureAddon(project.baseDir);
-
-  console.debug(`fastVerify: ${project.baseDir}`);
-
-  const fixturePath = join(__dirname, 'samples', fixtureName);
-  const outputPath = join(fixturePath, 'output.json');
-
-  if (fs.existsSync(outputPath)) {
-    const expectedResult = fse.readJSONSync(outputPath);
-
-    Object.keys(result).forEach((fPath) => {
-      if (fPath.endsWith('package.json')) {
-        const data = JSON.parse(result[fPath]);
-        const expectedData = JSON.parse(expectedResult[fPath]);
-
-        expect(`${fPath} keys: ${Object.keys(data).sort().join(',')}`).toEqual(
-          `${fPath} keys: ${Object.keys(expectedData).sort().join(',')}`
-        );
-
-        Object.keys(data).forEach((key) => {
-          if (key.toLocaleLowerCase().includes('dependencies')) {
-            const deps = Object.keys(data[key]);
-
-            deps.forEach((dep) => {
-              const prefix = `${fPath} ${key}[${dep}]`;
-              const meta = `${prefix} is ok: `;
-              const expectedResult = [meta, true.toString()].join(' ');
-
-              expect(`${prefix} is ${typeof expectedData[key][dep]}`).toBe(`${prefix} is string`);
-
-              if (expectedData[key][dep] === '*' && typeof data[key][dep]) {
-                return;
-              }
-
-              const cleanedExpectedResult = semver.coerce(expectedData[key][dep]);
-              const cleanResult = semver.coerce(data[key][dep]);
-
-              expect(`${expectedData[key][dep]} -> ${dep} expected version`).include(
-                String(cleanedExpectedResult?.version)
-              );
-              expect(`${data[key][dep]} -> ${dep} migrated version`).include(
-                String(cleanResult?.version)
-              );
-
-              const cleanExpectedResult = cleanedExpectedResult?.major;
-              const isOk = semver.satisfies(
-                cleanResult as semver.SemVer,
-                `${cleanExpectedResult?.toString()}.x`
-              );
-              const currentResult = [meta, isOk.toString()].join(' ');
-
-              expect(currentResult).toEqual(expectedResult);
-            });
-          } else {
-            expect(`${fPath} : ${JSON.stringify(data[key])}`).toEqual(
-              `${fPath} : ${JSON.stringify(expectedData[key])}`
-            );
-          }
-        });
-      } else {
-        const lines = (result[fPath] || '').split(/\r?\n/);
-        const expectedLines = (expectedResult[fPath] || '').split(/\r?\n/);
-
-        lines.forEach((line, index) => {
-          let expected = expectedLines[index] || '';
-          let actual = line || '';
-
-          // TODO: how do we handle package.json and version differences?
-          expect(`${fPath}@${index}: ${actual}`).toEqual(`${fPath}@${index}: ${expected}`);
-        });
-      }
-    });
-  } else {
-    fs.writeFileSync(outputPath, JSON.stringify(result, null, 2));
-    expect(Object.keys(result).length).toBeGreaterThan(0);
-  }
 }

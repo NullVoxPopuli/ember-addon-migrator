@@ -1,10 +1,10 @@
 /**
  * @typedef {import('./analysis/index').AddonInfo} Info
  */
-import fs from 'node:fs/promises';
-import path from 'node:path';
 import { execaCommand } from 'execa';
 import fse from 'fs-extra';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
 import { createTmp } from './prepare.js';
 

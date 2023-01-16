@@ -1,20 +1,19 @@
 // @ts-check
 
-import path from 'node:path';
+import Listr from 'listr';
 import assert from 'node:assert';
+import path from 'node:path';
 import util from 'node:util';
 
-import Listr from 'listr';
-
-import { lintFix } from './lint.js';
 import { migrateAddon } from './addon.js';
-import { prepare } from './prepare.js';
-import { migrateTestApp } from './test-app.js';
-import { updateRootFiles, install } from './workspaces.js';
-import { error, info } from './log.js';
-import { installV2Blueprint } from './v2-blueprint.js';
 import { AddonInfo } from './analysis/index.js';
 import { resolvedDirectory } from './analysis/paths.js';
+import { lintFix } from './lint.js';
+import { error, info } from './log.js';
+import { prepare } from './prepare.js';
+import { migrateTestApp } from './test-app.js';
+import { installV2Blueprint } from './v2-blueprint.js';
+import { install,updateRootFiles } from './workspaces.js';
 
 /**
  * @param {import('./analysis/types').Options} options
@@ -133,7 +132,7 @@ export default async function run(options) {
       error(e);
     }
 
-    // eslint-disable-next-line no-process-exit
+    // eslint-disable-next-line no-process-exit, n/no-process-exit
     process.exit(1);
   }
 }

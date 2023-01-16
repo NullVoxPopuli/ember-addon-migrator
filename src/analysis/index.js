@@ -1,10 +1,10 @@
 import { packageJson } from 'ember-apply';
 
+import { NothingToDoError, tryOrFail } from './error.js';
 import { findRoot } from './git.js';
+import { analyzeImports } from './imports.js';
 import { guessPackageManager } from './package-manager.js';
 import { createTmp } from './paths.js';
-import { NothingToDoError, tryOrFail } from './error.js';
-import { analyzeImports } from './imports.js';
 
 /**
  * Type imports!

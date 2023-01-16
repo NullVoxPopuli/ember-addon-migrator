@@ -1,7 +1,6 @@
-import path from 'node:path';
-
 import { js } from 'ember-apply';
 import { globbyStream } from 'globby';
+import path from 'node:path';
 
 const globs = [
   '**/*.{js,ts}',

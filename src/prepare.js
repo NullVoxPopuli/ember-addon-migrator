@@ -1,10 +1,10 @@
 /**
  * @typedef {import('./analysis/index').AddonInfo} Info
  */
+import fse from 'fs-extra';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import fse from 'fs-extra';
 
 const SKIP = ['.git', '.gitignore'];
 
