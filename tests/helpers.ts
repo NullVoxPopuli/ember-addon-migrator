@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import os from 'node:os';
-import fs from 'node:fs/promises';
-import path, { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-
 import { execa } from 'execa';
 import fse from 'fs-extra';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path, { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { expect } from 'vitest';
 
 export interface Project {
