@@ -1,14 +1,25 @@
 #!/usr/bin/env ts-node
+/* eslint-disable no-console */
 /* eslint-disable n/shebang */
 
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
 import { info } from '../src/log.js';
-import { addonFrom, adoptFixture } from './helpers.js';
+import { addonFrom, adoptFixture, findFixtures } from './helpers.js';
 
 yargs(hideBin(process.argv))
 .command(
+  ['list-fixtures'],
+  'lists the known fixtures -- for use for splitting C.I.',
+    () => {},
+    async () => {
+      let fixtures = await findFixtures();
+
+      console.log(JSON.stringify(fixtures.map(name => ({ fixture: name }))));
+    }
+  )
+  .command(
     ['output [name]'],
     'outputs a fixture to a tmp directory',
     (yargs) => {

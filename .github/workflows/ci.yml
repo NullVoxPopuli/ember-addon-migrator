@@ -64,16 +64,28 @@ jobs:
         continue-on-error: true
         working-directory: tests
 
-  tests:
-    name: "Tests"
+  prepare_tests:
+    name: "Prepare Tests"
     runs-on: ubuntu-latest
     needs: [install_dependencies]
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/pnpm
+      - id: set-matrix
+        name: "find fixture tests"
+        run: |
+          fixtures=$(pnpm run --silent dev list-fixtures)
+          echo "::set-output name=matrix::$(echo $fixtures)"
+
+  tests:
+    name: "Test ${{ matrix.fixture }}"
+    runs-on: ubuntu-latest
+    needs: [prepare_tests]
     strategy:
-      matrix:
-        # all tests like this are slow
-        slow-test:
-          - basic conversion
-          - snapshots conversion
+      fail-fast: true
+      matrix: ${{fromJson(needs.prepare_tests.outputs.matrix)}}
 
     steps:
       - uses: actions/checkout@v3
@@ -82,7 +94,7 @@ jobs:
           pnpm add --global ember-cli
       - name: Tests
         working-directory: 'tests'
-        run: pnpm vitest --testNamePattern "${{ matrix.slow-test }}"
+        run: pnpm vitest --testNamePattern "${{ matrix.fixture }}"
 
   # https://github.com/changesets/action
   release:
