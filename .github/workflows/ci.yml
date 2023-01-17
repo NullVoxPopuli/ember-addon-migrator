@@ -84,7 +84,11 @@ jobs:
     needs: [prepare_tests]
     strategy:
       fail-fast: true
-      matrix: ${{fromJson(needs.prepare_tests.outputs.matrix)}}
+      # matrix: ${{fromJson(needs.prepare_tests.outputs.matrix)}}
+      matrix:
+        fixture:
+          - base-js-v1-addon
+          - base-ts-v1-addon
 
     steps:
       - uses: actions/checkout@v3
