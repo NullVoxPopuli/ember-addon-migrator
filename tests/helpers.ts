@@ -5,7 +5,6 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path, { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { expect } from 'vitest';
 
 export interface Project {
   rootPath: string;
@@ -20,7 +19,20 @@ export interface Project {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const fixturesDir = join(__dirname, 'fixtures');
-const binPath = join(__dirname, '..', 'bin.js');
+
+
+export const binPath = join(__dirname, '..', 'bin.js');
+
+export async function adoptFixture(srcLocation: string): Promise<void> {
+
+  let packageJsonPath = path.join(srcLocation, 'package.json');
+  let packageJson = await fse.readJSON(packageJsonPath);
+  let name = packageJson.name;
+  let destinationPath = path.join(fixturesDir, name);
+
+  await fse.copy(srcLocation, destinationPath, { recursive: true });
+}
+
 
 export async function findFixtures(): Promise<string[]> {
   return (await fs.readdir(fixturesDir, { withFileTypes: true }))
@@ -59,12 +71,6 @@ export async function addonFrom(fixture: string): Promise<Project> {
 }
 
 
-export async function migrate(project: Project) {
-  let { stdout } = await execa('node', [binPath], { cwd: project.rootPath });
-
-  expect(stdout).toMatch(`🎉 Congratulations! Your addon is now formatted as a V2 addon!`);
-}
-
 export async function install(project: Project) {
   await execa('pnpm', ['install'], {
     cwd: project.rootPath,
@@ -72,33 +78,15 @@ export async function install(project: Project) {
 }
 
 export async function build(project: Project) {
-  let { stdout, exitCode } = await execa('pnpm', ['build'], { cwd: project.addonPath });
+  let buildResult = await execa('pnpm', ['build'], { cwd: project.addonPath });
 
-  // subset of full stdout
-  // can't use snapshot testing due to time taken printed
-  // to stdout
-  console.debug(stdout);
-  expect(exitCode).toEqual(0);
-
-  let result = await execa('ls', { cwd: project.addonPath });
-
-  expect(result.stdout).toMatch('dist');
+  return buildResult;
 }
 
 export async function emberTest(project: Project) {
-  let { stdout, exitCode } = await execa('pnpm', ['run', 'ember', 'test'], {
+  return await execa('pnpm', ['run', 'ember', 'test'], {
     cwd: project.testAppPath,
   });
-
-  // subset of full stdout
-  // can't use snapshot testing due to time taken printed
-  // to stdout
-  console.debug(stdout);
-  expect(exitCode).toEqual(0);
-  expect(stdout).toMatch('Built project successfully');
-  expect(stdout).toMatch('# skip  0');
-  expect(stdout).toMatch('# todo  0');
-  expect(stdout).toMatch('# fail  0');
 }
 
 export async function lintAddon(project: Project) {
@@ -107,13 +95,4 @@ export async function lintAddon(project: Project) {
 
 export async function lintTestApp(project: Project) {
   return await execa('pnpm', ['lint'], { cwd: project.testAppPath });
-}
-
-export async function verify(fixtureName: string) {
-  let project = await addonFrom(fixtureName);
-
-  await migrate(project);
-  await install(project);
-  await build(project);
-  await emberTest(project);
 }

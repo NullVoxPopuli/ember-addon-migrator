@@ -1,7 +1,8 @@
 import fse from 'fs-extra';
 import { beforeAll,describe, expect, test } from 'vitest';
 
-import { type Project, addonFrom, build,emberTest, findFixtures, lintAddon, lintTestApp, migrate } from './helpers.js';
+import { assertEmberTest, migrate } from './assertions.js';
+import { type Project, addonFrom, build, findFixtures, lintAddon, lintTestApp } from './helpers.js';
 
 let fixtures = await findFixtures();
 
@@ -41,9 +42,7 @@ describe('fixtures', () => {
       });
 
       test.concurrent('tests pass', async () => {
-        let result = await emberTest(project);
-
-        expect(result).toMatchObject({ exitCode: 0 });
+        await assertEmberTest(project);
       });
     }) 
   }

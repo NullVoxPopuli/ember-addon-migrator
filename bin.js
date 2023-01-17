@@ -7,13 +7,6 @@ import reset from './src/git-reset.js';
 import run from './src/index.js';
 import { info } from './src/log.js';
 
-/**
- * TODO:
- *  - monorepo
- *    - detect lockfile
- *    - no root package.json (by default)
- *    - inherit volta in test-app/package.json
- */
 yargs(hideBin(process.argv))
   .command(
     'reset',
