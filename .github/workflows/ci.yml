@@ -76,8 +76,7 @@ jobs:
       - id: set-matrix
         name: "find fixture tests"
         run: |
-          fixtures=$(pnpm run --silent dev list-fixtures)
-          echo "::set-output name=matrix::$(echo $fixtures)"
+          echo "::set-output name=matrix::$(pnpm run --silent dev list-fixtures)"
 
   tests:
     name: "Test ${{ matrix.fixture }}"
