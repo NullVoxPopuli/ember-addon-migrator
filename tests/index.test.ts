@@ -1,3 +1,4 @@
+import { execa } from 'execa';
 import fse from 'fs-extra';
 import { beforeAll,describe, expect, test } from 'vitest';
 
@@ -13,20 +14,16 @@ describe('fixtures', () => {
 
       beforeAll(async () => {
         project = await addonFrom(fixtureName);
+        await migrate(project);
+        await build(project);
       });
 
-      test('verify tmp project', async () => {
+      test.concurrent('verify tmp project', async () => {
+        await execa('ls', ['-la'], { cwd: project.rootPath, stdio: 'inherit' });
+
         expect(await fse.pathExists(project.rootPath), 'rootPath').toBe(true); 
         expect(await fse.pathExists(project.addonPath), 'addonPath').toBe(true); 
         expect(await fse.pathExists(project.testAppPath), 'testAppPath').toBe(true); 
-      });
-
-      test('migrate & build', async () => {
-        await migrate(project);
-        await build(project);
-
-        // Yay! no errors!
-        expect(true).toBe(true);
       });
 
       test.concurrent('lint addon', async () => {

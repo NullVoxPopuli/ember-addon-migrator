@@ -103,8 +103,8 @@ async function updateFilesWithinTestApp(info) {
  * @param {Info} info
  */
 async function moveTests(info) {
-  await fse.remove('tests/dummy');
-  await fse.remove('tests/index.html');
+  await fse.remove(path.join(info.tmpLocation, 'tests/dummy'));
+  await fse.remove(path.join(info.tmpLocation, 'tests/index.html'));
 
   const paths = await globby([path.join(info.tmpLocation, 'tests/**/*')]);
 

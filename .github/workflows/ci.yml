@@ -95,6 +95,10 @@ jobs:
       - uses: ./.github/actions/pnpm
       - run: |
           pnpm add --global ember-cli
+      - name: Setup
+        run: |
+          npm install --global yarn
+          npm install --global pnpm
       - name: Tests
         working-directory: 'tests'
         run: pnpm vitest --testNamePattern "${{ matrix.fixture }}"

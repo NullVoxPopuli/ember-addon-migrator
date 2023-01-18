@@ -84,7 +84,7 @@ export async function build(project: Project) {
 }
 
 export async function emberTest(project: Project) {
-  return await execa('pnpm', ['run', 'ember', 'test'], {
+  return await execa('pnpm', ['ember', 'test'], {
     cwd: project.testAppPath,
   });
 }
