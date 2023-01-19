@@ -26,7 +26,7 @@ jobs:
           echo "fixtures=$test_info" >> $GITHUB_OUTPUT
         working-directory: ./tests
 
-  lint_js:
+  linting_and_formatting:
     name: Lint JS
     runs-on: ubuntu-latest
     needs: [install_dependencies]
@@ -35,17 +35,9 @@ jobs:
       - uses: ./.github/actions/pnpm
       - name: ESLint
         run: pnpm lint
+      - name: Prettier
+        run: pnpm format:check
 
-  lint_tests:
-    name: Lint Tests
-    runs-on: ubuntu-latest
-    needs: [install_dependencies]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/actions/pnpm
-      - name: ESLint
-        run: pnpm lint
-        working-directory: tests
 
   types_library:
     name: "Types: Library"
@@ -58,6 +50,7 @@ jobs:
       - uses: ./.github/actions/pnpm
       - run: tsc --build --clean && tsc --build
         continue-on-error: true
+        working-directory: cli
 
   types_tests:
     name: "Types: Tests"
