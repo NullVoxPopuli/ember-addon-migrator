@@ -76,6 +76,7 @@ yargs(hideBin(process.argv))
 
       await execa('node', [binPath], {
         cwd: v1Project.rootPath,
+        preferLocal: true,
         stdio: 'inherit',
       });
     }

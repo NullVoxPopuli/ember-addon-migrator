@@ -2,7 +2,10 @@
  *
  * @typedef {import('./analysis/index').AddonInfo} Info
  */
+import { js } from 'ember-apply';
 import fse from 'fs-extra';
+import { globby } from 'globby';
+import { assert } from 'node:console';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
@@ -30,6 +33,7 @@ export async function migrateAddon(info) {
   }
 
   await updateAddonPackageJson(info);
+  await updateRollup(info);
 }
 
 /*
@@ -101,4 +105,77 @@ async function updateAddonPackageJson(info) {
     `${info.addonLocation}/package.json`,
     JSON.stringify(pJson, null, 2)
   );
+}
+
+/**
+ * The default blueprint only specifies components for publicEntrypoints and appReexports.
+ * We need to codemod the rollup.config.js / mjs to be have content that matches the files.
+ * (at least as a starting point)
+ *
+ * @param {Info} info
+ */
+async function updateRollup(info) {
+  let configs = await globby([
+    path.join(info.addonLocation, 'rollup.config.{js,mjs}'),
+  ]);
+
+  assert(
+    configs.length === 1,
+    'Multiple rollup configs found. Something is wrong with the v2 Addon blueprint'
+  );
+
+  // import { Addon } from '@embroider/addov-dev/rollup';
+  let importName = '';
+  // let addon = new Addon(...);
+  let addonInstanceName = '';
+
+  await js.transform(configs[0], async ({ j, root }) => {
+    // find "Addon" in import:
+    //    import { Addon } from '@embroider/addov-dev/rollup';
+    //    (could be imported "as" something else)
+    root
+      .find(j.ImportDeclaration, {
+        source: { value: '@embroider/addon-dev/rollup' },
+      })
+      .forEach((path) => {
+        j(path)
+          .find(j.ImportSpecifier, { imported: { name: 'Addon' } })
+          .forEach((path) => {
+            importName = path.node.local.name;
+          });
+      });
+
+    // find "addon" in instance creation
+    //    (might not be called "addon")
+    root
+      .find(j.VariableDeclarator, { init: { callee: { name: importName } } })
+      .forEach((path) => {
+        addonInstanceName = path.node.id.name;
+      });
+
+    // find publicEntrypoints, and change the default, per:
+    //  https://github.com/embroider-build/embroider/issues/1329
+    root
+      .find(j.CallExpression, {
+        callee: {
+          object: { name: addonInstanceName },
+          property: { name: 'publicEntrypoints' },
+        },
+      })
+      .forEach((path) => {
+        path.node.arguments[0].elements = [j.literal('index.js'), j.literal('**/*.js')]
+      });
+
+    // Find appReexports and add more stuff, based on what was in the v1 addon's app folder
+    root
+      .find(j.CallExpression, {
+        callee: {
+          object: { name: addonInstanceName },
+          property: { name: 'appReexports' },
+        },
+      })
+      .forEach((path) => {
+        path.node.arguments[0].elements.push(j.literal('modifiers/**/*.js'));
+      });
+  });
 }

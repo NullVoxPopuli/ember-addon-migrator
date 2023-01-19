@@ -21,7 +21,7 @@ export interface Project {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const fixturesDir = join(__dirname, 'fixtures');
 
-export const binPath = join(__dirname, '..', 'bin.js');
+export const binPath = join(__dirname, '..', 'cli', 'bin.js');
 
 export async function adoptFixture(srcLocation: string): Promise<void> {
   let packageJsonPath = path.join(srcLocation, 'package.json');

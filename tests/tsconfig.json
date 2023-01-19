@@ -1,4 +1,7 @@
 {
+  "ts-node": {
+    "esm": true
+  },
   "compilerOptions": {
     // Path resolution
     "baseUrl": "./",
@@ -20,5 +23,5 @@
     // Strictness / Correctness
     "strict": true
   },
-  "include": ["../cli/src/**/*", "./**/*"]
+  "include": ["./**/*"]
 }

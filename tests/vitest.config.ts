@@ -10,5 +10,8 @@ export default defineConfig({
     hookTimeout: 380_000,
     // https://vitest.dev/config/#configuration
     include: ['**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    coverage: {
+      include: ['../cli/**/*.js'],
+    },
   },
 });
