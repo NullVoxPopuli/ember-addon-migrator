@@ -78,7 +78,13 @@ jobs:
       - uses: ./.github/actions/pnpm
       - name: Tests
         working-directory: "tests"
-        run: pnpm vitest --testNamePattern "${{ matrix.fixtures.name }}"
+        run: |
+          TS_MSG="Test is skipped because ember-cli's typescript blueprint is unstable"
+          if [[ "base-ts-v1-addon" == "${{ matrix.fixture.name}}" ]]; then
+            echo $TS_MSG
+          else
+            pnpm vitest --testNamePattern "${{ matrix.fixtures.name }}"
+          fi
 
   # https://github.com/changesets/action
   release:
