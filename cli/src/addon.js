@@ -163,7 +163,10 @@ async function updateRollup(info) {
         },
       })
       .forEach((path) => {
-        path.node.arguments[0].elements = [j.literal('index.js'), j.literal('**/*.js')]
+        path.node.arguments[0].elements = [
+          j.literal('index.js'),
+          j.literal('**/*.js'),
+        ];
       });
 
     // Find appReexports and add more stuff, based on what was in the v1 addon's app folder

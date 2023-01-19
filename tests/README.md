@@ -20,10 +20,10 @@ This outputs the fixture to a tmp directory.
 After `cd`ing to the tmp directory, open a VSCode instance.
 Add ember-addon-migrator as a "workspace" so you can add breakpoints.
 Then, open the JavaScript Debug Terminal, and run:
+
 ```bash
 node ~/path/to/ember-addon-migrator/cli/bin.js
 ```
-
 
 ### Debug a transformed fixture
 
