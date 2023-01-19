@@ -18,7 +18,7 @@ yargs(hideBin(process.argv))
       let names = await findFixtures();
 
       let fixtures = names.map(name => ({ name }))
-      let output = JSON.stringify({ includes: fixtures })
+      let output = JSON.stringify({ fixtures })
 
       console.log(output);
     }

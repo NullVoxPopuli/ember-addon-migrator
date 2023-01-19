@@ -15,7 +15,7 @@ jobs:
     name: Install
     runs-on: ubuntu-latest
     outputs:
-      fixtures: ${{ steps.find_fixtures.outputs.fixtures }}
+      fixtures-matrix: ${{ steps.find_fixtures.outputs.fixtures }}
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/pnpm
@@ -73,20 +73,19 @@ jobs:
         working-directory: tests
 
   fixture_tests:
-    name: "Test: ${{ matrix.includes.name }}"
+    name: "Test: ${{ matrix.fixtures.name }}"
     runs-on: ubuntu-latest
     needs: [install_dependencies]
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.install_dependencies.outputs.fixtures) }}
+      matrix: ${{ fromJson(needs.install_dependencies.outputs.fixtures-matrix) }}
 
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/pnpm
-      - run: echo "${{ needs.install_dependencies.outputs.fixtures }}"
       - name: Tests
         working-directory: 'tests'
-        run: pnpm vitest --testNamePattern "${{ matrix.includes.name }}"
+        run: pnpm vitest --testNamePattern "${{ matrix.fixtures.name }}"
 
   # https://github.com/changesets/action
   release:
