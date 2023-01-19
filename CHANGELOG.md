@@ -1,3 +1,5 @@
+# ember-addon-migrator
+
 ## [1.7.1](https://github.com/NullVoxPopuli/ember-addon-migrator/compare/v1.7.0...v1.7.1) (2022-03-09)
 
 
