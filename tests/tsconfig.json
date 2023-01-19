@@ -2,7 +2,7 @@
   "compilerOptions": {
     // Path resolution
     "baseUrl": "./",
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
     // We only use tsc for type checking
     // "declarationDir": "./declarations",
     // "emitDeclarationOnly": true,

@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { execa } from 'execa';
-import fse from 'fs-extra';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path, { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import { execa } from 'execa';
+import fse from 'fs-extra';
 
 export interface Project {
   rootPath: string;
@@ -28,7 +29,7 @@ export async function adoptFixture(srcLocation: string): Promise<void> {
   let name = packageJson.name;
   let destinationPath = path.join(fixturesDir, name);
 
-  await fse.copy(srcLocation, destinationPath, { recursive: true });
+  await fs.cp(srcLocation, destinationPath, { recursive: true });
 }
 
 export async function findFixtures(): Promise<string[]> {
@@ -53,7 +54,7 @@ export async function addonFrom(fixture: string): Promise<Project> {
 
   let projectName = originalPackageJson.name;
 
-  await fse.copy(fixturePath, tmp, { recursive: true });
+  await fs.cp(fixturePath, tmp, { recursive: true });
 
   let project = {
     rootPath: tmp,
