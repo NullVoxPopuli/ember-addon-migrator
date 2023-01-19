@@ -14,9 +14,17 @@ jobs:
   install_dependencies:
     name: Install
     runs-on: ubuntu-latest
+    outputs:
+      fixtures: ${{ steps.find_fixtures.outputs.fixtures }}
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/pnpm
+      - id: find_fixtures
+        name: "find fixture tests"
+        run: |
+          test_info=$(pnpm run --silent dev list-fixtures)
+          echo "fixtures=$test_info" >> $GITHUB_OUTPUT
+        working-directory: ./tests
 
   lint_js:
     name: Lint JS
@@ -64,31 +72,13 @@ jobs:
         continue-on-error: true
         working-directory: tests
 
-  prepare_tests:
-    name: "Prepare Tests"
+  tests:
+    name: "Test: ${{ matrix.name }}"
     runs-on: ubuntu-latest
     needs: [install_dependencies]
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/actions/pnpm
-      - id: set-matrix
-        name: "find fixture tests"
-        run: |
-          echo "::set-output name=matrix::$(pnpm run --silent dev list-fixtures)"
-
-  tests:
-    name: "Test ${{ matrix.fixture }}"
-    runs-on: ubuntu-latest
-    needs: [prepare_tests]
     strategy:
-      fail-fast: true
-      # matrix: ${{fromJson(needs.prepare_tests.outputs.matrix)}}
-      matrix:
-        fixture:
-          - base-js-v1-addon
-          # - base-ts-v1-addon
+      fail-fast: false
+      matrix: ${{ fromJson(needs.install_dependencies.outputs.fixtures) }}
 
     steps:
       - uses: actions/checkout@v3
@@ -101,7 +91,7 @@ jobs:
           npm install --global pnpm
       - name: Tests
         working-directory: 'tests'
-        run: pnpm vitest --testNamePattern "${{ matrix.fixture }}"
+        run: pnpm vitest --testNamePattern "${{ matrix.name }}"
 
   # https://github.com/changesets/action
   release:

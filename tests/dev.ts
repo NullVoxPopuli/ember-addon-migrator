@@ -15,9 +15,12 @@ yargs(hideBin(process.argv))
   'lists the known fixtures -- for use for splitting C.I.',
     () => {},
     async () => {
-      let fixtures = await findFixtures();
+      let names = await findFixtures();
 
-      console.log(JSON.stringify(fixtures.map(name => ({ fixture: name }))));
+      let fixtures = names.map(name => ({ name }))
+      let output = JSON.stringify({ includes: fixtures })
+
+      console.log(output);
     }
   )
   .command(
