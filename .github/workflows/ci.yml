@@ -72,7 +72,7 @@ jobs:
         continue-on-error: true
         working-directory: tests
 
-  tests:
+  fixture_tests:
     name: "Test: ${{ matrix.name }}"
     runs-on: ubuntu-latest
     needs: [install_dependencies]
@@ -83,12 +83,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/pnpm
-      - run: |
-          pnpm add --global ember-cli
-      - name: Setup
-        run: |
-          npm install --global yarn
-          npm install --global pnpm
+      - run: echo "${{ needs.install_dependencies.outputs.fixtures }}"
       - name: Tests
         working-directory: 'tests'
         run: pnpm vitest --testNamePattern "${{ matrix.name }}"
@@ -99,7 +94,7 @@ jobs:
     timeout-minutes: 5
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    needs: [tests]
+    needs: [fixture_tests]
 
     steps:
       - uses: actions/checkout@v3
