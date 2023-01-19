@@ -19,5 +19,9 @@
     "esModuleInterop": true,
     // Strictness / Correctness
     "strict": true
-  }
+  },
+  "include": [
+    "../src/**/*",
+    "./**/*"
+  ],
 }

@@ -1,9 +1,8 @@
-name: Setup node and pnpm
-description: Setup node and install dependencies using pnpm
+name: Setup pnpm
+description: Setup pnpm with cache
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
-    - uses: volta-cli/action@v1
     - name: Cache pnpm modules
       uses: actions/cache@v3
       with:
@@ -11,7 +10,10 @@ runs:
         key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
         restore-keys: |
           ${{ runner.os }}-pnpm-
-    - uses: pnpm/action-setup@v2.2.2
+
+    - uses: pnpm/action-setup@v2.2.4
       with:
-        version: 7.11.0
-        run_install: true
+        version: 7.25.0
+    - name: Install Dependencies
+      run: pnpm install
+      shell: bash

@@ -13,6 +13,7 @@ import path from 'path';
  * @param {{ hidden?: boolean }} [options]
  */
 export async function install(info, options = {}) {
+  /** @type {any} */
   let opts = {};
 
   if (options.hidden) {
@@ -21,7 +22,13 @@ export async function install(info, options = {}) {
     opts.stdio = 'inherit';
   }
 
-  await execa(info.packageManager, ['install'], { preferLocal: true, ...opts });
+  try {
+    await execa(info.packageManager, ['install'], opts);
+  } catch (e) {
+    if (!(e instanceof Error)) throw e;
+
+    console.warn(e.message);
+  }
 }
 
 /**
