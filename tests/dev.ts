@@ -3,21 +3,25 @@
 /* eslint-disable no-console */
 /* eslint-disable n/shebang */
 
+import { info } from 'ember-addon-migrator/log';
+import { execa } from 'execa';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
-import { info } from '../src/log.js';
-import { addonFrom, adoptFixture, findFixtures } from './helpers.js';
+import { addonFrom, adoptFixture, binPath, findFixtures } from './helpers.js';
 
 yargs(hideBin(process.argv))
-.command(
-  ['list-fixtures'],
-  'lists the known fixtures -- for use for splitting C.I.',
+  .command(
+    ['list-fixtures'],
+    'lists the known fixtures -- for use for splitting C.I.',
     () => {},
     async () => {
-      let fixtures = await findFixtures();
+      let names = await findFixtures();
 
-      console.log(JSON.stringify(fixtures.map(name => ({ fixture: name }))));
+      let fixtures = names.map((name) => ({ name }));
+      let output = JSON.stringify({ fixtures });
+
+      console.log(output);
     }
   )
   .command(
@@ -37,17 +41,45 @@ yargs(hideBin(process.argv))
 
       info('Done! ✨');
     }
-  ).command(
-    ['adopt [sourceLocation]'], 
-    'copies a directory to be a fixture', 
+  )
+  .command(
+    ['adopt [sourceLocation]'],
+    'copies a directory to be a fixture',
     (yargs) => {
       return yargs.positional('sourceLocation', {
-        description: 'the source location of the fixture to copy. package.json is required'
+        description:
+          'the source location of the fixture to copy. package.json is required',
       });
-   }, async (argv) => {
+    },
+    async (argv) => {
       info('Coping fixture to tmp directory');
 
-      await adoptFixture(`${argv.location}`); 
+      await adoptFixture(`${argv.location}`);
 
       info('Done! ✨');
-  }).help().demandCommand().argv;
+    }
+  )
+  .command(
+    ['migrate [fixtureName]'],
+    'migrates a fixture within a tmp directory',
+    (yargs) => {
+      return yargs.positional('fixtureName', {
+        description: 'the name of the fixture to migrate',
+      });
+    },
+    async (argv) => {
+      info(`Migrating ${argv.fixtureName} within ${process.cwd()}`);
+
+      let v1Project = await addonFrom(`${argv.fixtureName}`);
+
+      console.info(`Output directory: ${v1Project.rootPath}`);
+
+      await execa('node', [binPath], {
+        cwd: v1Project.rootPath,
+        preferLocal: true,
+        stdio: 'inherit',
+      });
+    }
+  )
+  .help()
+  .demandCommand().argv;

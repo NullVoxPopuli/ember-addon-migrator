@@ -1,0 +1,68 @@
+name: ci
+
+env:
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+      - name: Lint javascript code
+        run: yarn lint:js
+      - name: Lint handlebars code
+        run: yarn lint:hbs
+
+  basic-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+      - name: Run tests
+        run: yarn test
+
+  ember-try:
+    needs: [lint, basic-tests]
+    strategy:
+      matrix:
+        ember: [lts-3.24, release, beta, canary]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+      - name: Run tests for ember-${{ matrix.ember }}
+        run: yarn ember try:one ember-${{ matrix.ember }}
+
+  floating-dependencies:
+    needs: [lint, basic-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - name: Install dependencies w/o lockfile
+        run: yarn install --no-lockfile --non-interactive
+      - name: Run tests
+        run: yarn test

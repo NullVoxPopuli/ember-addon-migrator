@@ -3,11 +3,12 @@ import { expect } from 'vitest';
 
 import { type Project, binPath, emberTest } from './helpers.js';
 
-
 export async function migrate(project: Project) {
   let { stdout } = await execa('node', [binPath], { cwd: project.rootPath });
 
-  expect(stdout).toMatch(`🎉 Congratulations! Your addon is now formatted as a V2 addon!`);
+  expect(stdout).toMatch(
+    `🎉 Congratulations! Your addon is now formatted as a V2 addon!`
+  );
 }
 
 export async function assertEmberTest(project: Project) {

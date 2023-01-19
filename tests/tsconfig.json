@@ -1,8 +1,11 @@
 {
+  "ts-node": {
+    "esm": true
+  },
   "compilerOptions": {
     // Path resolution
     "baseUrl": "./",
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
     // We only use tsc for type checking
     // "declarationDir": "./declarations",
     // "emitDeclarationOnly": true,
@@ -20,8 +23,5 @@
     // Strictness / Correctness
     "strict": true
   },
-  "include": [
-    "../src/**/*",
-    "./**/*"
-  ],
+  "include": ["./**/*"]
 }

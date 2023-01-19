@@ -14,11 +14,19 @@ jobs:
   install_dependencies:
     name: Install
     runs-on: ubuntu-latest
+    outputs:
+      fixtures-matrix: ${{ steps.find_fixtures.outputs.fixtures }}
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/pnpm
+      - id: find_fixtures
+        name: "find fixture tests"
+        run: |
+          test_info=$(pnpm run --silent dev list-fixtures)
+          echo "fixtures=$test_info" >> $GITHUB_OUTPUT
+        working-directory: ./tests
 
-  lint_js:
+  linting_and_formatting:
     name: Lint JS
     runs-on: ubuntu-latest
     needs: [install_dependencies]
@@ -27,17 +35,9 @@ jobs:
       - uses: ./.github/actions/pnpm
       - name: ESLint
         run: pnpm lint
+      - name: Prettier
+        run: pnpm format:check
 
-  lint_tests:
-    name: Lint Tests
-    runs-on: ubuntu-latest
-    needs: [install_dependencies]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/actions/pnpm
-      - name: ESLint
-        run: pnpm lint
-        working-directory: tests
 
   types_library:
     name: "Types: Library"
@@ -50,6 +50,7 @@ jobs:
       - uses: ./.github/actions/pnpm
       - run: tsc --build --clean && tsc --build
         continue-on-error: true
+        working-directory: cli
 
   types_tests:
     name: "Types: Tests"
@@ -64,44 +65,26 @@ jobs:
         continue-on-error: true
         working-directory: tests
 
-  prepare_tests:
-    name: "Prepare Tests"
+  fixture_tests:
+    name: "Test: ${{ matrix.fixtures.name }}"
     runs-on: ubuntu-latest
     needs: [install_dependencies]
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/actions/pnpm
-      - id: set-matrix
-        name: "find fixture tests"
-        run: |
-          echo "::set-output name=matrix::$(pnpm run --silent dev list-fixtures)"
-
-  tests:
-    name: "Test ${{ matrix.fixture }}"
-    runs-on: ubuntu-latest
-    needs: [prepare_tests]
     strategy:
-      fail-fast: true
-      # matrix: ${{fromJson(needs.prepare_tests.outputs.matrix)}}
-      matrix:
-        fixture:
-          - base-js-v1-addon
-          # - base-ts-v1-addon
+      fail-fast: false
+      matrix: ${{ fromJson(needs.install_dependencies.outputs.fixtures-matrix) }}
 
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/pnpm
-      - run: |
-          pnpm add --global ember-cli
-      - name: Setup
-        run: |
-          npm install --global yarn
-          npm install --global pnpm
       - name: Tests
-        working-directory: 'tests'
-        run: pnpm vitest --testNamePattern "${{ matrix.fixture }}"
+        working-directory: "tests"
+        run: |
+          TS_MSG="Test is skipped because ember-cli's typescript blueprint is unstable"
+          if [[ "base-ts-v1-addon" == "${{ matrix.fixtures.name}}" ]]; then
+            echo $TS_MSG
+          else
+            pnpm vitest --testNamePattern "${{ matrix.fixtures.name }}"
+          fi
 
   # https://github.com/changesets/action
   release:
@@ -109,7 +92,7 @@ jobs:
     timeout-minutes: 5
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    needs: [tests]
+    needs: [fixture_tests]
 
     steps:
       - uses: actions/checkout@v3

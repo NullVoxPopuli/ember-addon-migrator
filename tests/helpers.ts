@@ -13,31 +13,28 @@ export interface Project {
 }
 
 /**
-  * NOTE: these tests *only* use pnpm, becausue npm and yarn are frail 
-  *       and slow.
-  */
+ * NOTE: these tests *only* use pnpm, becausue npm and yarn are frail
+ *       and slow.
+ */
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const fixturesDir = join(__dirname, 'fixtures');
 
-
-export const binPath = join(__dirname, '..', 'bin.js');
+export const binPath = join(__dirname, '..', 'cli', 'bin.js');
 
 export async function adoptFixture(srcLocation: string): Promise<void> {
-
   let packageJsonPath = path.join(srcLocation, 'package.json');
   let packageJson = await fse.readJSON(packageJsonPath);
   let name = packageJson.name;
   let destinationPath = path.join(fixturesDir, name);
 
-  await fse.copy(srcLocation, destinationPath, { recursive: true });
+  await fs.cp(srcLocation, destinationPath, { recursive: true });
 }
-
 
 export async function findFixtures(): Promise<string[]> {
   return (await fs.readdir(fixturesDir, { withFileTypes: true }))
-    .filter(stat => stat.isDirectory())
-    .map(stat => stat.name);
+    .filter((stat) => stat.isDirectory())
+    .map((stat) => stat.name);
 }
 
 async function createTmpDir(prefix: string) {
@@ -56,20 +53,19 @@ export async function addonFrom(fixture: string): Promise<Project> {
 
   let projectName = originalPackageJson.name;
 
-  await fse.copy(fixturePath, tmp, { recursive: true });
+  await fs.cp(fixturePath, tmp, { recursive: true });
 
   let project = {
     rootPath: tmp,
     addonPath: path.join(tmp, projectName),
     testAppPath: path.join(tmp, 'test-app'),
-  }
+  };
 
   await execa('git', ['init'], { cwd: tmp });
   await execa('pnpm', ['install'], { cwd: tmp });
 
   return project;
 }
-
 
 export async function install(project: Project) {
   await execa('pnpm', ['install'], {
