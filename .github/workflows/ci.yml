@@ -73,7 +73,7 @@ jobs:
         working-directory: tests
 
   fixture_tests:
-    name: "Test: ${{ matrix.name }}"
+    name: "Test: ${{ matrix.includes.name }}"
     runs-on: ubuntu-latest
     needs: [install_dependencies]
     strategy:
@@ -86,7 +86,7 @@ jobs:
       - run: echo "${{ needs.install_dependencies.outputs.fixtures }}"
       - name: Tests
         working-directory: 'tests'
-        run: pnpm vitest --testNamePattern "${{ matrix.name }}"
+        run: pnpm vitest --testNamePattern "${{ matrix.includes.name }}"
 
   # https://github.com/changesets/action
   release:
