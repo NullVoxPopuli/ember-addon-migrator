@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { execa } from 'execa';
+import fse from 'fs-extra';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path, { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-
-import { execa } from 'execa';
-import fse from 'fs-extra';
 
 export interface Project {
   rootPath: string;
