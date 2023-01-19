@@ -10,9 +10,9 @@ on:
 
 env:
   CI: true
-  CACHE_PATH: "**/node_modules"
-  LIBRARY_DIR: "./ember-popperjs"
-  TEST_DIR: "./test-app"
+  CACHE_PATH: '**/node_modules'
+  LIBRARY_DIR: './ember-popperjs'
+  TEST_DIR: './test-app'
 
 concurrency:
   group: quality-${{ github.head_ref || github.ref }}
@@ -31,7 +31,7 @@ jobs:
         with:
           path: ${{ env.CACHE_PATH }}
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: "${{ runner.os }}-modules-"
+          restore-keys: '${{ runner.os }}-modules-'
       - run: yarn install
 
   source:

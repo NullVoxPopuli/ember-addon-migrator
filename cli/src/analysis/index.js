@@ -1,10 +1,10 @@
-import { packageJson } from "ember-apply";
+import { packageJson } from 'ember-apply';
 
-import { NothingToDoError, tryOrFail } from "./error.js";
-import { findRoot } from "./git.js";
-import { analyzeImports } from "./imports.js";
-import { guessPackageManager } from "./package-manager.js";
-import { createTmp } from "./paths.js";
+import { NothingToDoError, tryOrFail } from './error.js';
+import { findRoot } from './git.js';
+import { analyzeImports } from './imports.js';
+import { guessPackageManager } from './package-manager.js';
+import { createTmp } from './paths.js';
 
 /**
  * Type imports!
@@ -130,40 +130,40 @@ export class AddonInfo {
   }
 
   get isTS() {
-    return this.#localDependencyNames.has("typescript");
+    return this.#localDependencyNames.has('typescript');
   }
 
   get isYarn() {
-    return this.packageManager === "yarn";
+    return this.packageManager === 'yarn';
   }
 
   get isNpm() {
-    return this.packageManager === "npm";
+    return this.packageManager === 'npm';
   }
 
   get isPnpm() {
-    return this.packageManager === "pnpm";
+    return this.packageManager === 'pnpm';
   }
 
   get isEmber() {
     return Boolean(
-      this.packageJson["ember-addon"] || this.packageJson["ember"]
+      this.packageJson['ember-addon'] || this.packageJson['ember']
     );
   }
 
   get isAddon() {
     return (
       this.isEmber &&
-      Boolean(this.packageJson.keywords?.includes("ember-addon"))
+      Boolean(this.packageJson.keywords?.includes('ember-addon'))
     );
   }
 
   get isV2Addon() {
     if (!this.isAddon) return false;
 
-    let emberAddon = this.packageJson["ember-addon"];
+    let emberAddon = this.packageJson['ember-addon'];
 
-    if (emberAddon && "version" in emberAddon) {
+    if (emberAddon && 'version' in emberAddon) {
       return emberAddon.version === 2;
     }
 
@@ -209,11 +209,11 @@ export class AddonInfo {
    */
   get addonLocation() {
     if (this.isBiggerMonorepo) {
-      return this.#options.addonLocation || "pacakge";
+      return this.#options.addonLocation || 'pacakge';
     }
 
     return (
-      this.#options.addonLocation || (this.name.split("/")[1] ?? this.name)
+      this.#options.addonLocation || (this.name.split('/')[1] ?? this.name)
     );
   }
 
@@ -221,7 +221,7 @@ export class AddonInfo {
    * The path the test-app will end up in - defaults to <directory>/test-app
    */
   get testAppLocation() {
-    return this.#options.testAppLocation || "test-app";
+    return this.#options.testAppLocation || 'test-app';
   }
 
   /**
@@ -239,7 +239,7 @@ export class AddonInfo {
       );
     }
 
-    return this.#options.testAppName || "test-app";
+    return this.#options.testAppName || 'test-app';
   }
 
   /**
@@ -263,5 +263,5 @@ export class AddonInfo {
  * @param {string} name
  */
 function pathifyNpmName(name) {
-  return name.replace("@", "").replace("/", "__");
+  return name.replace('@', '').replace('/', '__');
 }

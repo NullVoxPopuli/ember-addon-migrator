@@ -1,12 +1,12 @@
 /**
  * @typedef {import('./analysis/index').AddonInfo} Info
  */
-import fse from "fs-extra";
-import fs from "node:fs/promises";
-import os from "node:os";
-import path from "node:path";
+import fse from 'fs-extra';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
 
-const SKIP = [".git", ".gitignore"];
+const SKIP = ['.git', '.gitignore'];
 
 /**
  *
@@ -36,7 +36,7 @@ export async function prepare(info) {
   return { tmpLocation: tmp };
 }
 
-export async function createTmp(prefix = "v2-addon-blueprint--") {
+export async function createTmp(prefix = 'v2-addon-blueprint--') {
   let prefixPath = path.join(os.tmpdir(), prefix);
 
   let tmpDirPath = await fs.mkdtemp(prefixPath);

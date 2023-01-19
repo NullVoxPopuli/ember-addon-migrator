@@ -1,7 +1,7 @@
-import fse from "fs-extra";
-import path from "node:path";
+import fse from 'fs-extra';
+import path from 'node:path';
 
-import { AnalysisError } from "./error.js";
+import { AnalysisError } from './error.js';
 
 /**
  * @param {string} root
@@ -19,9 +19,9 @@ export async function guessPackageManager(root, options) {
 
   while (dir !== path.dirname(root)) {
     paths.push(dir);
-    isYarn = fse.existsSync(path.join(dir, "yarn.lock"));
-    isNpm = fse.existsSync(path.join(dir, "package-lock.json"));
-    isPnpm = fse.existsSync(path.join(dir, "pnpm-lock.yaml"));
+    isYarn = fse.existsSync(path.join(dir, 'yarn.lock'));
+    isNpm = fse.existsSync(path.join(dir, 'package-lock.json'));
+    isPnpm = fse.existsSync(path.join(dir, 'pnpm-lock.yaml'));
 
     if (isYarn || isNpm || isPnpm) {
       packagerRoot = dir;
@@ -29,16 +29,16 @@ export async function guessPackageManager(root, options) {
       break;
     }
 
-    dir = path.resolve(path.join(dir, ".."));
+    dir = path.resolve(path.join(dir, '..'));
   }
 
   if (!isYarn && !isNpm && !isPnpm) {
     throw new AnalysisError(
-      `Could not determine packager. Searched in: ${paths.join(", ")}`
+      `Could not determine packager. Searched in: ${paths.join(', ')}`
     );
   }
 
-  const packager = (isYarn && "yarn") || (isNpm && "npm") || "pnpm";
+  const packager = (isYarn && 'yarn') || (isNpm && 'npm') || 'pnpm';
 
   return { manager: packager, root: packagerRoot };
 }

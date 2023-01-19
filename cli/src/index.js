@@ -1,19 +1,19 @@
 // @ts-check
 
-import Listr from "listr";
-import assert from "node:assert";
-import path from "node:path";
-import util from "node:util";
+import Listr from 'listr';
+import assert from 'node:assert';
+import path from 'node:path';
+import util from 'node:util';
 
-import { migrateAddon } from "./addon.js";
-import { AddonInfo } from "./analysis/index.js";
-import { resolvedDirectory } from "./analysis/paths.js";
-import { lintFix } from "./lint.js";
-import { error, info } from "./log.js";
-import { prepare } from "./prepare.js";
-import { migrateTestApp } from "./test-app.js";
-import { installV2Blueprint } from "./v2-blueprint.js";
-import { install, updateRootFiles } from "./workspaces.js";
+import { migrateAddon } from './addon.js';
+import { AddonInfo } from './analysis/index.js';
+import { resolvedDirectory } from './analysis/paths.js';
+import { lintFix } from './lint.js';
+import { error, info } from './log.js';
+import { prepare } from './prepare.js';
+import { migrateTestApp } from './test-app.js';
+import { installV2Blueprint } from './v2-blueprint.js';
+import { install, updateRootFiles } from './workspaces.js';
 
 /**
  * @param {import('./analysis/types').Options} options
@@ -43,7 +43,7 @@ export default async function run(options) {
         },
       },
       {
-        title: "Running Migrator",
+        title: 'Running Migrator',
         skip: () => options.analysisOnly,
         task: () => {
           return new Listr([
@@ -52,7 +52,7 @@ export default async function run(options) {
               task: () => prepare(analysis),
             },
             {
-              title: "Installing the V2 Addon Blueprint",
+              title: 'Installing the V2 Addon Blueprint',
               task: () => installV2Blueprint(analysis),
             },
             {
@@ -60,24 +60,24 @@ export default async function run(options) {
               task: () => updateRootFiles(analysis),
             },
             {
-              title: "Migrating addon files",
+              title: 'Migrating addon files',
               task: () => {
                 return migrateAddon(analysis);
               },
             },
             {
-              title: "Migrating test files",
+              title: 'Migrating test files',
               task: () => migrateTestApp(analysis),
             },
           ]);
         },
       },
       {
-        title: "Running package manager",
+        title: 'Running package manager',
         task: () => install(analysis, { hidden: true }),
       },
       {
-        title: "Running lint:fix",
+        title: 'Running lint:fix',
         task: () => {
           return new Listr([
             {
@@ -106,7 +106,7 @@ export default async function run(options) {
           ` - run \`${analysis.packageManager} install\`\n` +
           ` - run \`${analysis.packageManager} ` +
           `${
-            analysis.packageManager === "npm" ? "run " : ""
+            analysis.packageManager === 'npm' ? 'run ' : ''
           }lint:fix\` in each workspace\n` +
           ` - test your addon \`cd test-app; ${analysis.packageManager} test\`\n` +
           ` - push up a branch, merge, release\n` +
@@ -115,7 +115,7 @@ export default async function run(options) {
     });
   } catch (/** @type {any} */ e) {
     if (process.env.DEBUG) {
-      console.info("Detected options: ", util.inspect(options));
+      console.info('Detected options: ', util.inspect(options));
       throw e;
     } else {
       error(`
@@ -162,8 +162,8 @@ async function verifyOptions(options) {
   if (options.testAppName) {
     if (
       !(
-        (options.testAppName.includes("@") &&
-          options.testAppName.startsWith("@")) ||
+        (options.testAppName.includes('@') &&
+          options.testAppName.startsWith('@')) ||
         /[a-z-]+/.test(options.testAppName)
       )
     ) {

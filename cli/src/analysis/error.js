@@ -1,4 +1,4 @@
-import { error } from "../log.js";
+import { error } from '../log.js';
 
 export class NothingToDoError extends Error {}
 export class AnalysisError extends Error {}

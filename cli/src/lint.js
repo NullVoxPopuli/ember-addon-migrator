@@ -1,4 +1,4 @@
-import { execa } from "execa";
+import { execa } from 'execa';
 
 /**
  *
@@ -8,9 +8,9 @@ import { execa } from "execa";
 export async function lintFix(analysis, location) {
   let packageManager = analysis.packageManager;
 
-  if (packageManager === "npm") {
-    return await execa("npm", ["run", "lint:fix"], { cwd: location });
+  if (packageManager === 'npm') {
+    return await execa('npm', ['run', 'lint:fix'], { cwd: location });
   }
 
-  return await execa(packageManager, ["lint:fix"], { cwd: location });
+  return await execa(packageManager, ['lint:fix'], { cwd: location });
 }

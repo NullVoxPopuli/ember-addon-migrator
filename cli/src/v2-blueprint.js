@@ -1,26 +1,26 @@
 /**
  * @typedef {import('./analysis/index').AddonInfo} Info
  */
-import { execaCommand } from "execa";
-import fse from "fs-extra";
-import fs from "node:fs/promises";
-import path from "node:path";
+import { execaCommand } from 'execa';
+import fse from 'fs-extra';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
-import { createTmp } from "./prepare.js";
+import { createTmp } from './prepare.js';
 
 /**
  * @param {Info} info
  */
 export async function installV2Blueprint(info) {
-  let tmp = await createTmp("v2-addon-creation--");
+  let tmp = await createTmp('v2-addon-creation--');
   let packager = info.isPnpm
-    ? "--pnpm"
+    ? '--pnpm'
     : info.isYarn
-    ? "--yarn"
+    ? '--yarn'
     : info.isNpm
-    ? "--npm"
-    : "";
-  let ts = info.isTS ? "--typescript" : "";
+    ? '--npm'
+    : '';
+  let ts = info.isTS ? '--typescript' : '';
 
   await execaCommand(
     `npx ember-cli@4.10.0-beta.0 addon ${info.name}` +

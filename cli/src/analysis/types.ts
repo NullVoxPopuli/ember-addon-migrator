@@ -1,4 +1,4 @@
-import type { PackageJson as BasicPackage } from "types-package-json";
+import type { PackageJson as BasicPackage } from 'types-package-json';
 
 export interface Options {
   analysisOnly: boolean;
@@ -21,11 +21,11 @@ type EmberAddon =
       version: number;
       type: string;
       main: string;
-      "app-js": Record<string, string>;
+      'app-js': Record<string, string>;
     };
 
 interface Ember {
-  edition?: "octane";
+  edition?: 'octane';
 }
 
 /**
@@ -34,7 +34,7 @@ interface Ember {
 interface PackageExtras {
   volta?: Volta;
   ember?: Ember;
-  "ember-addon"?: EmberAddon;
+  'ember-addon'?: EmberAddon;
   private?: boolean;
   /**
    * Present in npm and yarn, but not pnpm
