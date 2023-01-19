@@ -11,13 +11,13 @@ on:
 
 env:
   CI: true
-  CACHE_PATH: '**/node_modules'
-  LIBRARY_DIR: './ember-popperjs'
-  TEST_DIR: './test-app'
+  CACHE_PATH: "**/node_modules"
+  LIBRARY_DIR: "./ember-popperjs"
+  TEST_DIR: "./test-app"
 
 concurrency:
-   group: ci-${{ github.head_ref || github.ref }}
-   cancel-in-progress: true
+  group: ci-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   tests:

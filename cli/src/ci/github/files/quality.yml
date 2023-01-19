@@ -10,13 +10,13 @@ on:
 
 env:
   CI: true
-  CACHE_PATH: '**/node_modules'
-  LIBRARY_DIR: './ember-popperjs'
-  TEST_DIR: './test-app'
+  CACHE_PATH: "**/node_modules"
+  LIBRARY_DIR: "./ember-popperjs"
+  TEST_DIR: "./test-app"
 
 concurrency:
-   group: quality-${{ github.head_ref || github.ref }}
-   cancel-in-progress: true
+  group: quality-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   install_dependencies:
@@ -111,7 +111,6 @@ jobs:
   #   - run: yarn install
   #   - run: yarn lint:docs
 
-
   # docs-js-code:
   #   if: "! contains(toJSON(github.event.commits.*.message), '[skip ci]')"
   #   name: Docs (JS Code Samples)
@@ -129,9 +128,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
-    - uses: volta-cli/action@v1
-    - uses: wagoid/commitlint-github-action@v4.1.9
+      - uses: volta-cli/action@v1
+      - uses: wagoid/commitlint-github-action@v4.1.9

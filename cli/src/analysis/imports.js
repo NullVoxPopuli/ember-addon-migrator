@@ -1,49 +1,49 @@
-import { js } from 'ember-apply';
-import { globbyStream } from 'globby';
-import path from 'node:path';
+import { js } from "ember-apply";
+import { globbyStream } from "globby";
+import path from "node:path";
 
 const globs = [
-  '**/*.{js,ts}',
+  "**/*.{js,ts}",
   // Addons that have fancy build time stuff can't be converted to v2 automatically
-  '!^index.js',
+  "!^index.js",
   // Don't need to traverse these
-  '!**/docs/**/*',
-  '!**/node_modules/**/*',
+  "!**/docs/**/*",
+  "!**/node_modules/**/*",
   // Generated Directories
-  '!**/dist/**/*',
-  '!**/declarations/**/*',
+  "!**/dist/**/*",
+  "!**/declarations/**/*",
   // These don't usually have imports we'd care about
-  '!**/blueprints/**/*',
-  '!**/config/**/*',
-  '!**/public/**/*',
-  '!**/vendor/**/*',
+  "!**/blueprints/**/*",
+  "!**/config/**/*",
+  "!**/public/**/*",
+  "!**/vendor/**/*",
 ];
 
 // These are provided by ember-source
 const EMBER_VIRTUAL_DEPENDENCIES = [
-  '@ember/application',
-  '@ember/array',
-  '@ember/component',
-  '@ember/controller',
-  '@ember/debug',
-  '@ember/destroyable',
-  '@ember/helper',
-  '@ember/owner',
-  '@ember/object',
-  '@ember/routing',
-  '@ember/runloop',
-  '@ember/service',
-  '@ember/template',
-  '@ember/string',
-  '@ember/error',
-  '@ember/utils',
-  '@ember/test',
-  'ember',
-  'rsvp',
+  "@ember/application",
+  "@ember/array",
+  "@ember/component",
+  "@ember/controller",
+  "@ember/debug",
+  "@ember/destroyable",
+  "@ember/helper",
+  "@ember/owner",
+  "@ember/object",
+  "@ember/routing",
+  "@ember/runloop",
+  "@ember/service",
+  "@ember/template",
+  "@ember/string",
+  "@ember/error",
+  "@ember/utils",
+  "@ember/test",
+  "ember",
+  "rsvp",
 
   // People should *not* be importing from these packages... :-\
   // DANGER!
-  '@glimmer/validator',
+  "@glimmer/validator",
 ];
 
 /**
@@ -103,13 +103,13 @@ async function collectImportedDependencies(filePath) {
     root.find(j.ImportDeclaration).forEach((path) => {
       let importPath = path.node.source.value;
 
-      if (importPath.startsWith('.')) return;
+      if (importPath.startsWith(".")) return;
 
       let pkgName = importPathToPackage(importPath);
 
       // BUNDLED from other locations
       if (EMBER_VIRTUAL_DEPENDENCIES.includes(pkgName)) {
-        importedDeps.push('ember-source');
+        importedDeps.push("ember-source");
 
         return;
       }
@@ -130,7 +130,7 @@ async function collectImportedDependencies(filePath) {
  */
 async function runOnGlob(directory, fn, glob) {
   let globs = glob.map((g) => {
-    if (g.startsWith('!')) {
+    if (g.startsWith("!")) {
       return g;
     }
 
@@ -154,12 +154,12 @@ async function runOnGlob(directory, fn, glob) {
  * @param {string} specifier
  */
 function importPathToPackage(specifier) {
-  let parts = specifier.split('/');
+  let parts = specifier.split("/");
 
   let [first, second] = parts;
 
-  if (first.startsWith('@')) {
-    return [first, second].join('/');
+  if (first.startsWith("@")) {
+    return [first, second].join("/");
   }
 
   return first;

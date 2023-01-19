@@ -2,11 +2,11 @@
  * @typedef {import('./analysis/index').AddonInfo} Info
  * @typedef {import('./analysis/types').PackageJson} PackageJson
  */
-import { execa } from 'execa';
-import fse from 'fs-extra';
-import deepMerge from 'merge';
-import fs from 'node:fs/promises';
-import path from 'path';
+import { execa } from "execa";
+import fse from "fs-extra";
+import deepMerge from "merge";
+import fs from "node:fs/promises";
+import path from "path";
 
 /**
  * @param {Info} info
@@ -17,13 +17,13 @@ export async function install(info, options = {}) {
   let opts = {};
 
   if (options.hidden) {
-    opts.stdout = 'ignore';
+    opts.stdout = "ignore";
   } else {
-    opts.stdio = 'inherit';
+    opts.stdio = "inherit";
   }
 
   try {
-    await execa(info.packageManager, ['install'], opts);
+    await execa(info.packageManager, ["install"], opts);
   } catch (e) {
     if (!(e instanceof Error)) throw e;
 
@@ -40,10 +40,10 @@ export async function updateRootFiles(info) {
    * known monorepeo root files, because they likely exist elsewhere.
    */
   if (info.isBiggerMonorepo) {
-    await fse.rm(path.join(info.directory, 'package.json'));
+    await fse.rm(path.join(info.directory, "package.json"));
 
     if (info.isPnpm) {
-      await fse.rm(path.join(info.directory, 'pnpm-workspace.yaml'));
+      await fse.rm(path.join(info.directory, "pnpm-workspace.yaml"));
     }
 
     return;
@@ -56,7 +56,7 @@ export async function updateRootFiles(info) {
  * @param {Info} info
  */
 async function updatePackageJson(info) {
-  let packageJsonPath = path.join(info.directory, 'package.json');
+  let packageJsonPath = path.join(info.directory, "package.json");
   let generated = await fse.readJSON(packageJsonPath);
 
   let newInfo = workspacePackageJsonFrom(info);

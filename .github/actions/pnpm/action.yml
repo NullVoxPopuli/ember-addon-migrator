@@ -1,7 +1,7 @@
 name: Setup pnpm
 description: Setup pnpm with cache
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - uses: pnpm/action-setup@v2.2.4
       with:
@@ -9,7 +9,7 @@ runs:
     - uses: actions/setup-node@v3
       with:
         node-version: 16
-        cache: 'pnpm'
+        cache: "pnpm"
     # - name: Cache pnpm modules
     #   uses: actions/cache@v3
     #   with:

@@ -1,13 +1,14 @@
-import { execa } from 'execa';
-import { expect } from 'vitest';
+import { execa } from "execa";
+import { expect } from "vitest";
 
-import { type Project, binPath, emberTest } from './helpers.js';
-
+import { type Project, binPath, emberTest } from "./helpers.js";
 
 export async function migrate(project: Project) {
-  let { stdout } = await execa('node', [binPath], { cwd: project.rootPath });
+  let { stdout } = await execa("node", [binPath], { cwd: project.rootPath });
 
-  expect(stdout).toMatch(`🎉 Congratulations! Your addon is now formatted as a V2 addon!`);
+  expect(stdout).toMatch(
+    `🎉 Congratulations! Your addon is now formatted as a V2 addon!`
+  );
 }
 
 export async function assertEmberTest(project: Project) {
@@ -18,8 +19,8 @@ export async function assertEmberTest(project: Project) {
   // to stdout
   console.debug(stdout);
   expect(exitCode).toEqual(0);
-  expect(stdout).toMatch('Built project successfully');
-  expect(stdout).toMatch('# skip  0');
-  expect(stdout).toMatch('# todo  0');
-  expect(stdout).toMatch('# fail  0');
+  expect(stdout).toMatch("Built project successfully");
+  expect(stdout).toMatch("# skip  0");
+  expect(stdout).toMatch("# todo  0");
+  expect(stdout).toMatch("# fail  0");
 }

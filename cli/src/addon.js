@@ -2,27 +2,31 @@
  *
  * @typedef {import('./analysis/index').AddonInfo} Info
  */
-import fse from 'fs-extra';
-import fs from 'node:fs/promises';
-import path from 'node:path';
+import fse from "fs-extra";
+import fs from "node:fs/promises";
+import path from "node:path";
 
 /**
  * @param {Info} info
  */
 export async function migrateAddon(info) {
-  let addonFolder = path.join(info.tmpLocation, 'addon');
-  let testSupportFolder = path.join(info.tmpLocation, 'addon-test-support');
+  let addonFolder = path.join(info.tmpLocation, "addon");
+  let testSupportFolder = path.join(info.tmpLocation, "addon-test-support");
 
   if (await fse.pathExists(addonFolder)) {
-    await fse.move(addonFolder, path.join(info.addonLocation, 'src'), {
+    await fse.move(addonFolder, path.join(info.addonLocation, "src"), {
       overwrite: true,
     });
   }
 
   if (await fse.pathExists(testSupportFolder)) {
-    await fse.move(testSupportFolder, path.join(info.addonLocation, 'src/test-support'), {
-      overwrite: true,
-    });
+    await fse.move(
+      testSupportFolder,
+      path.join(info.addonLocation, "src/test-support"),
+      {
+        overwrite: true,
+      }
+    );
   }
 
   await updateAddonPackageJson(info);
@@ -32,13 +36,13 @@ export async function migrateAddon(info) {
  * Common dependencies in v1 addons that we don't need in v2 addons
  * */
 const NO_LONGER_NEEDED = [
-  'ember-auto-import',
-  'ember-cli-babel',
-  'ember-cli-htmlbars',
-  'ember-cli-typescript',
+  "ember-auto-import",
+  "ember-cli-babel",
+  "ember-cli-htmlbars",
+  "ember-cli-typescript",
   // Fake modules, listing them did nothing
-  '@glimmer/tracking',
-  '@glimmer/component',
+  "@glimmer/tracking",
+  "@glimmer/component",
 ];
 
 /**
@@ -46,7 +50,7 @@ const NO_LONGER_NEEDED = [
  */
 async function updateAddonPackageJson(info) {
   /** @type {Partial<import('./analysis/types').PackageJson>} */
-  let pJson = await fse.readJSON(path.join(info.addonLocation, 'package.json'));
+  let pJson = await fse.readJSON(path.join(info.addonLocation, "package.json"));
 
   let { packageJson: old, packageManager } = info;
 
@@ -72,7 +76,7 @@ async function updateAddonPackageJson(info) {
     pJson.volta = {
       extends: path.join(
         path.relative(info.addonLocation, info.packageManagerRoot),
-        'package.json'
+        "package.json"
       ),
     };
   }
@@ -93,5 +97,8 @@ async function updateAddonPackageJson(info) {
     }
   }
 
-  await fs.writeFile(`${info.addonLocation}/package.json`, JSON.stringify(pJson, null, 2));
+  await fs.writeFile(
+    `${info.addonLocation}/package.json`,
+    JSON.stringify(pJson, null, 2)
+  );
 }

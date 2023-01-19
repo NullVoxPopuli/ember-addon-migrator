@@ -20,8 +20,5 @@
     // Strictness / Correctness
     "strict": true
   },
-  "include": [
-    "../src/**/*",
-    "./**/*"
-  ],
+  "include": ["../cli/src/**/*", "./**/*"]
 }

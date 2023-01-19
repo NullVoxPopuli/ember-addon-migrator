@@ -1,11 +1,11 @@
-import chalk from 'chalk';
-import { stripIndent } from 'common-tags';
+import chalk from "chalk";
+import { stripIndent } from "common-tags";
 
 /**
  * @param {string | Error} msg
  */
 export function error(msg) {
-  if (typeof msg !== 'string') {
+  if (typeof msg !== "string") {
     if (msg instanceof Error) {
       msg = msg.message + `\n\n` + msg.stack;
     }
