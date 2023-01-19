@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     // Path resolution
-    "baseUrl": "cli/src",
+    "baseUrl": "./src",
     "moduleResolution": "node",
     // We only use tsc for type checking
     // "declarationDir": "./declarations",
@@ -20,6 +20,5 @@
     // Strictness / Correctness
     "strict": true
   },
-  "include": ["cli/src/**/*"],
-  "exclude": ["cli/src/ts/files/**/*", "cli/src/js/files/**/*"]
+  "include": ["./src/**/*"]
 }

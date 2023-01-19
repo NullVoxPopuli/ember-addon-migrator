@@ -8,7 +8,6 @@ npx ember-addon-migrator
 ```
 
 This command will move all your addon files into two new locations:
-
 ```
 {your-addon-name}/
   - plain / normal npm package built with rollup
@@ -34,12 +33,12 @@ Places the addon in `--addon-location` instead of `{addon-name}`
 
 ## Compatibility
 
-- Node 16+
+ - Node 16+
 
 ## Contributing
 
-- clone the repo
-- `cd ember-addon-migrator`
-- `yarn`
-- cd to your v1 addon for testing
-- run `node ../path/to/ember-addon-migrator/bin.js`
+ - clone the repo
+ - `cd ember-addon-migrator`
+ - `yarn`
+ - cd to your v1 addon for testing
+ - run `node ../path/to/ember-addon-migrator/bin.js`
