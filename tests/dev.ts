@@ -21,6 +21,7 @@ yargs(hideBin(process.argv))
       let fixtures = names.map((name) => ({ name }));
       let output = JSON.stringify({ fixtures });
 
+      // STDOUT is used to pipe to C.I. env vars
       console.log(output);
     }
   )
@@ -47,6 +48,7 @@ yargs(hideBin(process.argv))
     'copies a directory to be a fixture',
     (yargs) => {
       return yargs.positional('sourceLocation', {
+        type: 'string',
         description:
           'the source location of the fixture to copy. package.json is required',
       });
@@ -54,7 +56,7 @@ yargs(hideBin(process.argv))
     async (argv) => {
       info('Coping fixture to tmp directory');
 
-      await adoptFixture(`${argv.location}`);
+      await adoptFixture(`${argv.sourceLocation}`);
 
       info('Done! ✨');
     }

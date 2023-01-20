@@ -1,4 +1,7 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+// @ts-ignore
+import { packageJson } from 'ember-apply';
 import { execa } from 'execa';
 import fse from 'fs-extra';
 import fs from 'node:fs/promises';
@@ -23,12 +26,24 @@ const fixturesDir = join(__dirname, 'fixtures');
 export const binPath = join(__dirname, '..', 'cli', 'bin.js');
 
 export async function adoptFixture(srcLocation: string): Promise<void> {
-  let packageJsonPath = path.join(srcLocation, 'package.json');
-  let packageJson = await fse.readJSON(packageJsonPath);
-  let name = packageJson.name;
-  let destinationPath = path.join(fixturesDir, name);
+  let fullLocation = path.join(
+    process.env.INIT_CWD ?? process.cwd(),
+    srcLocation
+  );
+  let packageJsonPath = path.join(fullLocation, 'package.json');
+  let oldPackageJson = await fse.readJSON(packageJsonPath);
+  let { name, version } = oldPackageJson;
 
-  await fs.cp(srcLocation, destinationPath, { recursive: true });
+  // replacing @ with [at] breaks vitest...
+  name = name.replace('@', '').replace('/', '__');
+
+  let destinationPath = path.join(fixturesDir, `${name}-${version}`);
+
+  await fs.cp(fullLocation, destinationPath, { recursive: true });
+
+  await packageJson.modify(async (json: any) => {
+    delete json.volta;
+  }, path.dirname(destinationPath));
 }
 
 export async function findFixtures(): Promise<string[]> {
