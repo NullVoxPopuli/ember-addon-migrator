@@ -56,7 +56,7 @@ export default async function run(options) {
               {
                 title: `Deferring to ember-codemod-v1-to-v2, by @ijlee2`,
                 task: () => deferCodemod(analysis),
-              }
+              },
             ]);
           }
 
