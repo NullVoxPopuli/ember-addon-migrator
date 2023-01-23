@@ -20,6 +20,8 @@ import { install, updateRootFiles } from './workspaces.js';
  * @param {import('./analysis/types').Options} options
  */
 export default async function run(options) {
+  console.log('!! Welcome to *ember-addon-migrator* !! ');
+
   await verifyOptions(options);
 
   let targetAddon = resolvedDirectory(options.directory);
@@ -51,7 +53,7 @@ export default async function run(options) {
             return new Listr([
               {
                 title: `Project is TypeScript, which does not have native support from ember-cli + v2-addon-blueprint (yet)`,
-                task: () => true,
+                task: () => {},
               },
               {
                 title: `Deferring to ember-codemod-v1-to-v2, by @ijlee2`,
