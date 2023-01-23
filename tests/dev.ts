@@ -33,7 +33,7 @@ yargs(hideBin(process.argv))
       });
     },
     async (argv) => {
-      info('Coping fixture to tmp directory');
+      info('Copying fixture to tmp directory');
 
       let project = await addonFrom(`${argv.name}`);
 
