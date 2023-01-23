@@ -3,6 +3,9 @@
  * @typedef {import('./analysis/index').AddonInfo} Info
  */
 import { execa } from 'execa';
+// import path from 'node:path';
+// import fs from 'node:fs/promises';
+// import { pathExists } from 'fs-extra/esm';
 
 /**
  * @param {Info} info
@@ -17,10 +20,28 @@ export async function deferCodemod(info) {
  * @param {Info} info
  */
 export async function addMissingFiles(info) {
-  /**
-    * 1. .template-lintrc.js
-    */
+  // let writeIfMissing = (location, content) => {
+  //   if (await pathExists(location)) return;
 
+  //   await fs.writeFile(location, content);
+  // }
+  // /**
+  //   * 1. .template-lintrc.js
+  //   */
+  // await writeIfMissing(path.join(info.addonLocation, '.template-lintrc.js'),
+// `'use strict';
+
+// module.exports = {
+  // extends: 'recommended',
+// };
+// `
+  // );
+
+  // await writeIfMissing(path.join(info.addonLocation, '.eslintrc.js'),
+  // `
+
+  //   `
+  // )
 }
 
 /**
