@@ -1,0 +1,8 @@
+{
+  "name": "tmp-v2-ts-addon-blueprint",
+  "type": "commonjs",
+  "keywords": [
+    "ember-addon",
+    "ember-blueprint"
+  ]
+}

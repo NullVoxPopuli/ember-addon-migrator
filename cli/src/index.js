@@ -8,6 +8,7 @@ import util from 'node:util';
 import { migrateAddon } from './addon.js';
 import { AddonInfo } from './analysis/index.js';
 import { resolvedDirectory } from './analysis/paths.js';
+import { deferCodemod } from './defer.js';
 import { lintFix } from './lint.js';
 import { error, info } from './log.js';
 import { prepare } from './prepare.js';
@@ -46,6 +47,19 @@ export default async function run(options) {
         title: 'Running Migrator',
         skip: () => options.analysisOnly,
         task: () => {
+          if (analysis.isTS) {
+            return new Listr([
+              {
+                title: `Project is TypeScript, which does not have native support from ember-cli + v2-addon-blueprint (yet)`,
+                task: () => true,
+              },
+              {
+                title: `Deferring to ember-codemod-v1-to-v2, by @ijlee2`,
+                task: () => deferCodemod(analysis),
+              }
+            ]);
+          }
+
           return new Listr([
             {
               title: `Moving addon to tmp directory, ${analysis.tmpLocation}`,
@@ -130,7 +144,7 @@ export default async function run(options) {
         aliased as both:
           ea2 reset
           ember-addon-migrator reset
-    
+
     -----------------------------------\n
     `);
       error(e);
