@@ -12,3 +12,12 @@ export async function deferCodemod(info) {
     stdio: 'inherit',
   });
 }
+
+/**
+ * @param {Info} info
+ */
+export async function addMissingFiles(info) {
+  /**
+    * 1. .template-lintrc.js
+    */
+}
