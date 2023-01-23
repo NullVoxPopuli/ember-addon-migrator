@@ -8,7 +8,7 @@ import util from 'node:util';
 import { migrateAddon } from './addon.js';
 import { AddonInfo } from './analysis/index.js';
 import { resolvedDirectory } from './analysis/paths.js';
-import { addMissingFiles, deferCodemod } from './defer.js';
+import { addMissingDependencies, addMissingFiles, deferCodemod } from './defer.js';
 import { lintFix } from './lint.js';
 import { error, info } from './log.js';
 import { prepare } from './prepare.js';
@@ -58,6 +58,14 @@ export default async function run(options) {
               {
                 title: `Deferring to ember-codemod-v1-to-v2, by @ijlee2`,
                 task: () => deferCodemod(analysis),
+              },
+              {
+                title: `Installing dependencies`,
+                task: () => install(analysis, { hidden: true }),
+              },
+              {
+                title: `Adding missing dependencies`,
+                task: () => addMissingDependencies(analysis),
               },
               {
                 title: `Adding missing files`,
