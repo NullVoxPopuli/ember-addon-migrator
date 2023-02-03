@@ -71,7 +71,8 @@ yarg
     },
     async (args) => {
       // "Light logic" to keep the test app to be a sibling to the addon directory (if not specified)
-      let testAppLocation = args.testAppLocation || (args.inPlace ? 'test-app' : '../test-app');
+      let testAppLocation =
+        args.testAppLocation || (args.inPlace ? 'test-app' : '../test-app');
 
       return extractTests({ ...args, testAppLocation });
     }

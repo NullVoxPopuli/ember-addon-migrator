@@ -1,6 +1,7 @@
 # Blueprint files
 src/js/files/
 src/ts/files/
+src/override-files/
 
 # Tests has separate config
 tests/
