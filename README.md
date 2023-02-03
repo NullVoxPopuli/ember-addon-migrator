@@ -26,14 +26,6 @@ _Additional tweaking may be required after the migrator runs_.
 Be sure to check out `npx ember-addon-migrator --help` for a full list of commands and options.
 (Noting that to see options' help, you'll need to specify the command, e.g.: `npx ember-addon-migrator extract-tests --help`)
 
-## Parameters
-
-Parameters follow naming of args used in the [v2 addon blueprint](https://github.com/embroider-build/addon-blueprint)
-
-### `--addon-location`
-
-Places the addon in `--addon-location` instead of `{addon-name}`
-
 ## Other Commands 
 
 ### `npx ember-addon-migrator extract-tests`
@@ -59,18 +51,8 @@ Example workflow:
   The default command for `ember-addon-migrator` will do this for you via `--exclude-tests` or `--in-place` (these flags are aliases of each-other)
   
 
-#### Parameters 
 
-##### `--test-app-location`
-
-##### `--directory`
-
-##### `--in-place`
-
-##### `--addon-location`
-
-##### `--test-app-name`
-
+See `npx ember-addon-migrator extract-tests --help` for parameters' information.
 
 
 ### `npx ember-addon-migrator reset`
@@ -92,6 +74,6 @@ This can be useful for development of the addon-migrator when trying on real pro
 
  - clone the repo
  - `cd ember-addon-migrator`
- - `yarn`
+ - `pnpm`
  - cd to your v1 addon for testing
  - run `node ../path/to/ember-addon-migrator/bin.js`
