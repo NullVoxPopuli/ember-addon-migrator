@@ -3,12 +3,12 @@
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
-import extractTests from './src/extract-tests.js';
+import extractTests from './src/extract-tests/index.js';
 import reset from './src/git-reset.js';
 import run from './src/index.js';
 import { info } from './src/log.js';
 
-let yarg = yargs(hideBin(process.argv))
+let yarg = yargs(hideBin(process.argv));
 
 yarg.wrap(yarg.terminalWidth());
 
@@ -29,11 +29,19 @@ yarg
   )
   .command(
     'extract-tests',
-    `in low-maintenance projects, or projects with many people needing context, ` + `it is greatly beneficial to do a v2 addon conversion in two parts: ` + `split the tests from the addon, and then later in a separate PR, ` + `do the actual v1 -> v2 conversion of the addon itself.`,
+    `in low-maintenance projects, or projects with many people needing context, ` +
+      `it is greatly beneficial to do a v2 addon conversion in two parts: ` +
+      `split the tests from the addon, and then later in a separate PR, ` +
+      `do the actual v1 -> v2 conversion of the addon itself. ` +
+      `extract-tests is meant to be a partial migration -- as such, it does not generate C.I.-passable code after running, as it cannot know exactly how your repo and C.I. are configured. ` +
+      `Please check lints and C.I. config after running.`,
     (yargs) => {
       yargs.option('test-app-location', {
-        describe: 'The folder to place the extracted test app. ' + 'Defaults to a sibling folder to the addon-location named "test-app"',
+        describe:
+          'The folder to place the extracted test app. ' +
+          'Defaults to a sibling folder to the addon-location named "test-app"',
         type: 'string',
+        default: '../test-app',
       });
       yargs.option('directory', {
         describe:
@@ -42,7 +50,8 @@ yarg
         default: process.cwd(),
       });
       yargs.option('in-place', {
-        describe: 'within the current directory, move the v1 addon out of the way and in to a sub-folder that will be sibling to the test-app',
+        describe:
+          'within the current directory, move the v1 addon out of the way and in to a sub-folder that will be sibling to the test-app',
         type: 'boolean',
       });
       yargs.option('addon-location', {
@@ -54,6 +63,11 @@ yarg
         describe: 'the name of the test-app package.',
         type: 'string',
         default: 'test-app',
+      });
+      yargs.option('analysis-only', {
+        describe: 'inspect the analysis object, skipping migration entirely',
+        type: 'boolean',
+        default: false,
       });
     },
     async (args) => {
@@ -95,5 +109,4 @@ yarg
       return run(args);
     }
   )
-  .help()
-  .argv;
+  .help().argv;

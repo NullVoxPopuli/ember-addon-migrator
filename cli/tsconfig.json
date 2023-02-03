@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     // Path resolution
-    "baseUrl": "./src",
     "moduleResolution": "node",
     // We only use tsc for type checking
     // "declarationDir": "./declarations",
