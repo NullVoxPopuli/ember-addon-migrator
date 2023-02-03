@@ -41,7 +41,6 @@ yarg
           'The folder to place the extracted test app. ' +
           'Defaults to a sibling folder to the addon-location named "test-app"',
         type: 'string',
-        default: '../test-app',
       });
       yargs.option('directory', {
         describe:
@@ -71,7 +70,10 @@ yarg
       });
     },
     async (args) => {
-      return extractTests(args);
+      // "Light logic" to keep the test app to be a sibling to the addon directory (if not specified)
+      let testAppLocation = args.testAppLocation || (args.inPlace ? 'test-app' : '../test-app');
+
+      return extractTests({ ...args, testAppLocation });
     }
   )
   .command(

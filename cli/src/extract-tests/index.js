@@ -1,12 +1,19 @@
+import { packageJson } from 'ember-apply';
 import { execa } from 'execa';
 import fs from 'fs-extra';
 import { globby } from 'globby';
 import Listr from 'listr';
+import path from 'node:path';
+import url from 'node:url';
 import util from 'node:util';
 
 import { AddonInfo } from '../analysis/index.js';
 import { resolvedDirectory } from '../analysis/paths.js';
 import { error, info } from '../log.js';
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+
+const tsIssue =  ' See: https://github.com/ember-cli/ember-cli/issues/10045';
 
 /**
  * @param {import('./types.js').Args} args
@@ -44,10 +51,10 @@ export default async function extractTests(args) {
           task: async (ctx, task) => {
             if (analysis.isTS) {
               task.output =
-                '⚠️  Native typescript from ember-cli ignores --skip-npm.';
+                '⚠️  Native typescript from ember-cli ignores --skip-npm.' + tsIssue; 
             }
 
-            await createTestApp(analysis);
+            await createTestApp(analysis, task);
           },
         });
 
@@ -136,21 +143,29 @@ async function analyze(args) {
  * @param {AddonInfo} analysis
  */
 async function moveAddon(analysis) {
+  await fs.rm(analysis.addonLocation, { force: true, recursive: true });
   await fs.ensureDir(analysis.addonLocation);
 
-  let paths = await globby(['*', '.*', '!.git', '!.github'], {
+  let toMoveTo = path.relative(analysis.directory, analysis.addonLocation)
+
+  let paths = await globby(['*', '.*', '!.git', '!.github', `!${toMoveTo}`], {
     expandDirectories: false,
+    cwd: analysis.directory,
+    onlyFiles: false, 
   });
 
   for (let filePath of paths) {
-    await fs.move(filePath, analysis.addonLocation);
+    let source = path.join(analysis.directory, filePath);
+    let destination = path.join(analysis.addonLocation, filePath);
+
+    await fs.move(source, destination);
   }
 }
 
 /**
  * @param {AddonInfo} analysis
  */
-async function createTestApp(analysis) {
+async function createTestApp(analysis, task) {
   /**
    * NOTE: using `--typescript` forces skip-npm to be ignored due to how the --typescript support is implemented in ember-cli
    */
@@ -172,13 +187,32 @@ async function createTestApp(analysis) {
     { cwd: analysis.directory }
   );
 
+  let testApp = analysis.testAppLocation;
+
   /**
    * Because of the --typescript problem, let's delete node_modules and the generated lockfile.
    * they're likely wrong / broken anyway.
    */
+  task.output = 'Deleting artifacts from --typescript bug.' +tsIssue ;
+  await fs.rm(path.join(testApp, 'node_modules'), { force: true, recursive: true });
+  await fs.rm(path.join(testApp, 'package-lock.json'), { force: true, recursive: true });
 
   /**
    * Because this is an addon, we want to add `@embroider/test-setup`
    * and configure the ember-cli-build to optionally use embroider
    */
+  task.output = 'Converting "ember new" app to addon-test app...';
+  await packageJson.addDevDependencies({
+    'ember-source-channel-url': '^3.0.0',
+    'ember-try': '^2.0.0',
+    '@embroider/test-setup': '^2.1.1',
+  }, testApp);
+
+  let replacementECBuild = path.join(__dirname, '../override-files/test-app/ember-cli-build.js');
+  let emberTry = path.join(__dirname, '../override-files/test-app/ember-try.js');
+
+  await fs.copy(replacementECBuild, path.join(testApp, 'ember-cli-build.js'));
+  await fs.copy(emberTry, path.join(testApp, 'config/ember-try.js'));
+  // there is no --ci-provider=none?
+  await fs.rm(path.join(testApp, '.github'));
 }
