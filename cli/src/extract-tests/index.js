@@ -1,4 +1,6 @@
+import { execa } from 'execa';
 import fs from 'fs-extra';
+import { globby } from 'globby';
 import Listr from 'listr';
 import util from 'node:util';
 
@@ -39,7 +41,14 @@ export default async function extractTests(args) {
 
         tasks.push({
           title: `Creating new app (named: ${analysis.testAppName}) for tests in: ${analysis.testAppLocation}`,
-          task: () => {},
+          task: async (ctx, task) => {
+            if (analysis.isTS) {
+              task.output =
+                '⚠️  Native typescript from ember-cli ignores --skip-npm.';
+            }
+
+            await createTestApp(analysis);
+          },
         });
 
         tasks.push({
@@ -72,7 +81,7 @@ export default async function extractTests(args) {
         ` - ensure linting / formatting works how you like\n` +
         ` - ensure C.I. works, and runs the new test app\n` +
         ` - PR\n` +
-        ` - party 🥳\n` + 
+        ` - party 🥳\n` +
         ` - prepare for the conversion of the addon to the V2 format\n`
     );
   } catch (/** @type{any} */ e) {
@@ -128,4 +137,48 @@ async function analyze(args) {
  */
 async function moveAddon(analysis) {
   await fs.ensureDir(analysis.addonLocation);
+
+  let paths = await globby(['*', '.*', '!.git', '!.github'], {
+    expandDirectories: false,
+  });
+
+  for (let filePath of paths) {
+    await fs.move(filePath, analysis.addonLocation);
+  }
+}
+
+/**
+ * @param {AddonInfo} analysis
+ */
+async function createTestApp(analysis) {
+  /**
+   * NOTE: using `--typescript` forces skip-npm to be ignored due to how the --typescript support is implemented in ember-cli
+   */
+  await execa(
+    'ember',
+    [
+      'new',
+      analysis.testAppName,
+      '--skip-git',
+      '--skip-npm',
+      '--directory',
+      analysis.testAppLocation,
+      '--lang',
+      'en-US',
+      '--welcome',
+      'false',
+      ...(analysis.isTS ? ['--typescript'] : []),
+    ],
+    { cwd: analysis.directory }
+  );
+
+  /**
+   * Because of the --typescript problem, let's delete node_modules and the generated lockfile.
+   * they're likely wrong / broken anyway.
+   */
+
+  /**
+   * Because this is an addon, we want to add `@embroider/test-setup`
+   * and configure the ember-cli-build to optionally use embroider
+   */
 }
