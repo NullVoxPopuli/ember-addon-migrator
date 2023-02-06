@@ -3,7 +3,7 @@ import { expect } from 'vitest';
 
 import { type Project, binPath, emberTest } from './helpers.js';
 
-export async function migrate(project: Project) {
+export async function migrate(project: Pick<Project, 'rootPath'>) {
   let { stdout } = await execa('node', [binPath], { cwd: project.rootPath });
 
   expect(stdout).toMatch(
@@ -11,7 +11,15 @@ export async function migrate(project: Project) {
   );
 }
 
-export async function assertEmberTest(project: Project) {
+export async function extractTests(project: Pick<Project, 'rootPath'>, flags: Array<'--in-place' | string> = []) {
+  let { stdout } = await execa('node', [binPath, 'extract-tests', ...flags], { cwd: project.rootPath });
+
+  expect(stdout).toMatch(
+    `🎉 Congratulations! Your addon is now formatted as a V2 addon!`
+  );
+}
+
+export async function assertEmberTest(project: Pick<Project, 'testAppPath'>) {
   let { stdout, exitCode } = await emberTest(project);
 
   // subset of full stdout
