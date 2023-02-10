@@ -165,9 +165,14 @@ async function moveAddon(analysis) {
 }
 
 /**
+  * We need to generate this in a tmp directory, and then move files back to where we want them to live.
+  * This is in part due to ember-cli's aggressive protections around not deleting files (good),
+  * but we can work around it.
+  *
  * @param {AddonInfo} analysis
  */
 async function createTestApp(analysis, task) {
+  task.output = ''
   /**
    * NOTE: using `--typescript` forces skip-npm to be ignored due to how the --typescript support is implemented in ember-cli
    */

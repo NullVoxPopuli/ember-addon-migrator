@@ -2,26 +2,25 @@ import { execa } from 'execa';
 import fse from 'fs-extra';
 import { beforeAll, describe, expect, test } from 'vitest';
 
-import { assertEmberTest, migrate } from './assertions.js';
+import { assertEmberTest, extractTests } from '../assertions.js';
 import {
   type Project,
   addonFrom,
   build,
   findFixtures,
-  lintAddon,
   lintTestApp,
-} from './helpers.js';
+} from '../helpers.js';
 
 let fixtures = await findFixtures();
 
-describe('default command: fixtures', () => {
+describe('extract-tests: fixtures', () => {
   for (let fixtureName of fixtures) {
     describe(fixtureName, () => {
       let project: Project;
 
       beforeAll(async () => {
         project = await addonFrom(fixtureName);
-        await migrate(project);
+        await extractTests(project, ['--in-place']);
         await build(project);
       });
 
@@ -33,12 +32,6 @@ describe('default command: fixtures', () => {
         expect(await fse.pathExists(project.testAppPath), 'testAppPath').toBe(
           true
         );
-      });
-
-      test.concurrent('lint addon', async () => {
-        let result = await lintAddon(project);
-
-        expect(result).toMatchObject({ exitCode: 0 });
       });
 
       test.concurrent('lint test-app', async () => {
