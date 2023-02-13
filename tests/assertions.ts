@@ -11,8 +11,13 @@ export async function migrate(project: Pick<Project, 'rootPath'>) {
   );
 }
 
-export async function extractTests(project: Pick<Project, 'rootPath'>, flags: Array<'--in-place' | string> = []) {
-  let { stdout } = await execa('node', [binPath, 'extract-tests', ...flags], { cwd: project.rootPath });
+export async function extractTests(
+  project: Pick<Project, 'rootPath'>,
+  flags: Array<'--in-place' | string> = []
+) {
+  let { stdout } = await execa('node', [binPath, 'extract-tests', ...flags], {
+    cwd: project.rootPath,
+  });
 
   expect(stdout).toMatch(
     `🎉 Congratulations! Your addon is now formatted as a V2 addon!`
