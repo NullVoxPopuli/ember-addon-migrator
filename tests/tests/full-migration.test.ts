@@ -28,11 +28,18 @@ describe('default command: fixtures', () => {
       test.concurrent('verify tmp project', async () => {
         await execa('ls', ['-la'], { cwd: project.rootPath, stdio: 'inherit' });
 
-        expect(await fse.pathExists(project.rootPath), 'rootPath').toBe(true);
-        expect(await fse.pathExists(project.addonPath), 'addonPath').toBe(true);
-        expect(await fse.pathExists(project.testAppPath), 'testAppPath').toBe(
-          true
-        );
+        expect(
+          await fse.pathExists(project.rootPath),
+          `rootPath: ${project.rootPath}`
+        ).toBe(true);
+        expect(
+          await fse.pathExists(project.addonPath),
+          `addonPath: ${project.addonPath}`
+        ).toBe(true);
+        expect(
+          await fse.pathExists(project.testAppPath),
+          `testAppPath: ${project.testAppPath}`
+        ).toBe(true);
       });
 
       test.concurrent('lint addon', async () => {
