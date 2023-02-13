@@ -12,17 +12,17 @@ import { fileURLToPath } from 'node:url';
 export interface Project {
   rootPath: string;
   /**
-    * Default location of the addon
-    */
+   * Default location of the addon
+   */
   addonPath: string;
   /**
-    * Location of the addon when already in a monorepo or when 
-  * tests are extracted.
-    */
+   * Location of the addon when already in a monorepo or when
+   * tests are extracted.
+   */
   packagePath: string;
   /**
-    * Location of the test app
-    */
+   * Location of the test app
+   */
   testAppPath: string;
 }
 

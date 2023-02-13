@@ -22,12 +22,17 @@ describe('extract-tests: fixtures', () => {
       beforeAll(async () => {
         project = await addonFrom(fixtureName);
         await extractTests(project, ['--in-place']);
-        // For tests, since we aren't in a monorepo, 
+        // For tests, since we aren't in a monorepo,
         // make the rootDir a monorepo
         // "extra-tests" does not create monorepos
-        await fse.writeFile(path.join(project.rootPath, 'package.json'), JSON.stringify({ name: 'root', private: true, version: '0.0.0' }));
-        await fse.writeFile(path.join(project.rootPath, 'pnpm-workspace.yaml'), `packages:\n` + `- package\n` + `- test-app\n`)
-
+        await fse.writeFile(
+          path.join(project.rootPath, 'package.json'),
+          JSON.stringify({ name: 'root', private: true, version: '0.0.0' })
+        );
+        await fse.writeFile(
+          path.join(project.rootPath, 'pnpm-workspace.yaml'),
+          `packages:\n` + `- package\n` + `- test-app\n`
+        );
 
         await install(project);
       });
