@@ -107,7 +107,7 @@ export async function build(project: Project) {
 }
 
 export async function emberTest(project: Pick<Project, 'testAppPath'>) {
-  return await execa('pnpm', ['ember', 'test'], {
+  return await execa('pnpm', ['ember', 'test', '--test-port', '0'], {
     cwd: project.testAppPath,
   });
 }
