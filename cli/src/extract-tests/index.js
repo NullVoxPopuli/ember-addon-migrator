@@ -236,7 +236,7 @@ async function createTestApp(analysis, task) {
   await fs.copy(replacementECBuild, path.join(testApp, 'ember-cli-build.js'));
   await fs.copy(emberTry, path.join(testApp, 'config/ember-try.js'));
   // there is no --ci-provider=none?
-  await fs.rm(path.join(testApp, '.github'));
+  await fs.rm(path.join(testApp, '.github'), { recursive: true, force: true });
 }
 
 /**

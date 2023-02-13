@@ -6,7 +6,6 @@ import { assertEmberTest, extractTests } from '../assertions.js';
 import {
   type Project,
   addonFrom,
-  build,
   findFixtures,
   lintTestApp,
 } from '../helpers.js';
@@ -21,7 +20,6 @@ describe('extract-tests: fixtures', () => {
       beforeAll(async () => {
         project = await addonFrom(fixtureName);
         await extractTests(project, ['--in-place']);
-        await build(project);
       });
 
       test.concurrent('verify tmp project', async () => {

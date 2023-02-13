@@ -20,7 +20,7 @@ export async function extractTests(
   });
 
   expect(stdout).toMatch(
-    `🎉 Congratulations! Your addon is now formatted as a V2 addon!`
+    `🎉 Congratulations! Your tests have been extracted to their own app!`
   );
 }
 
