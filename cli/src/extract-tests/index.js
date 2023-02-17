@@ -177,8 +177,9 @@ async function createTestApp(analysis, task) {
    * NOTE: using `--typescript` forces skip-npm to be ignored due to how the --typescript support is implemented in ember-cli
    */
   await execa(
-    'ember',
+    'npx',
     [
+      'ember-cli@^4.10.0',
       'new',
       analysis.testAppName,
       '--skip-git',
