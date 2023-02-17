@@ -23,7 +23,7 @@ export async function installV2Blueprint(info) {
   let ts = info.isTS ? '--typescript' : '';
 
   await execaCommand(
-    `npx ember-cli@4.10.0-beta.0 addon ${info.name}` +
+    `npx ember-cli@^4.10.0 addon ${info.name}` +
       ` --blueprint @embroider/addon-blueprint` +
       // ` --blueprint ../addon-blueprint` +
       ` --test-app-location=${info.testAppLocation}` +
