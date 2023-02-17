@@ -4,7 +4,7 @@ import { expect } from 'vitest';
 import { type Project, binPath, emberTest } from './helpers.js';
 
 export async function migrate(project: Pick<Project, 'rootPath'>) {
-  console.debug('To Debug:')
+  console.debug('To Debug:');
   console.debug(`  within: ${project.rootPath}`);
   console.debug(`node ${binPath}`);
 
@@ -19,7 +19,7 @@ export async function extractTests(
   project: Pick<Project, 'rootPath'>,
   flags: Array<'--in-place' | string> = []
 ) {
-  console.debug('To Debug:')
+  console.debug('To Debug:');
   console.debug(`  within: ${project.rootPath}`);
   console.debug(`node ${binPath} extra-tests ${flags.join(' ')}`);
 
