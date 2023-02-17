@@ -57,7 +57,8 @@
     "merge": "^2.1.1",
     "semver": "^7.3.8",
     "types-package-json": "^2.0.39",
-    "yargs": "^17.6.2"
+    "yargs": "^17.6.2",
+    "yn": "^5.0.0"
   },
   "devDependencies": {
     "@nullvoxpopuli/eslint-configs": "^3.0.4",

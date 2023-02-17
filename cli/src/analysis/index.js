@@ -178,6 +178,13 @@ export class AddonInfo {
   }
 
   /**
+   * Proxied --no-monorepo option
+   */
+  get noMonorepo() {
+    return this.#options.noMonorepo;
+  }
+
+  /**
    * if true, this tool will not create a top-level / workspaces package.json
    */
   get isBiggerMonorepo() {
@@ -215,8 +222,12 @@ export class AddonInfo {
    *   (because <directory> usually ends with some form of the addon-name)
    */
   get addonLocation() {
+    if (this.#options.noMonorepo) {
+      return this.directory;
+    }
+
     if (this.isBiggerMonorepo) {
-      return this.#options.addonLocation || 'pacakge';
+      return this.#options.addonLocation || 'package';
     }
 
     return (
@@ -228,6 +239,10 @@ export class AddonInfo {
    * The path the test-app will end up in - defaults to <directory>/test-app
    */
   get testAppLocation() {
+    if (this.#options.noMonorepo) {
+      return this.directory;
+    }
+
     return this.#options.testAppLocation || 'test-app';
   }
 

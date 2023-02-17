@@ -120,7 +120,7 @@ async function updateFilesWithinTestApp(info) {
 /**
  * @param {Info} info
  */
-async function moveTests(info) {
+export async function moveTests(info) {
   await fse.remove(path.join(info.tmpLocation, 'tests/dummy'));
   await fse.remove(path.join(info.tmpLocation, 'tests/index.html'));
 

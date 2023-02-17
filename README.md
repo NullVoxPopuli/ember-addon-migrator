@@ -2,6 +2,9 @@
 
 Migrate your V1 addons to V2 addons
 
+
+The default layout is a monorepo, as this scales well with adding docs, tooling packages, etc.
+
 ```bash
 # in the root of your addon
 npx ember-addon-migrator
@@ -25,6 +28,22 @@ _Additional tweaking may be required after the migrator runs_.
 
 Be sure to check out `npx ember-addon-migrator --help` for a full list of commands and options.
 (Noting that to see options' help, you'll need to specify the command, e.g.: `npx ember-addon-migrator extract-tests --help`)
+
+## Non-monorepo layouts
+
+There are a variety of reasons someone may wish to not have a monorepo, migrate a non-monorepo v1 addon to a non-monorepo v2 addon: 
+```bash
+# in the root of your addon / repo 
+npx ember-addon-migrator --no-monorepo 
+```
+
+This will do the following:
+ - move `addon` to `src`
+ - move `addon-test-support` to `src/test-support`
+ - delete all boilerplate in `tests`
+ - update package.json scripts to reflect the new structure
+
+_Additional tweaking may be required after the migrator runs_.
 
 ## Other Commands 
 
@@ -92,4 +111,12 @@ This can be useful for development of the addon-migrator when trying on real pro
  - `cd ember-addon-migrator`
  - `pnpm`
  - cd to your v1 addon for testing
+ - run `node ../path/to/ember-addon-migrator/bin.js`
+
+### Test with a fixture 
+
+ - `cd tests`
+ - Get list of fixtures via `pnpm dev list-fixtures`
+ - `pnpm dev output <fixture-name>`
+ - cd to the printed directory
  - run `node ../path/to/ember-addon-migrator/bin.js`

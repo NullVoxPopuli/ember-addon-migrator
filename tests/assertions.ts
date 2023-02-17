@@ -3,12 +3,17 @@ import { expect } from 'vitest';
 
 import { type Project, binPath, emberTest } from './helpers.js';
 
-export async function migrate(project: Pick<Project, 'rootPath'>) {
+export async function migrate(
+  project: Pick<Project, 'rootPath'>,
+  flags: Array<'--no-monorepo' | string> = []
+) {
   console.debug('To Debug:');
   console.debug(`  within: ${project.rootPath}`);
   console.debug(`node ${binPath}`);
 
-  let { stdout } = await execa('node', [binPath], { cwd: project.rootPath });
+  let { stdout } = await execa('node', [binPath, ...flags], {
+    cwd: project.rootPath,
+  });
 
   expect(stdout).toMatch(
     `🎉 Congratulations! Your addon is now formatted as a V2 addon!`
@@ -21,7 +26,7 @@ export async function extractTests(
 ) {
   console.debug('To Debug:');
   console.debug(`  within: ${project.rootPath}`);
-  console.debug(`node ${binPath} extra-tests ${flags.join(' ')}`);
+  console.debug(`node ${binPath} extract-tests ${flags.join(' ')}`);
 
   let { stdout } = await execa('node', [binPath, 'extract-tests', ...flags], {
     cwd: project.rootPath,
