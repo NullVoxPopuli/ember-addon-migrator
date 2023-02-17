@@ -1,3 +1,4 @@
+import { packageJson } from 'ember-apply';
 import { execa } from 'execa';
 import fse from 'fs-extra';
 import path from 'node:path';
@@ -33,6 +34,15 @@ describe('extract-tests: fixtures', () => {
           path.join(project.rootPath, 'pnpm-workspace.yaml'),
           `packages:\n` + `- package\n` + `- test-app\n`
         );
+        await packageJson.modify((json) => {
+          if (json.dependencies?.[fixtureName]) {
+            json.dependencies[fixtureName] = `workspace:*`;
+          }
+
+          if (json.devDependencies?.[fixtureName]) {
+            json.devDependencies[fixtureName] = `workspace:*`;
+          }
+        });
 
         await install(project);
       });

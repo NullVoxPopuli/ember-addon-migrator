@@ -25,7 +25,7 @@
     "c8": "^7.11.0",
     "concurrently": "^7.2.1",
     "ember-addon-migrator": "workspace:../cli",
-    "ember-apply": "2.5.2",
+    "ember-apply": "2.6.5",
     "eslint": "^8.32.0",
     "execa": "^6.0.0",
     "fs-extra": "^11.1.0",
