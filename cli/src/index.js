@@ -121,7 +121,7 @@ export default async function run(options) {
       error(`
       Error occurred
         You may want to reset your repository and try again.
-        Errors encountered during migration are likely unrecoverable.
+        Errors encountered during migration are likely unrecoverable by this tool.
 
         the addon-migrator can do this for you via
 

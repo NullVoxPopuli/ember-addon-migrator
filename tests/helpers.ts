@@ -11,7 +11,18 @@ import { fileURLToPath } from 'node:url';
 
 export interface Project {
   rootPath: string;
+  /**
+   * Default location of the addon
+   */
   addonPath: string;
+  /**
+   * Location of the addon when already in a monorepo or when
+   * tests are extracted.
+   */
+  packagePath: string;
+  /**
+   * Location of the test app
+   */
   testAppPath: string;
 }
 
@@ -73,6 +84,7 @@ export async function addonFrom(fixture: string): Promise<Project> {
   let project = {
     rootPath: tmp,
     addonPath: path.join(tmp, projectName),
+    packagePath: path.join(tmp, 'package'),
     testAppPath: path.join(tmp, 'test-app'),
   };
 
@@ -82,7 +94,7 @@ export async function addonFrom(fixture: string): Promise<Project> {
   return project;
 }
 
-export async function install(project: Project) {
+export async function install(project: Pick<Project, 'rootPath'>) {
   await execa('pnpm', ['install'], {
     cwd: project.rootPath,
   });
@@ -94,8 +106,8 @@ export async function build(project: Project) {
   return buildResult;
 }
 
-export async function emberTest(project: Project) {
-  return await execa('pnpm', ['ember', 'test'], {
+export async function emberTest(project: Pick<Project, 'testAppPath'>) {
+  return await execa('pnpm', ['ember', 'test', '--test-port', '0'], {
     cwd: project.testAppPath,
   });
 }

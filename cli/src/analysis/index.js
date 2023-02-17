@@ -158,6 +158,10 @@ export class AddonInfo {
     );
   }
 
+  get isV1Addon() {
+    return this.isAddon && !this.isV2Addon;
+  }
+
   get isV2Addon() {
     if (!this.isAddon) return false;
 

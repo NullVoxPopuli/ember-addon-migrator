@@ -35,11 +35,12 @@
   ],
   "scripts": {
     "build:types": "tsc --build",
-    "format": "prettier -w .",
-    "format:check": "prettier -c .",
-    "lint": "pnpm lint:js",
-    "lint:js": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "concurrently 'npm:lint:*(!fix)' --names 'lint:'",
+    "lint:fix": "concurrently 'npm:lint:*:fix' --names 'fix:'",
+    "lint:js": "eslint . --cache",
+    "lint:js:fix": "eslint . --fix",
+    "lint:prettier": "prettier --check .",
+    "lint:prettier:fix": "prettier --write .",
     "test": "pnpm --filter 'tests' test"
   },
   "dependencies": {
@@ -66,6 +67,7 @@
     "@types/semver": "^7.3.13",
     "@typescript-eslint/eslint-plugin": "^5.48.2",
     "@typescript-eslint/parser": "^5.48.2",
+    "concurrently": "^7.2.1",
     "eslint": "^8.32.0",
     "eslint-plugin-decorator-position": "^5.0.1",
     "eslint-plugin-import": "^2.27.5",
