@@ -77,12 +77,7 @@ jobs:
       - name: Tests
         working-directory: "tests"
         run: |
-          TS_MSG="Test is skipped because ember-cli's typescript blueprint is unstable"
-          if [[ "base-ts-v1-addon" == "${{ matrix.fixtures.name}}" ]]; then
-            echo $TS_MSG
-          else
-            pnpm vitest --testNamePattern "${{ matrix.fixtures.name }}"
-          fi
+          pnpm vitest --testNamePattern "${{ matrix.fixtures.name }}"
 
   # https://github.com/changesets/action
   release:
