@@ -7,6 +7,7 @@ import extractTests from './src/extract-tests/index.js';
 import reset from './src/git-reset.js';
 import run from './src/index.js';
 import { info } from './src/log.js';
+import { isSolorepo } from './src/workspaces.js';
 
 let yarg = yargs(hideBin(process.argv));
 
@@ -73,6 +74,10 @@ yarg
       // "Light logic" to keep the test app to be a sibling to the addon directory (if not specified)
       let testAppLocation =
         args.testAppLocation || (args.inPlace ? 'test-app' : '../test-app');
+
+      if (!args.inPlace && (await isSolorepo(args.directory))) {
+        args.inPlace = true;
+      }
 
       return extractTests({ ...args, testAppLocation });
     }
