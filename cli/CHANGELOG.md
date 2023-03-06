@@ -1,5 +1,11 @@
 # ember-addon-migrator
 
+## 2.0.1
+
+### Patch Changes
+
+- [`99b1193`](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/99b1193e131ed125554ae38f3f618b33f360d7f2) Thanks [@NullVoxPopuli](https://github.com/NullVoxPopuli)! - Use ember-cli range rather than 4.10.0-beta
+
 ## 2.0.0
 
 ### Major Changes
