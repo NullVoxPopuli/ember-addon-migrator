@@ -72,9 +72,13 @@ async function updateFilesWithinTestApp(info) {
     `${testAppLocation}/config`
   );
 
-  // TODO: pnpm should use the workspace protocol
   await packageJson.removeDevDependencies([info.name], testAppLocation);
-  await packageJson.addDependencies({ [info.name]: '*' }, testAppLocation);
+
+  if (info.packageManager === 'pnpm') {
+    await packageJson.addDependencies({ [info.name]: 'workspace:*' }, testAppLocation);
+  } else {
+    await packageJson.addDependencies({ [info.name]: '*' }, testAppLocation);
+  }
 
   await packageJson.addDevDependencies(
     {

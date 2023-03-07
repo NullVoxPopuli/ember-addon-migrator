@@ -1,9 +1,7 @@
-import { packageJson } from 'ember-apply';
+import { packageJson, project } from 'ember-apply';
 
 import { NothingToDoError, tryOrFail } from './error.js';
-import { findRoot } from './git.js';
 import { analyzeImports } from './imports.js';
-import { guessPackageManager } from './package-manager.js';
 import { createTmp } from './paths.js';
 
 /**
@@ -35,14 +33,13 @@ export class AddonInfo {
     );
 
     let repoRoot = await tryOrFail(
-      () => findRoot(),
+      () => project.gitRoot(),
       `Could not find git root. Only git is supported at this time.`
     );
 
-    let packageManager = await tryOrFail(
-      () => guessPackageManager(repoRoot, options),
-      `Could not determine package manager. Only npm, yarn, and pnpm are supported at this time.`
-    );
+    let packageManager = await project.getPackageManager(repoRoot);
+    let packageManagerRoot = await project.workspaceRoot(repoRoot);
+    let existingWorkspaces = await project.getWorkspaces(repoRoot);
 
     // At this point, the CWD *is* the addon.
     // Verified by the above not erroring.
@@ -53,11 +50,12 @@ export class AddonInfo {
     let info = new AddonInfo({
       packageJson: pkgJson,
       options,
-      packageManager: packageManager.manager,
-      packageManagerRoot: packageManager.root,
+      packageManager,
+      packageManagerRoot,
       repoRoot,
       tmpDirectory,
       importedDependencies,
+      existingWorkspaces,
     });
 
     if (info.isV2Addon) {
@@ -88,6 +86,9 @@ export class AddonInfo {
   /** @type {import('./types').ImportedDependencies} */
   importedDependencies;
 
+  /** @type {string[]} */
+  #existingWorkspaces;
+
   /**
    * @typedef {object}  ResolvedInfo
    * @property {PackageJson} packageJson
@@ -97,6 +98,7 @@ export class AddonInfo {
    * @property {string} repoRoot
    * @property {string} tmpDirectory
    * @property {import('./types').ImportedDependencies} importedDependencies
+   * @property {string[]} existingWorkspaces
    *
    * @param {ResolvedInfo} resolvedInfo;
    */
@@ -108,6 +110,7 @@ export class AddonInfo {
     this.gitRoot = resolvedInfo.repoRoot;
     this.#tmpDirectory = resolvedInfo.tmpDirectory;
     this.importedDependencies = resolvedInfo.importedDependencies;
+    this.#existingWorkspaces = resolvedInfo.existingWorkspaces;
   }
 
   /**
@@ -178,7 +181,7 @@ export class AddonInfo {
    * if true, this tool will not create a top-level / workspaces package.json
    */
   get isBiggerMonorepo() {
-    return this.packageManagerRoot !== this.gitRoot;
+    return this.#existingWorkspaces.length > 1;
   }
 
   /****************************************************************************
