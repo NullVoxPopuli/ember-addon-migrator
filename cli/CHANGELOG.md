@@ -1,5 +1,11 @@
 # ember-addon-migrator
 
+## 2.0.2
+
+### Patch Changes
+
+- [#52](https://github.com/NullVoxPopuli/ember-addon-migrator/pull/52) [`f395f77`](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/f395f77f8b692935160b76b60386a0dbe98b0694) Thanks [@simonihmig](https://github.com/simonihmig)! - Fix an issue where an addon has a scoped package name, ember-cli will turn the package name into a dasherized version of it as the addon location, which then would not match the location we were expecting. This happened when generating the temporary addon that files get pulled from for migration / merging with the existing addon.
+
 ## 2.0.1
 
 ### Patch Changes
