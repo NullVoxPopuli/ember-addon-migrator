@@ -77,7 +77,8 @@ export async function addonFrom(fixture: string): Promise<Project> {
   let originalPackageJsonPath = path.join(fixturePath, 'package.json');
   let originalPackageJson = await fse.readJSON(originalPackageJsonPath);
 
-  let projectName = originalPackageJson.name;
+  let projectName =
+    originalPackageJson.name.split('/')[1] ?? originalPackageJson.name;
 
   await fs.cp(fixturePath, tmp, { recursive: true });
 
