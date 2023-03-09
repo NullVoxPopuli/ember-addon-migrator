@@ -1,7 +1,7 @@
 import { module, test } from 'qunit';
 import { setupTest } from 'ember-qunit';
 
-import { two } from 'base-v1-addon';
+import { two } from '@some/base-v1-addon';
 
 module('sample', function (hooks) {
   setupTest(hooks);

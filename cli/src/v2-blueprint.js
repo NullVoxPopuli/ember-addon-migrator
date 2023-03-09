@@ -22,8 +22,13 @@ export async function installV2Blueprint(info) {
     : '';
   let ts = info.isTS ? '--typescript' : '';
 
+  // we'll create the addon here instead of using a directory based on the actual name, as this is temporary anyway
+  // and prevents issues with scoped package names getting in some way dasherized by ember-cli
+  let addonDir = 'addon';
+
   await execaCommand(
     `npx ember-cli@^4.10.0 addon ${info.name}` +
+      ` --dir=${addonDir}` +
       ` --blueprint @embroider/addon-blueprint` +
       // ` --blueprint ../addon-blueprint` +
       ` --test-app-location=${info.testAppLocation}` +
@@ -40,7 +45,7 @@ export async function installV2Blueprint(info) {
     }
   );
 
-  let generatedLocation = path.join(tmp, info.name);
+  let generatedLocation = path.join(tmp, addonDir);
   let generatedFiles = await fs.readdir(generatedLocation);
 
   for (let current of generatedFiles) {
