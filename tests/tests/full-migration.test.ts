@@ -24,7 +24,7 @@ for (let fixtureName of fixtures) {
       await build(project);
     });
 
-    test.concurrent('verify tmp project', async () => {
+    test('verify tmp project', async () => {
       await execa('ls', ['-la'], { cwd: project.rootPath, stdio: 'inherit' });
 
       expect(
@@ -41,19 +41,19 @@ for (let fixtureName of fixtures) {
       ).toBe(true);
     });
 
-    test.concurrent('lint addon', async () => {
+    test('lint addon', async () => {
       let result = await lintAddon(project);
 
       expect(result).toMatchObject({ exitCode: 0 });
     });
 
-    test.concurrent('lint test-app', async () => {
+    test('lint test-app', async () => {
       let result = await lintTestApp(project);
 
       expect(result).toMatchObject({ exitCode: 0 });
     });
 
-    test.concurrent('tests pass', async () => {
+    test('tests pass', async () => {
       await assertEmberTest(project);
     });
   });

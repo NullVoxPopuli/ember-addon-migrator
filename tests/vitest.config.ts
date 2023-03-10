@@ -7,7 +7,9 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   test: {
     root: __dirname,
+    // By default, vite(st) uses too many threads in development.
     maxThreads: Math.ceil(os.cpus().length / 2),
+    minThreads: 1,
     testTimeout: 380_000,
     hookTimeout: 380_000,
     // https://vitest.dev/config/#configuration
