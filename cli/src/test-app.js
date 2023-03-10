@@ -75,7 +75,10 @@ async function updateFilesWithinTestApp(info) {
   await packageJson.removeDevDependencies([info.name], testAppLocation);
 
   if (info.packageManager === 'pnpm') {
-    await packageJson.addDependencies({ [info.name]: 'workspace:*' }, testAppLocation);
+    await packageJson.addDependencies(
+      { [info.name]: 'workspace:*' },
+      testAppLocation
+    );
   } else {
     await packageJson.addDependencies({ [info.name]: '*' }, testAppLocation);
   }
