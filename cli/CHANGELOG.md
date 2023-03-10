@@ -1,5 +1,11 @@
 # ember-addon-migrator
 
+## 2.0.3
+
+### Patch Changes
+
+- [#51](https://github.com/NullVoxPopuli/ember-addon-migrator/pull/51) [`dc300c9`](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/dc300c9017e995e36931245cbbdc7c4c9481a9e9) Thanks [@NullVoxPopuli](https://github.com/NullVoxPopuli)! - extract-tests forgot to move tests from the addon over to the new test-app
+
 ## 2.0.2
 
 ### Patch Changes
