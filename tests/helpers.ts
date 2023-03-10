@@ -103,7 +103,10 @@ export async function install(project: Pick<Project, 'rootPath'>) {
 }
 
 export async function build(project: Project) {
-  let buildResult = await execa('pnpm', ['build'], { cwd: project.addonPath, env: { JOBS: '1' } });
+  let buildResult = await execa('pnpm', ['build'], {
+    cwd: project.addonPath,
+    env: { JOBS: '1' },
+  });
 
   return buildResult;
 }
@@ -111,7 +114,7 @@ export async function build(project: Project) {
 export async function emberTest(project: Pick<Project, 'testAppPath'>) {
   return await execa('pnpm', ['ember', 'test', '--test-port', '0'], {
     cwd: project.testAppPath,
-    env: { JOBS: '1' }
+    env: { JOBS: '1' },
   });
 }
 
