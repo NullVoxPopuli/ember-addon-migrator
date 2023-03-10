@@ -98,11 +98,15 @@ export async function addonFrom(fixture: string): Promise<Project> {
 export async function install(project: Pick<Project, 'rootPath'>) {
   await execa('pnpm', ['install'], {
     cwd: project.rootPath,
+    env: { JOBS: '1' },
   });
 }
 
 export async function build(project: Project) {
-  let buildResult = await execa('pnpm', ['build'], { cwd: project.addonPath });
+  let buildResult = await execa('pnpm', ['build'], {
+    cwd: project.addonPath,
+    env: { JOBS: '1' },
+  });
 
   return buildResult;
 }
@@ -110,6 +114,7 @@ export async function build(project: Project) {
 export async function emberTest(project: Pick<Project, 'testAppPath'>) {
   return await execa('pnpm', ['ember', 'test', '--test-port', '0'], {
     cwd: project.testAppPath,
+    env: { JOBS: '1' },
   });
 }
 
