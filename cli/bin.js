@@ -7,6 +7,7 @@ import extractTests from './src/extract-tests/index.js';
 import reset from './src/git-reset.js';
 import run from './src/index.js';
 import { info } from './src/log.js';
+import { isSolorepo } from './src/workspaces.js';
 
 let yarg = yargs(hideBin(process.argv));
 
@@ -50,8 +51,9 @@ yarg
       });
       yargs.option('in-place', {
         describe:
-          'within the current directory, move the v1 addon out of the way and in to a sub-folder that will be sibling to the test-app',
+          'move the v1 addon out to a sub-folder of the current directory, and the test-app will be a sibling to that new directory.',
         type: 'boolean',
+        default: true,
       });
       yargs.option('addon-location', {
         describe: `This flag is only relevant when in-place is present. This is the location that the addon will be moved to. To match the addon-blueprint, set this to the addon's name.`,
@@ -73,6 +75,13 @@ yarg
       // "Light logic" to keep the test app to be a sibling to the addon directory (if not specified)
       let testAppLocation =
         args.testAppLocation || (args.inPlace ? 'test-app' : '../test-app');
+
+      let isSolo = await isSolorepo(args.directory);
+
+      if (!args.inPlace && isSolo) {
+        args.inPlace = true;
+        testAppLocation = args.testAppLocation || 'test-app';
+      }
 
       return extractTests({ ...args, testAppLocation });
     }

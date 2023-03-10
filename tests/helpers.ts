@@ -96,7 +96,7 @@ export async function addonFrom(fixture: string): Promise<Project> {
 }
 
 export async function install(project: Pick<Project, 'rootPath'>) {
-  await execa('pnpm', ['install'], {
+  await execa('pnpm', ['install', '--no-frozen-lockfile'], {
     cwd: project.rootPath,
     env: { JOBS: '1' },
   });
@@ -124,4 +124,24 @@ export async function lintAddon(project: Project) {
 
 export async function lintTestApp(project: Project) {
   return await execa('pnpm', ['lint'], { cwd: project.testAppPath });
+}
+
+/**
+ * noEmitOnError: true is only useful if you don't treat tsc as a linter
+ *                (which the current app blueprint does: treat tsc as a linter)
+ */
+export async function disableNoEmitOnError(cwd: string) {
+  let tsconfigPath = path.join(cwd, 'tsconfig.json');
+
+  if (await fse.pathExists(tsconfigPath)) {
+    let tsconfig = await fse.readFile(tsconfigPath);
+    let content = tsconfig.toString();
+
+    let result = content.replace(
+      `compilerOptions": {`,
+      `compilerOptions": {\n    "noEmitOnError": false,`
+    );
+
+    await fse.writeFile(tsconfigPath, result);
+  }
 }

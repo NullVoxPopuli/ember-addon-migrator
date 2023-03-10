@@ -25,6 +25,8 @@ for (let fixtureName of fixtures) {
     });
 
     test('verify tmp project', async () => {
+      console.debug(`verify tmp project 'ls -la' @ ${project.rootPath}`);
+
       await execa('ls', ['-la'], { cwd: project.rootPath, stdio: 'inherit' });
 
       expect(

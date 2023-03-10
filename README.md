@@ -54,6 +54,22 @@ Example workflow:
 
 See `npx ember-addon-migrator extract-tests --help` for parameters' information.
 
+#### `--in-place`
+
+When using `--in-place` (default `true`), the v1 addon will be moved to a sub folder and the test app created along side that sub folder.
+For example:
+```bash 
+/packages/ember-stargate/{addon,addon-test-support} (v1 addon)
+ => extract-tests --in-place # same as omitting `--in-place` 
+ /packages/ember-stargate/package (v1 addon moved to sub directory)
+ /packages/ember-stargate/test-app (new app for tests, tests copied over)
+
+
+/packages/ember-stargate/{addon,addon-test-support} (v1 addon)
+ => extract-tests --in-place=false 
+ /packages/ember-stargate (v1 addon stays put)
+ /packages/test-app (new app for tests, tests copied over)
+```
 
 ### `npx ember-addon-migrator reset`
 

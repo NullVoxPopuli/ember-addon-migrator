@@ -137,7 +137,10 @@ async function runOnGlob(directory, fn, glob) {
     return path.join(directory, g);
   });
 
-  for await (let filePath of globbyStream(globs)) {
+  for await (let filePath of globbyStream(globs, {
+    followSymbolicLinks: false,
+    onlyFiles: true,
+  })) {
     try {
       await fn(filePath.toString());
     } catch (e) {

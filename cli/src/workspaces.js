@@ -2,6 +2,7 @@
  * @typedef {import('./analysis/index').AddonInfo} Info
  * @typedef {import('./analysis/types').PackageJson} PackageJson
  */
+import { project } from 'ember-apply';
 import { execa } from 'execa';
 import fse from 'fs-extra';
 import deepMerge from 'merge';
@@ -89,4 +90,49 @@ function workspacePackageJsonFrom(info) {
   }
 
   return rootJson;
+}
+
+/**
+ * @param {string} directory
+ */
+export async function isSolorepo(directory) {
+  let cwd = process.cwd();
+  let target = cwd;
+
+  if (cwd !== directory) {
+    if (directory.startsWith('/')) {
+      target = directory;
+    } else {
+      target = path.join(cwd, directory);
+    }
+  }
+
+  try {
+    process.chdir(target);
+
+    let workspaceRoot = await project.workspaceRoot();
+    let gitRoot = await project.gitRoot();
+
+    if (workspaceRoot === gitRoot) {
+      try {
+        let workspaces = await project.getWorkspaces();
+
+        return workspaces.length === 1;
+      } catch (/** @type {any} */ e) {
+        // error occurs when workspaces are not used
+        // we defer to other CLI tools to get the workspaces
+        if (e?.code === 1) {
+          return true;
+        }
+
+        // if code isn't present, we have an unhandled error
+        return false;
+      }
+    }
+  } finally {
+    // return to previous directory
+    process.chdir(cwd);
+  }
+
+  return false;
 }
