@@ -1,5 +1,11 @@
 # ember-addon-migrator
 
+## 2.1.0
+
+### Minor Changes
+
+- [#57](https://github.com/NullVoxPopuli/ember-addon-migrator/pull/57) [`4e5a5c1`](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/4e5a5c1e8c914c084df40ec189f1b7e37e8ae7c5) Thanks [@NullVoxPopuli](https://github.com/NullVoxPopuli)! - New command: make-monorepo -- for doing a 3-phase open source v1 -> v2 addon conversion
+
 ## 2.0.3
 
 ### Patch Changes
