@@ -7,6 +7,7 @@ import extractTests from './src/extract-tests/index.js';
 import reset from './src/git-reset.js';
 import run from './src/index.js';
 import { info } from './src/log.js';
+import { convertToMonorepo } from './src/monorepo.js';
 import { isSolorepo } from './src/workspaces.js';
 
 let yarg = yargs(hideBin(process.argv));
@@ -24,6 +25,25 @@ yarg
       info(`Resetting git repo to clean state...`);
 
       await reset();
+
+      info('Done! ✨');
+    }
+  )
+  .command(
+    'make-monorepo',
+    'Converts a traditional v1 addon at the root of a git repository to a monorepo where that v1 addon exists as the sole workspace',
+    (yargs) => {
+      return yargs.option('directory', {
+        describe:
+          'the directory to run the migration in. defaults to the current directory',
+        type: 'string',
+        default: process.cwd(),
+      });
+    },
+    async (args) => {
+      info(`Converting to monorepo...`);
+
+      await convertToMonorepo(args);
 
       info('Done! ✨');
     }
