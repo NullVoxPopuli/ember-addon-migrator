@@ -57,7 +57,7 @@ export async function convertToMonorepo(args) {
     await tasks.run();
 
     info(
-      `You'll probably need to manually update .github / C.I. configurations`
+      `ℹ️  You'll probably need to manually update .github / C.I. configurations`
     );
   } catch (/** @type{any} */ e) {
     if (process.env.DEBUG) {

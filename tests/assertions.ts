@@ -15,13 +15,30 @@ export async function migrate(project: Pick<Project, 'rootPath'>) {
   );
 }
 
+export async function makeMonorepo(
+  project: Pick<Project, 'rootPath'>,
+  flags: Array<string> = []
+) {
+  console.debug('To Debug:');
+  console.debug(`  within: ${project.rootPath}`);
+  console.debug(`node ${binPath} make-monorepo ${flags.join(' ')}`);
+
+  let { stdout } = await execa('node', [binPath, 'make-monorepo', ...flags], {
+    cwd: project.rootPath,
+  });
+
+  expect(stdout).toMatch(
+    `ℹ️  You'll probably need to manually update .github / C.I. configurations`
+  );
+}
+
 export async function extractTests(
   project: Pick<Project, 'rootPath'>,
   flags: Array<'--in-place' | string> = []
 ) {
   console.debug('To Debug:');
   console.debug(`  within: ${project.rootPath}`);
-  console.debug(`node ${binPath} extra-tests ${flags.join(' ')}`);
+  console.debug(`node ${binPath} extract-tests ${flags.join(' ')}`);
 
   let { stdout } = await execa('node', [binPath, 'extract-tests', ...flags], {
     cwd: project.rootPath,

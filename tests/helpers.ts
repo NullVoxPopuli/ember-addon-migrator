@@ -27,7 +27,7 @@ export interface Project {
 }
 
 /**
- * NOTE: these tests *only* use pnpm, becausue npm and yarn are frail
+ * NOTE: these tests *only* use pnpm, because npm and yarn are frail
  *       and slow.
  */
 
