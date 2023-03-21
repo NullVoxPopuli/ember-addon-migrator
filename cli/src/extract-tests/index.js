@@ -1,16 +1,15 @@
 import { packageJson } from 'ember-apply';
 import { execa } from 'execa';
 import fs from 'fs-extra';
-import { globby } from 'globby';
 import Listr from 'listr';
 import path from 'node:path';
 import url from 'node:url';
 import util from 'node:util';
 
+import { moveAddon } from '../addon.js';
 import { AddonInfo } from '../analysis/index.js';
 import { resolvedDirectory } from '../analysis/paths.js';
 import { error, info } from '../log.js';
-import { prepare } from '../prepare.js';
 import { migrateTestApp } from '../test-app.js';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
@@ -44,7 +43,7 @@ export default async function extractTests(args) {
         if (args.inPlace) {
           tasks.push({
             title: `Moving addon to sub-folder: ${analysis.addonLocation}`,
-            task: () => moveAddon(analysis),
+            task: () => moveAddon(analysis, { globs: ['!tests'] }),
           });
         }
 
@@ -140,34 +139,6 @@ async function analyze(args) {
   }
 
   return analysis;
-}
-
-/**
- * @param {AddonInfo} analysis
- */
-export async function moveAddon(analysis) {
-  await prepare(analysis);
-
-  await fs.rm(analysis.addonLocation, { force: true, recursive: true });
-  await fs.ensureDir(analysis.addonLocation);
-
-  let toMoveTo = path.relative(analysis.directory, analysis.addonLocation);
-
-  let paths = await globby(
-    ['*', '.*', '!.git', '!.github', `!${toMoveTo}`, `!tests`],
-    {
-      expandDirectories: false,
-      cwd: analysis.tmpLocation,
-      onlyFiles: false,
-    }
-  );
-
-  for (let filePath of paths) {
-    let source = path.join(analysis.tmpLocation, filePath);
-    let destination = path.join(analysis.addonLocation, filePath);
-
-    await fs.copy(source, destination, { recursive: true });
-  }
 }
 
 /**

@@ -9,6 +9,8 @@ import { assert } from 'node:console';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+import { prepare } from './prepare.js';
+
 /**
  * @param {Info} info
  */
@@ -34,6 +36,37 @@ export async function migrateAddon(info) {
 
   await updateAddonPackageJson(info);
   await updateRollup(info);
+}
+
+/**
+ * @param {Info} analysis
+ * @param {{ globs?: string[] }} [ options ]
+ */
+export async function moveAddon(analysis, options = {}) {
+  let globs = options?.globs ?? [];
+
+  await prepare(analysis);
+
+  await fse.rm(analysis.addonLocation, { force: true, recursive: true });
+  await fse.ensureDir(analysis.addonLocation);
+
+  let toMoveTo = path.relative(analysis.directory, analysis.addonLocation);
+
+  let paths = await globby(
+    ['*', '.*', '!.git', '!.github', `!${toMoveTo}`, ...globs],
+    {
+      expandDirectories: false,
+      cwd: analysis.tmpLocation,
+      onlyFiles: false,
+    }
+  );
+
+  for (let filePath of paths) {
+    let source = path.join(analysis.tmpLocation, filePath);
+    let destination = path.join(analysis.addonLocation, filePath);
+
+    await fse.copy(source, destination, { recursive: true });
+  }
 }
 
 /*

@@ -1,10 +1,13 @@
+/**
+ * @typedef {import('./analysis/index').AddonInfo} AddonInfo
+ */
 import fse from 'fs-extra';
 import Listr from 'listr';
 import util from 'node:util';
 
-import { AddonInfo, analyze } from './analysis/index.js';
+import { moveAddon } from './addon.js';
+import { analyze } from './analysis/index.js';
 import { resolvedDirectory } from './analysis/paths.js';
-import { moveAddon } from './extract-tests/index.js';
 import { error, info } from './log.js';
 
 /**
