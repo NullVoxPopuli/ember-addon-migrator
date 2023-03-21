@@ -1,9 +1,3 @@
-import { packageJson, project } from 'ember-apply';
-
-import { NothingToDoError, tryOrFail } from './error.js';
-import { analyzeImports } from './imports.js';
-import { createTmp } from './paths.js';
-
 /**
  * Type imports!
  *
@@ -11,10 +5,37 @@ import { createTmp } from './paths.js';
  * @typedef {import('./types').PackageJson} PackageJson
  */
 
+import { packageJson, project } from 'ember-apply';
+import util from 'node:util';
+
+import { NothingToDoError, tryOrFail } from './error.js';
+import { analyzeImports } from './imports.js';
+import { createTmp } from './paths.js';
+
+/**
+ * @param {RunOptions} args
+ */
+export async function analyze(args) {
+  let analysis = await AddonInfo.create(args);
+
+  if (args.analysisOnly) {
+    console.debug(util.inspect(analysis, { showHidden: true, getters: true }));
+
+    // eslint-disable-next-line n/no-process-exit
+    process.exit(0);
+  }
+
+  if (!analysis.isV1Addon) {
+    throw new Error(`This operations is only allowed on v1 addons`);
+  }
+
+  return analysis;
+}
+
 /**
  * Goal:
  * This class should be robust, and not error when analyzing an addon.
- * All data defined must be known, and resiliant to weirdness, or print a specific error about
+ * All data defined must be known, and resilient to weirdness, or print a specific error about
  * how to get around a problem.
  */
 export class AddonInfo {
@@ -38,8 +59,22 @@ export class AddonInfo {
     );
 
     let packageManager = await project.getPackageManager(repoRoot);
-    let packageManagerRoot = await project.workspaceRoot(repoRoot);
-    let existingWorkspaces = await project.getWorkspaces(repoRoot);
+    let packageManagerRoot;
+
+    try {
+      packageManagerRoot = await project.workspaceRoot(repoRoot);
+    } catch {
+      // ignore everything
+    }
+
+    /** @type {string[]} */
+    let existingWorkspaces = [];
+
+    try {
+      existingWorkspaces = await project.getWorkspaces(repoRoot);
+    } catch {
+      // ignore everything
+    }
 
     // At this point, the CWD *is* the addon.
     // Verified by the above not erroring.

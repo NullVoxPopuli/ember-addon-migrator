@@ -145,7 +145,7 @@ async function analyze(args) {
 /**
  * @param {AddonInfo} analysis
  */
-async function moveAddon(analysis) {
+export async function moveAddon(analysis) {
   await prepare(analysis);
 
   await fs.rm(analysis.addonLocation, { force: true, recursive: true });
