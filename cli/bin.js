@@ -136,9 +136,15 @@ yarg
         type: 'boolean',
         default: false,
       });
+      yargs.option('no-monorepo', {
+        describe:
+          'without creating a monorepo, keep the v2 addon and test app in the same package folder',
+        type: 'boolean',
+        default: false,
+      });
     },
     (args) => {
-      return run(args);
+      return run({ ...args, noMonorepo: !args.monorepo });
     }
   )
   .help().argv;

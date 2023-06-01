@@ -11,7 +11,7 @@ import path from 'path';
 
 /**
  * @param {Info} info
- * @param {{ hidden?: boolean }} [options]
+ * @param {{ hidden?: boolean, cwd?: string }} [options]
  */
 export async function install(info, options = {}) {
   /** @type {any} */

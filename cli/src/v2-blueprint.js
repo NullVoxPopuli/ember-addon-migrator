@@ -30,10 +30,11 @@ export async function installV2Blueprint(info) {
     `npx ember-cli@^4.10.0 addon ${info.name}` +
       ` --dir=${addonDir}` +
       ` --blueprint @embroider/addon-blueprint` +
-      // ` --blueprint ../addon-blueprint` +
-      ` --test-app-location=${info.testAppLocation}` +
-      ` --test-app-name=${info.testAppName}` +
-      ` --addon-location=${info.addonLocation}` +
+      (info.noMonorepo
+        ? ` --addon-only`
+        : ` --test-app-location=${info.testAppLocation}` +
+          ` --test-app-name=${info.testAppName}` +
+          ` --addon-location=${info.addonLocation}`) +
       ` ${packager}` +
       ` ${ts}` +
       // Installation will only happen as needed, and with the correct package manager

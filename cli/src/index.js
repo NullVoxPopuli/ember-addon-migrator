@@ -8,10 +8,11 @@ import util from 'node:util';
 import { migrateAddon } from './addon.js';
 import { AddonInfo } from './analysis/index.js';
 import { resolvedDirectory } from './analysis/paths.js';
+import { VERBOSE } from './env.js';
 import { lintFix } from './lint.js';
 import { error, info } from './log.js';
 import { prepare } from './prepare.js';
-import { migrateTestApp } from './test-app.js';
+import { migrateTestApp, moveTests } from './test-app.js';
 import { installV2Blueprint } from './v2-blueprint.js';
 import { install, updateRootFiles } from './workspaces.js';
 
@@ -46,39 +47,33 @@ export default async function run(options) {
         title: 'Running Migrator',
         skip: () => options.analysisOnly,
         task: () => {
-          return new Listr([
-            {
-              title: `Moving addon to tmp directory, ${analysis.tmpLocation}`,
-              task: () => prepare(analysis),
-            },
-            {
-              title: 'Installing the V2 Addon Blueprint',
-              task: () => installV2Blueprint(analysis),
-            },
-            {
-              title: `Updating addon's root files`,
-              task: () => updateRootFiles(analysis),
-            },
-            {
-              title: 'Migrating addon files',
-              task: () => {
-                return migrateAddon(analysis);
-              },
-            },
-            {
-              title: 'Migrating test files',
-              task: () => migrateTestApp(analysis),
-            },
-          ]);
+          if (options.noMonorepo) {
+            return runSolorepoMigrator(analysis);
+          }
+
+          return runMonorepoMigrator(analysis);
         },
       },
       {
         title: 'Running package manager',
-        task: () => install(analysis, { hidden: true }),
+        task: () =>
+          install(analysis, {
+            hidden: !VERBOSE,
+            cwd: analysis.packageManagerRoot,
+          }),
       },
       {
         title: 'Running lint:fix',
         task: () => {
+          if (options.noMonorepo) {
+            return new Listr([
+              {
+                title: `lint:fix`,
+                task: () => lintFix(analysis, analysis.addonLocation),
+              },
+            ]);
+          }
+
           return new Listr([
             {
               title: `lint:fix on ${analysis.name}`,
@@ -139,6 +134,63 @@ export default async function run(options) {
     // eslint-disable-next-line no-process-exit, n/no-process-exit
     process.exit(1);
   }
+}
+
+/**
+ * @param {AddonInfo} analysis
+ */
+function runMonorepoMigrator(analysis) {
+  return new Listr([
+    {
+      title: `Moving addon to tmp directory, ${analysis.tmpLocation}`,
+      task: () => prepare(analysis),
+    },
+    {
+      title: 'Installing the V2 Addon Blueprint',
+      task: () => installV2Blueprint(analysis),
+    },
+    {
+      title: `Updating addon's root files`,
+      task: () => updateRootFiles(analysis),
+    },
+    {
+      title: 'Migrating addon files',
+      task: () => {
+        return migrateAddon(analysis);
+      },
+    },
+    {
+      title: 'Migrating test files',
+      task: () => migrateTestApp(analysis),
+    },
+  ]);
+}
+
+/**
+ * @param {AddonInfo} analysis
+ */
+function runSolorepoMigrator(analysis) {
+  return new Listr([
+    {
+      title: `Moving addon to tmp directory, ${analysis.tmpLocation}`,
+      task: () => prepare(analysis),
+    },
+    {
+      title: 'Installing the V2 Addon Blueprint as non-monorepo',
+      task: () => installV2Blueprint(analysis),
+    },
+    {
+      title: 'Migrating files',
+      task: async () => {
+        await migrateAddon(analysis);
+        await moveTests(analysis);
+      },
+    },
+    {
+      title: 'Integrating buttered-ember as test-runner',
+      task: async () => {},
+    },
+  ]);
 }
 
 /**

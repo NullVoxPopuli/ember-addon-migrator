@@ -42,6 +42,7 @@ importers:
       types-package-json: ^2.0.39
       typescript: 4.9.4
       yargs: ^17.6.2
+      yn: ^5.0.0
     dependencies:
       chalk: 5.2.0
       common-tags: 1.8.2
@@ -57,6 +58,7 @@ importers:
       semver: 7.3.8
       types-package-json: 2.0.39
       yargs: 17.6.2
+      yn: 5.0.0
     devDependencies:
       '@nullvoxpopuli/eslint-configs': 3.0.4_tnhva45lcwaup2hl4dhmjgx35u
       '@types/common-tags': 1.8.1
@@ -12476,6 +12478,11 @@ packages:
     resolution: {integrity: sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==}
     engines: {node: '>=6'}
     dev: true
+
+  /yn/5.0.0:
+    resolution: {integrity: sha512-+l37+9TyGEsyxGLaTg6QgYy5KnOp74ZZl4dPFLQpBWSkO99uBC5jnS0pOGwXFViPbiaEtWbParH2KrgWWF2duQ==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
+    dev: false
 
   /yocto-queue/0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
