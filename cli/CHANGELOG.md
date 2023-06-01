@@ -1,5 +1,11 @@
 # ember-addon-migrator
 
+## 2.1.1
+
+### Patch Changes
+
+- [#60](https://github.com/NullVoxPopuli/ember-addon-migrator/pull/60) [`fee23d2`](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/fee23d2868388b8a560bfb43ba3af46f914e8039) Thanks [@nicolechung](https://github.com/nicolechung)! - Fix typo in default package directory name when --addon-location is omitted
+
 ## 2.1.0
 
 ### Minor Changes
