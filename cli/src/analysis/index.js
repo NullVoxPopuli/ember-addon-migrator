@@ -251,7 +251,7 @@ export class AddonInfo {
    */
   get addonLocation() {
     if (this.isBiggerMonorepo) {
-      return this.#options.addonLocation || 'pacakge';
+      return this.#options.addonLocation || 'package';
     }
 
     return (
