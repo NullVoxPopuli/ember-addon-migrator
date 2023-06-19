@@ -1,5 +1,6 @@
 /**
  * @typedef {import('./analysis/index').AddonInfo} Info
+ * @typedef {import('./types').TestAppOptions} TestAppOptions
  */
 import { packageJson } from 'ember-apply';
 import fs from 'fs/promises';
@@ -10,13 +11,14 @@ import path from 'path';
 
 /**
  * @param {Info} info
+ * @param {TestAppOptions} options
  */
-export async function migrateTestApp(info) {
+export async function migrateTestApp(info, options) {
   await moveTests(info);
   // TODO: update in-test imports to use the test-app name instead of "dummy"
 
   await moveFilesToTestApp(info);
-  await updateFilesWithinTestApp(info);
+  await updateFilesWithinTestApp(info, options);
   await removeFiles(info);
 }
 
@@ -45,8 +47,9 @@ async function moveFilesToTestApp(info) {
 
 /**
  * @param {Info} info
+ * @param {TestAppOptions} options
  */
-async function updateFilesWithinTestApp(info) {
+async function updateFilesWithinTestApp(info, options) {
   let { testAppLocation } = info;
 
   // ember-cli-build: EmberAddon => EmberApp
@@ -71,6 +74,78 @@ async function updateFilesWithinTestApp(info) {
     'dummy/config',
     `${testAppLocation}/config`
   );
+
+  if (options.reuseExistingVersions || options.ignoreNewDependencies) {
+    // Reuse existing versions specifiers (e.g. when having pinned versions), optionally remove new dependencies
+    let newPkg = await packageJson.read(testAppLocation);
+
+    if (newPkg.dependencies) {
+      /** @type Record<string, string> */
+      let dependenciesToFix = {};
+      let dependenciesToRemove = [];
+
+      for (let [depName, newVersion] of Object.entries(newPkg.dependencies)) {
+        let existingVersion = info.versionForDependency(depName);
+
+        if (
+          options.reuseExistingVersions &&
+          existingVersion &&
+          existingVersion !== newVersion
+        ) {
+          dependenciesToFix[depName] = existingVersion;
+        } else if (options.ignoreNewDependencies && !existingVersion) {
+          dependenciesToRemove.push(depName);
+        }
+      }
+
+      if (Object.keys(dependenciesToFix).length > 0) {
+        await packageJson.addDependencies(dependenciesToFix, testAppLocation);
+      }
+
+      if (dependenciesToRemove.length) {
+        await packageJson.removeDependencies(
+          dependenciesToRemove,
+          testAppLocation
+        );
+      }
+    }
+
+    if (newPkg.devDependencies) {
+      /** @type Record<string, string> */
+      let devDependenciesToFix = {};
+      let devDependenciesToRemove = [];
+
+      for (let [depName, newVersion] of Object.entries(
+        newPkg.devDependencies
+      )) {
+        let existingVersion = info.versionForDependency(depName);
+
+        if (
+          options.reuseExistingVersions &&
+          existingVersion &&
+          existingVersion !== newVersion
+        ) {
+          devDependenciesToFix[depName] = existingVersion;
+        } else if (options.ignoreNewDependencies && !existingVersion) {
+          devDependenciesToRemove.push(depName);
+        }
+      }
+
+      if (Object.keys(devDependenciesToFix).length > 0) {
+        await packageJson.addDevDependencies(
+          devDependenciesToFix,
+          testAppLocation
+        );
+      }
+
+      if (devDependenciesToRemove.length) {
+        await packageJson.removeDevDependencies(
+          devDependenciesToRemove,
+          testAppLocation
+        );
+      }
+    }
+  }
 
   await packageJson.removeDevDependencies([info.name], testAppLocation);
 

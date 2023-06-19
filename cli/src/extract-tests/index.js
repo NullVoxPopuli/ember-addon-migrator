@@ -62,7 +62,7 @@ export default async function extractTests(args) {
 
         tasks.push({
           title: `Moving files from the addon to the test-app`,
-          task: () => migrateTestApp(analysis),
+          task: () => migrateTestApp(analysis, args),
         });
 
         tasks.push({

@@ -299,6 +299,17 @@ export class AddonInfo {
   hasDevDependency = (dep) => {
     return Boolean(this.packageJson.devDependencies?.[dep]);
   };
+
+  /**
+   * get the version specifier of an existing dependency
+   * @param {string} dep
+   */
+  versionForDependency = (dep) => {
+    return (
+      this.packageJson.dependencies?.[dep] ??
+      this.packageJson.devDependencies?.[dep]
+    );
+  };
 }
 
 /**
