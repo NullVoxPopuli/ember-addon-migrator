@@ -40,7 +40,14 @@ If you have tests failing that were not failing before, there are a few culprits
 1. missing items in the `test-app/tests/index.html` file. For example, your original `tests/index.html` might have `{{content-for "something"}}` that is now missing in the index file.
 2. removing test scripts from the `package/package.json` npm scripts. Remember, tests area now run in the `test-app`, so no need to run any tests in `/package`!
 3. if you have a monorepo, remove any configuration to run tests in the new `package` and run them in `test-app` instead. 
+4. double-check that the v2 addon has been added to the `test-app` in the package.json dependencies (NOT dev dependencies)
 
+```js
+// in test-app/package.json
+"dependencies": {
+  "@org/your-v2-addon-from-the-package-folder": "*"
+}
+```
 
 ### Cannot run test-app locally
 
