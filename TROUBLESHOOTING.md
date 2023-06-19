@@ -57,7 +57,6 @@ For example, the migrator creates the `test-app` package name as `test-app`.
 
 This name, `test-app` is copied into a few places:
 
-
 1. `test-app/app/app.ts`
 2. `test-app/app/index.html`
 3. `test-app/app/router.ts`
@@ -67,6 +66,36 @@ This name, `test-app` is copied into a few places:
 
 If you update the name of `test-app` in the package.json `name`, then those places above need to be updated.
 
+## Monorepo specific troubleshooting
+
+### Unexpected stylelint, prettier or eslint errors
+
+`ember-addon-migrator` copies over best-practises stylelint, prettier and eslint configs. But this might not be what you need in your monorepo.
+
+If you get errors, delete these related configs (stylelint, prettier or eslint), nuke your node_modules and try again.
+
+### Unexpected config errors
+
+If you had a config folder, the contents of this get copied over with what `ember-addon-migrator` has for sensible v2 defaults. This might cause you to have build errors.
+
+The fix: copy over the original configs into both:
+
+1. `package/config`
+2. `test-app/config`.
+
+### Packages consuming the new v2 addon `package` can't find the new v2 addon
+
+If you have packages or apps in your monorepo that consume the newly migrated v2 addon, but they can't seem to find it, this is because the `path` in the external `tsconfig` needs to be migrated.
+
+```diff
+// the tsconfig.json app "bar" that consumes your new v2 addon "foo"
+"references": [
+    {
+-       "path": "../packages/my-new-v2-addon", 
++       "path": "../packages/my-new-v2-addon/package", 
+    }
+]
+```
 
 
 
