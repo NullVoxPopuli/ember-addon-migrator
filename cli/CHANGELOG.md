@@ -1,5 +1,20 @@
 # ember-addon-migrator
 
+## 2.2.0
+
+### Minor Changes
+
+- [#72](https://github.com/NullVoxPopuli/ember-addon-migrator/pull/72) [`f60862c`](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/f60862c18f1d8ee277cc7fc7280d9780772cbb84) Thanks [@simonihmig](https://github.com/simonihmig)! - Two new flags for managing dependencies:
+
+  - `--reuse-existing-versions`
+    When the test-app is generated, instead of using the (latest) dependency versions of the app blueprint it will try to use the same versions previously used in the addon.
+
+  - `--ignore-new-dependencies`
+    When the test-app is generated, any dependencies that are part of the default app blueprint which were not used before will be ignored. WARNING: there is a considerable risk that this leaves your dependencies in a broken state, use it only with great caution!
+
+  These two flags are available for both the default command (run), and extract-tests.
+  See `--help` for more information.
+
 ## 2.1.1
 
 ### Patch Changes
