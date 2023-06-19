@@ -16,7 +16,7 @@ import { installV2Blueprint } from './v2-blueprint.js';
 import { install, updateRootFiles } from './workspaces.js';
 
 /**
- * @param {import('./analysis/types').Options} options
+ * @param {import('./types').Options} options
  */
 export default async function run(options) {
   await verifyOptions(options);
@@ -67,7 +67,7 @@ export default async function run(options) {
             },
             {
               title: 'Migrating test files',
-              task: () => migrateTestApp(analysis),
+              task: () => migrateTestApp(analysis, options),
             },
           ]);
         },
