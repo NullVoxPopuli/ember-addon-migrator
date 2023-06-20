@@ -19,7 +19,7 @@ export async function fixReferences(info) {
  * @param {Info} info
  */
 export async function fixTSConfigReferences(info) {
-  for (const file of await globby(['**/tsconfig*.json'])) {
+  for (const file of await globby(['**/tsconfig*.json'], { gitignore: true })) {
     const filename = join(info.directory, file);
     const dir = dirname(file);
     const contents = await fs.readFile(file, { encoding: 'utf8' });
