@@ -53,11 +53,12 @@ export async function moveAddon(analysis, options = {}) {
   let toMoveTo = path.relative(analysis.directory, analysis.addonLocation);
 
   let paths = await globby(
-    ['*', '.*', '!.git', '!.github', `!${toMoveTo}`, ...globs],
+    ['*', '!.git', '!.github', `!${toMoveTo}`, ...globs],
     {
       expandDirectories: false,
       cwd: analysis.tmpLocation,
       onlyFiles: false,
+      dot: true,
     }
   );
 

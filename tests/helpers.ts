@@ -50,7 +50,7 @@ export async function adoptFixture(srcLocation: string): Promise<void> {
 
   let destinationPath = path.join(fixturesDir, `${name}-${version}`);
 
-  await fs.cp(fullLocation, destinationPath, { recursive: true });
+  await fse.copy(fullLocation, destinationPath);
 
   await packageJson.modify(async (json: any) => {
     delete json.volta;
@@ -80,7 +80,7 @@ export async function addonFrom(fixture: string): Promise<Project> {
   let projectName =
     originalPackageJson.name.split('/')[1] ?? originalPackageJson.name;
 
-  await fs.cp(fixturePath, tmp, { recursive: true });
+  await fse.copy(fixturePath, tmp);
 
   let project = {
     rootPath: tmp,
