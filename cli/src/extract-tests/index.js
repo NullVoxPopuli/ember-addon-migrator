@@ -10,6 +10,7 @@ import { moveAddon } from '../addon.js';
 import { AddonInfo } from '../analysis/index.js';
 import { resolvedDirectory } from '../analysis/paths.js';
 import { error, info } from '../log.js';
+import { fixReferences } from '../references.js';
 import { migrateTestApp } from '../test-app.js';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
@@ -44,6 +45,11 @@ export default async function extractTests(args) {
           tasks.push({
             title: `Moving addon to sub-folder: ${analysis.addonLocation}`,
             task: () => moveAddon(analysis, { globs: ['!tests'] }),
+          });
+
+          tasks.push({
+            title: `Fix references for new addon location: ${analysis.addonLocation}`,
+            task: () => fixReferences(analysis),
           });
         }
 
