@@ -17,6 +17,24 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const tsIssue = ' See: https://github.com/ember-cli/ember-cli/issues/10045';
 
+// Known testing-related possible dependencies
+const testingDependencies = [
+  'ember-qunit',
+  '@types/ember-qunit',
+  '@ember/test-helpers',
+  '@types/ember__test-helpers',
+  'qunit',
+  '@types/qunit',
+  'qunit-dom',
+  'ember-try',
+  'sinon',
+  'ember-sinon-qunit',
+  'ember-a11y-testing',
+  'ember-cli-page-object',
+  'ember-cli-code-coverage',
+  'ember-test-selectors',
+];
+
 /**
  * @param {import('./types.js').Args} args
  */
@@ -72,8 +90,8 @@ export default async function extractTests(args) {
         });
 
         tasks.push({
-          title: `Deleting remaining extraneous files from addon`,
-          task: () => deleteExtraAddonFiles(analysis),
+          title: `Cleaning up unused artifacts from addon`,
+          task: () => cleanupAddon(analysis),
         });
 
         return new Listr(tasks);
@@ -226,14 +244,9 @@ async function createTestApp(analysis, task) {
 /**
  * @param {AddonInfo} analysis
  */
-async function deleteExtraAddonFiles(analysis) {
+async function cleanupAddon(analysis) {
   // These were recently moved to the app!
   await fs.rm(path.join(analysis.addonLocation, 'tests'), {
-    force: true,
-    recursive: true,
-  });
-  // Not compatible with v2 addons anyway
-  await fs.rm(path.join(analysis.addonLocation, 'vendor'), {
     force: true,
     recursive: true,
   });
@@ -250,4 +263,22 @@ async function deleteExtraAddonFiles(analysis) {
     force: true,
     recursive: true,
   });
+
+  await packageJson.modify((json) => {
+    // Remove any test-related scripts, as they now will be in the test-app
+    json.scripts = Object.fromEntries(
+      Object.entries(json.scripts).filter(
+        ([key]) => key !== 'test' && key !== '_test' && !key.match(/^test:.*/)
+      )
+    );
+
+    // Remove testing dependencies from devDependencies, unless they are in peerDependencies, which means the addon's own code (e.g. /addon-test-support) might need them
+    json.devDependencies = Object.fromEntries(
+      Object.entries(json.devDependencies).filter(
+        ([key]) =>
+          !testingDependencies.includes(key) ||
+          json.peerDependencies?.[key] !== undefined
+      )
+    );
+  }, analysis.addonLocation);
 }
