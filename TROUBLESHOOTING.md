@@ -19,17 +19,10 @@ See the following for reference: https://github.com/embroider-build/embroider/bl
 
 ## Typescript errors
 
-If you encounter typescript errors that you haven't seen before, it's likely that the some of the following has been busted while running the migrator:
+If you encounter typescript errors that you haven't seen before, copy over the contents of the original `types` folder (pre-migration). 
 
-1. `references` in tsconfig
-2. `extends` in tsconfig.compiler-options.json
-3. types folders (the migrator overrides the types folder types needed for a v2 addon, it's possible your original types have been deleted). 
+The migrator overrides the types folder types needed for a v2 addon, it's possible your original types have been deleted. 
 
-[//]: # (TODO: remove when these are fixed)
-
-Related Issues (these are currently TODO)
-https://github.com/NullVoxPopuli/ember-addon-migrator/issues/65
-https://github.com/NullVoxPopuli/ember-addon-migrator/issues/66
 
 ## Unexpected errors in the test-app
 
