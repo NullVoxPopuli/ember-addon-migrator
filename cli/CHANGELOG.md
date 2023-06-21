@@ -1,5 +1,13 @@
 # ember-addon-migrator
 
+## 2.2.1
+
+### Patch Changes
+
+- [#74](https://github.com/NullVoxPopuli/ember-addon-migrator/pull/74) [`7cf1d8d`](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/7cf1d8d88fecbb0283d53a7d6f210108758bc90d) Thanks [@simonihmig](https://github.com/simonihmig)! - Fix references and repo-relative paths in addon's package.json and tsconfig.json after moving.
+
+  Closes: #65, #66, #71
+
 ## 2.2.0
 
 ### Minor Changes
