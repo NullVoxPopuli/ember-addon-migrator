@@ -1,5 +1,12 @@
 # ember-addon-migrator
 
+## 2.2.2
+
+### Patch Changes
+
+- [#77](https://github.com/NullVoxPopuli/ember-addon-migrator/pull/77) [`e88ba13`](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/e88ba13c0ac19b9ab96ada389148d42e0b7d9f6f) Thanks [@simonihmig](https://github.com/simonihmig)! - extract-tests: remove unused test scripts and devDeps from addon
+  As the addon does not contain any tests anymore, we can remove package.json scripts and devDependencies that relate to testing.
+
 ## 2.2.1
 
 ### Patch Changes
