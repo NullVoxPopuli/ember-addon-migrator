@@ -268,7 +268,7 @@ async function cleanupAddon(analysis) {
     // Remove any test-related scripts, as they now will be in the test-app
     json.scripts = Object.fromEntries(
       Object.entries(json.scripts).filter(
-        ([key]) => key !== 'test' && key !== '_test' && !key.match(/^test:.*/)
+        ([key]) => !key.includes('test')
       )
     );
 
