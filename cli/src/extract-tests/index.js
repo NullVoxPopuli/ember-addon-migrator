@@ -267,9 +267,7 @@ async function cleanupAddon(analysis) {
   await packageJson.modify((json) => {
     // Remove any test-related scripts, as they now will be in the test-app
     json.scripts = Object.fromEntries(
-      Object.entries(json.scripts).filter(
-        ([key]) => !key.includes('test')
-      )
+      Object.entries(json.scripts).filter(([key]) => !key.includes('test'))
     );
 
     // Remove testing dependencies from devDependencies, unless they are in peerDependencies, which means the addon's own code (e.g. /addon-test-support) might need them
