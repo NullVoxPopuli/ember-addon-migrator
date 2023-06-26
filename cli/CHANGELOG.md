@@ -1,5 +1,19 @@
 # ember-addon-migrator
 
+## 2.3.0
+
+### Minor Changes
+
+- [#79](https://github.com/NullVoxPopuli/ember-addon-migrator/pull/79) [`c8a601e`](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/c8a601e75378bb353b9869ac41088a5bd96e921c) Thanks [@simonihmig](https://github.com/simonihmig)! - Add new flag, `--reuse-existing-configs` to both the default command and `extract-tests`
+
+  When used, this will copy the existing configs to the new test-app, rather than using the defaults.
+  This is helpful for when a project's configs are resilient to directory and project changes.
+
+  For examples of such configs, see:
+
+  - https://github.com/NullVoxPopuli/eslint-configs
+  - https://github.com/embroider-build/addon-blueprint/issues/71#issuecomment-1341912431
+
 ## 2.2.2
 
 ### Patch Changes
