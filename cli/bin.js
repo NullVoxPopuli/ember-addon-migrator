@@ -102,6 +102,12 @@ yarg
         type: 'boolean',
         default: false,
       });
+      yargs.option('reuse-existing-configs', {
+        describe:
+          'When the test-app is generated, existing config files like .eslintrc.js will be reused for the test-app, instead of the default configs coming form the app blueprint.',
+        type: 'boolean',
+        default: false,
+      });
     },
     async (args) => {
       // "Light logic" to keep the test app to be a sibling to the addon directory (if not specified)
@@ -157,6 +163,12 @@ yarg
       yargs.option('ignore-new-dependencies', {
         describe:
           'When the test-app is generated, any dependencies that are part of the default app blueprint which were not used before will be ignored. WARNING: there is a considerable risk that this leaves your dependencies in a broken state, use it only with great caution!',
+        type: 'boolean',
+        default: false,
+      });
+      yargs.option('reuse-existing-configs', {
+        describe:
+          'When the test-app is generated, existing config files like .eslintrc.js will be reused for the test-app, instead of the default configs coming form the app blueprint.',
         type: 'boolean',
         default: false,
       });

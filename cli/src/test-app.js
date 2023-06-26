@@ -17,7 +17,10 @@ export async function migrateTestApp(info, options) {
   await moveTests(info);
   // TODO: update in-test imports to use the test-app name instead of "dummy"
 
-  await moveFilesToTestApp(info);
+  if (options.reuseExistingConfigs) {
+    await moveFilesToTestApp(info);
+  }
+
   await updateFilesWithinTestApp(info, options);
   await removeFiles(info);
 }
@@ -28,19 +31,33 @@ export async function migrateTestApp(info, options) {
 async function moveFilesToTestApp(info) {
   let { testAppLocation } = info;
 
-  // Move useful files to test app
-  let toMove = [
-    'ember-cli-build.js',
-    'config/ember-try.js',
+  // Move useful files to test app, which have no use for the addon anymore
+  let toMove = ['ember-cli-build.js', 'config/ember-try.js', 'testem.js'];
+
+  // Copy other config files that we can reuse for the addon and the test-app
+  let toCopy = [
     '.template-lintrc.js',
     '.prettierrc.js',
     '.prettierignore',
     '.eslintrc.js',
+    '.stylelintrc.js',
+    '.stylelintignore',
   ];
 
   await Promise.allSettled([
     ...toMove.map((filePath) =>
-      fse.move(filePath, `${testAppLocation}/${filePath}`, { overwrite: true })
+      fse.move(
+        path.join(info.addonLocation, filePath),
+        path.join(testAppLocation, filePath),
+        { overwrite: true }
+      )
+    ),
+    ...toCopy.map((filePath) =>
+      fse.copy(
+        path.join(info.addonLocation, filePath),
+        path.join(testAppLocation, filePath),
+        { overwrite: true }
+      )
     ),
   ]);
 }
