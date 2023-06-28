@@ -80,7 +80,7 @@ export default async function extractTests(args) {
                 tsIssue;
             }
 
-            await createTestApp(analysis, task);
+            await createTestApp(analysis, task, args);
           },
         });
 
@@ -171,8 +171,9 @@ async function analyze(args) {
  * but we can work around it.
  *
  * @param {AddonInfo} analysis
+ * @param {import('../types.js').TestAppOptions} options
  */
-async function createTestApp(analysis, task) {
+async function createTestApp(analysis, task, options) {
   task.output = '';
   /**
    * NOTE: using `--typescript` forces skip-npm to be ignored due to how the --typescript support is implemented in ember-cli
@@ -220,23 +221,36 @@ async function createTestApp(analysis, task) {
   await packageJson.addDevDependencies(
     {
       'ember-source-channel-url': '^3.0.0',
-      'ember-try': '^2.0.0',
       '@embroider/test-setup': '^2.1.1',
     },
     testApp
   );
 
+  if (!options.skipEmberTry) {
+    await packageJson.addDevDependencies(
+      {
+        'ember-try': '^2.0.0',
+      },
+      testApp
+    );
+  }
+
   let replacementECBuild = path.join(
     __dirname,
     '../override-files/test-app/ember-cli-build.js'
   );
-  let emberTry = path.join(
-    __dirname,
-    '../override-files/test-app/ember-try.js'
-  );
 
   await fs.copy(replacementECBuild, path.join(testApp, 'ember-cli-build.js'));
-  await fs.copy(emberTry, path.join(testApp, 'config/ember-try.js'));
+
+  if (!options.skipEmberTry) {
+    let emberTry = path.join(
+      __dirname,
+      '../override-files/test-app/ember-try.js'
+    );
+
+    await fs.copy(emberTry, path.join(testApp, 'config/ember-try.js'));
+  }
+
   // there is no --ci-provider=none?
   await fs.rm(path.join(testApp, '.github'), { recursive: true, force: true });
 }

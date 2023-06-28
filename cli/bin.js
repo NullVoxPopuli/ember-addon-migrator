@@ -108,6 +108,11 @@ yarg
         type: 'boolean',
         default: false,
       });
+      yargs.option('skip-ember-try', {
+        describe: 'Do not set up ember-try for the generated test-app.',
+        type: 'boolean',
+        default: false,
+      });
     },
     async (args) => {
       // "Light logic" to keep the test app to be a sibling to the addon directory (if not specified)
