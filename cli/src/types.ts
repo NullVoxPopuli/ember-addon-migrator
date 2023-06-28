@@ -2,6 +2,7 @@ export interface TestAppOptions {
   reuseExistingVersions: boolean;
   ignoreNewDependencies: boolean;
   reuseExistingConfigs: boolean;
+  skipEmberTry: boolean;
 }
 
 export interface Options extends TestAppOptions {
