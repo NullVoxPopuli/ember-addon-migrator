@@ -14,7 +14,7 @@ import path from 'path';
  * @param {TestAppOptions} options
  */
 export async function migrateTestApp(info, options) {
-  await moveTests(info);
+  await moveTestsAndDummyApp(info, options);
   // TODO: update in-test imports to use the test-app name instead of "dummy"
 
   if (options.reuseExistingConfigs) {
@@ -67,7 +67,7 @@ async function moveFilesToTestApp(info) {
  * @param {TestAppOptions} options
  */
 async function updateFilesWithinTestApp(info, options) {
-  let { testAppLocation } = info;
+  let { testAppLocation, testAppName } = info;
 
   // ember-cli-build: EmberAddon => EmberApp
   // ember-cli-build: 'ember-addon' => 'ember-app'
@@ -84,12 +84,17 @@ async function updateFilesWithinTestApp(info, options) {
   await replaceIn(
     `${testAppLocation}/tests/test-helper.{js,ts}`,
     'dummy/app',
-    `${testAppLocation}/app`
+    `${testAppName}/app`
   );
   await replaceIn(
     `${testAppLocation}/tests/test-helper.{js,ts}`,
     'dummy/config',
-    `${testAppLocation}/config`
+    `${testAppName}/config`
+  );
+  await replaceIn(
+    `${testAppLocation}/app/app.{js,ts}`,
+    'dummy/config',
+    `${testAppName}/config`
   );
 
   if (options.reuseExistingVersions || options.ignoreNewDependencies) {
@@ -211,8 +216,23 @@ async function updateFilesWithinTestApp(info, options) {
 
 /**
  * @param {Info} info
+ * @param {TestAppOptions} options
  */
-async function moveTests(info) {
+async function moveTestsAndDummyApp(info, options) {
+  const dummyAppPaths = await globby(['**/*'], {
+    cwd: path.join(info.tmpLocation, 'tests/dummy/'),
+  });
+
+  for (let filePath of dummyAppPaths) {
+    if (!filePath.startsWith('config') || options.reuseExistingConfigs) {
+      await fse.copy(
+        path.join(info.tmpLocation, 'tests/dummy/', filePath),
+        path.join(info.testAppLocation, filePath),
+        { overwrite: true }
+      );
+    }
+  }
+
   await fse.remove(path.join(info.tmpLocation, 'tests/dummy'));
   await fse.remove(path.join(info.tmpLocation, 'tests/index.html'));
 
