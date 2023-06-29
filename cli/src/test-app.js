@@ -42,6 +42,7 @@ async function moveFilesToTestApp(info) {
     '.eslintrc.js',
     '.stylelintrc.js',
     '.stylelintignore',
+    'tailwind.config.js',
   ];
 
   await Promise.allSettled([
