@@ -1,6 +1,6 @@
 ---
 # each of these should be one of "patch", "minor", "major"
-"ember-addon-migrator": TODO
+"ember-addon-migrator": "minor"
 ---
 
 extract-tests: copy eventual tailwind.config.js
