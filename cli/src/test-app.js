@@ -16,7 +16,6 @@ import path from 'path';
 export async function migrateTestApp(info, options) {
   await moveTestsAndDummyApp(info, options);
   await fixDummyAppReferences(info);
-  // TODO: update in-test imports to use the test-app name instead of "dummy"
 
   if (options.reuseExistingConfigs) {
     await moveFilesToTestApp(info);
@@ -273,33 +272,40 @@ async function fixDummyAppReferences(info) {
           }
         }
       });
-    }
+    },
+    { quote: 'single' }
   );
 
   // fix `import ... from 'dummy/...' in .{js,ts} files
-  const dummyAppJsFiles = await globby([
-    `${info.testAppLocation}/**/*.{js,ts}`,
-  ]);
+  const dummyAppJsFiles = await globby(
+    [`${info.testAppLocation}/**/*.{js,ts}`],
+    { gitignore: true }
+  );
 
   for (const fileToTransform of dummyAppJsFiles) {
-    await js.transform(fileToTransform, async ({ j, root }) => {
-      root
-        .find(j.ImportDeclaration, {
-          source: { value: (value) => value.startsWith('dummy') },
-        })
-        .forEach((path) => {
-          path.node.source.value = path.node.source.value.replace(
-            /^dummy/,
-            info.testAppName
-          );
-        });
-    });
+    await js.transform(
+      fileToTransform,
+      async ({ j, root }) => {
+        root
+          .find(j.ImportDeclaration, {
+            source: { value: (value) => value.startsWith('dummy') },
+          })
+          .forEach((path) => {
+            path.node.source.value = path.node.source.value.replace(
+              /^dummy/,
+              info.testAppName
+            );
+          });
+      },
+      { quote: 'single' }
+    );
   }
 
   // fix <script> and <link> in index.html
-  const dummyHtmlFiles = await globby([
-    `${info.testAppLocation}/**/index.html`,
-  ]);
+  const dummyHtmlFiles = await globby(
+    [`${info.testAppLocation}/**/index.html`],
+    { gitignore: true }
+  );
 
   for (const htmlFile of dummyHtmlFiles) {
     await html.transform(htmlFile, (tree) => {
