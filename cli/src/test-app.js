@@ -2,7 +2,7 @@
  * @typedef {import('./analysis/index').AddonInfo} Info
  * @typedef {import('./types').TestAppOptions} TestAppOptions
  */
-import { packageJson } from 'ember-apply';
+import { html, js, packageJson } from 'ember-apply';
 import fs from 'fs/promises';
 import fse from 'fs-extra';
 import { globby } from 'globby';
@@ -15,7 +15,7 @@ import path from 'path';
  */
 export async function migrateTestApp(info, options) {
   await moveTestsAndDummyApp(info, options);
-  // TODO: update in-test imports to use the test-app name instead of "dummy"
+  await fixDummyAppReferences(info);
 
   if (options.reuseExistingConfigs) {
     await moveFilesToTestApp(info);
@@ -226,7 +226,7 @@ async function moveTestsAndDummyApp(info, options) {
 
   for (let filePath of dummyAppPaths) {
     if (!filePath.startsWith('config') || options.reuseExistingConfigs) {
-      await fse.copy(
+      await fse.move(
         path.join(info.tmpLocation, 'tests/dummy/', filePath),
         path.join(info.testAppLocation, filePath),
         { overwrite: true }
@@ -234,8 +234,12 @@ async function moveTestsAndDummyApp(info, options) {
     }
   }
 
+  await fse.move(
+    path.join(info.tmpLocation, 'tests/index.html'),
+    path.join(info.testAppLocation, 'tests/index.html'),
+    { overwrite: true }
+  );
   await fse.remove(path.join(info.tmpLocation, 'tests/dummy'));
-  await fse.remove(path.join(info.tmpLocation, 'tests/index.html'));
 
   const paths = await globby([path.join(info.tmpLocation, 'tests/**/*')]);
 
@@ -248,6 +252,86 @@ async function moveTestsAndDummyApp(info, options) {
   }
 
   await fse.remove(path.join(info.testAppLocation, 'tests', 'dummy'));
+}
+
+/**
+ * @param {Info} info
+ */
+async function fixDummyAppReferences(info) {
+  // fix `{ modulePrefix: 'dummy' }` in environment.js
+  await js.transform(
+    path.join(info.testAppLocation, 'config', 'environment.js'),
+    async ({ j, root }) => {
+      root.find(j.ObjectExpression).forEach((path) => {
+        for (const prop of path.node.properties) {
+          if (
+            prop.key.name === 'modulePrefix' &&
+            prop.value.value === 'dummy'
+          ) {
+            prop.value.value = info.testAppName;
+          }
+        }
+      });
+    },
+    { quote: 'single' }
+  );
+
+  // fix `import ... from 'dummy/...' in .{js,ts} files
+  const dummyAppJsFiles = await globby(
+    [`${info.testAppLocation}/**/*.{js,ts}`],
+    { gitignore: true }
+  );
+
+  for (const fileToTransform of dummyAppJsFiles) {
+    await js.transform(
+      fileToTransform,
+      async ({ j, root }) => {
+        root
+          .find(j.ImportDeclaration, {
+            source: { value: (value) => value.startsWith('dummy') },
+          })
+          .forEach((path) => {
+            path.node.source.value = path.node.source.value.replace(
+              /^dummy/,
+              info.testAppName
+            );
+          });
+      },
+      { quote: 'single' }
+    );
+  }
+
+  // fix <script> and <link> in index.html
+  const dummyHtmlFiles = await globby(
+    [`${info.testAppLocation}/**/index.html`],
+    { gitignore: true }
+  );
+
+  for (const htmlFile of dummyHtmlFiles) {
+    await html.transform(htmlFile, (tree) => {
+      tree.match({ tag: 'script' }, (node) => {
+        if (node.attrs) {
+          node.attrs.src = node.attrs.src?.replace(
+            'assets/dummy.js',
+            `assets/${info.testAppName}.js`
+          );
+        }
+
+        return node;
+      });
+
+      tree.match({ tag: 'link' }, (node) => {
+        if (node.attrs) {
+          node.attrs.href = node.attrs.href?.replace(
+            'assets/dummy.css',
+            `assets/${info.testAppName}.css`
+          );
+        }
+
+        return node;
+      });
+    });
+  }
 }
 
 /**
