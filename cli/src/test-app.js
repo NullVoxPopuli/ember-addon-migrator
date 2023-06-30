@@ -222,6 +222,7 @@ async function updateFilesWithinTestApp(info, options) {
 async function moveTestsAndDummyApp(info, options) {
   const dummyAppPaths = await globby(['**/*'], {
     cwd: path.join(info.tmpLocation, 'tests/dummy/'),
+    gitignore: true,
   });
 
   for (let filePath of dummyAppPaths) {
@@ -231,6 +232,8 @@ async function moveTestsAndDummyApp(info, options) {
         path.join(info.testAppLocation, filePath),
         { overwrite: true }
       );
+
+      await ensureNoJsTsDuplicates(info, filePath);
     }
   }
 
@@ -241,17 +244,39 @@ async function moveTestsAndDummyApp(info, options) {
   );
   await fse.remove(path.join(info.tmpLocation, 'tests/dummy'));
 
-  const paths = await globby([path.join(info.tmpLocation, 'tests/**/*')]);
+  const paths = await globby([path.join(info.tmpLocation, 'tests/**/*')], {
+    cwd: info.tmpLocation,
+    gitignore: true,
+  });
 
   for (let filePath of paths) {
-    let localFile = filePath.replace(info.tmpLocation, '');
-
-    await fse.move(filePath, path.join(info.testAppLocation, localFile), {
+    await fse.move(filePath, path.join(info.testAppLocation, filePath), {
       overwrite: true,
     });
+
+    await ensureNoJsTsDuplicates(info, filePath);
   }
 
   await fse.remove(path.join(info.testAppLocation, 'tests', 'dummy'));
+}
+
+/**
+ * @param {Info} info
+ * @param {string} filePath
+ */
+async function ensureNoJsTsDuplicates(info, filePath) {
+  // When the dummy app has e.g. a `app.js` file, and the app blueprint (with `--typescript`) has an `app.ts`, after copying the files from the dummy app you would end up with duplicates of `app.js` vs. `app.ts`, which is bad.
+  // As the .js file coming from the dummy app could contain meaningful code that is not included in the fresh boilerplate, it should take precedence.
+  if (path.extname(filePath) === '.js') {
+    const eventualTsDuplicate = path.join(
+      info.testAppLocation,
+      filePath.replace(/\.js$/, '.ts')
+    );
+
+    if (fse.existsSync(eventualTsDuplicate)) {
+      await fse.remove(eventualTsDuplicate);
+    }
+  }
 }
 
 /**
