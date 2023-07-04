@@ -1,5 +1,21 @@
 # ember-addon-migrator
 
+## 2.4.0
+
+### Minor Changes
+
+- [`fb7fbe2`](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/fb7fbe2549cba8c97e8a797641aba2bf1e9a04f0) Thanks [@NullVoxPopuli](https://github.com/NullVoxPopuli)! - extract-tests: copy eventual tailwind.config.js
+
+  Even though the config is not part of the default setup, I think it wouldn't hurt to include it when copying configs to the test-app in case it exists.
+
+- [`fb7fbe2`](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/fb7fbe2549cba8c97e8a797641aba2bf1e9a04f0) Thanks [@NullVoxPopuli](https://github.com/NullVoxPopuli)! - extract-tests: copy dummy app files
+
+  Copy also the dummy app's files alongside tests.
+
+- [`fb7fbe2`](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/fb7fbe2549cba8c97e8a797641aba2bf1e9a04f0) Thanks [@NullVoxPopuli](https://github.com/NullVoxPopuli)! - extract-tests: add `--skip-ember-try` flag
+
+  You might not want ember-try e.g. in a monorepo.
+
 ## 2.3.0
 
 ### Minor Changes
