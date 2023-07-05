@@ -244,15 +244,19 @@ async function moveTestsAndDummyApp(info, options) {
   );
   await fse.remove(path.join(info.tmpLocation, 'tests/dummy'));
 
-  const paths = await globby([path.join(info.tmpLocation, 'tests/**/*')], {
+  const paths = await globby(['tests/**/*'], {
     cwd: info.tmpLocation,
     gitignore: true,
   });
 
   for (let filePath of paths) {
-    await fse.move(filePath, path.join(info.testAppLocation, filePath), {
-      overwrite: true,
-    });
+    await fse.move(
+      path.join(info.tmpLocation, filePath),
+      path.join(info.testAppLocation, filePath),
+      {
+        overwrite: true,
+      }
+    );
 
     await ensureNoJsTsDuplicates(info, filePath);
   }
