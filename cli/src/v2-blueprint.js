@@ -31,8 +31,7 @@ export async function installV2Blueprint(info) {
       'addon',
       info.name,
       `--dir=${addonDir}`,
-      // needs https://github.com/embroider-build/addon-blueprint/pull/137 for proper TS support
-      '--blueprint=embroider-build/addon-blueprint#update-for-upstream-ts-changes',
+      '--blueprint=@embroider/addon-blueprint',
       `--test-app-location=${info.testAppLocation}`,
       `--test-app-name=${info.testAppName}`,
       `--addon-location=${info.addonLocation}`,
