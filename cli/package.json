@@ -47,7 +47,7 @@
     "chalk": "^5.2.0",
     "common-tags": "^1.8.2",
     "ember-apply": "2.8.0",
-    "ember-cli": "ember-cli/ember-cli#master",
+    "ember-cli": "5.2.0-beta.0",
     "execa": "^6.1.0",
     "fs-extra": "^10.1.0",
     "global": "^4.4.0",
