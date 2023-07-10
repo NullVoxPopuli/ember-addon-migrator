@@ -1,5 +1,4 @@
 import { packageJson } from 'ember-apply';
-import { execa } from 'execa';
 import fs from 'fs-extra';
 import Listr from 'listr';
 import path from 'node:path';
@@ -9,13 +8,12 @@ import util from 'node:util';
 import { moveAddon } from '../addon.js';
 import { AddonInfo } from '../analysis/index.js';
 import { resolvedDirectory } from '../analysis/paths.js';
+import { runEmber } from '../ember.js';
 import { error, info } from '../log.js';
 import { fixReferences } from '../references.js';
 import { migrateTestApp } from '../test-app.js';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
-
-const tsIssue = ' See: https://github.com/ember-cli/ember-cli/issues/10045';
 
 // Known testing-related possible dependencies
 const testingDependencies = [
@@ -74,12 +72,6 @@ export default async function extractTests(args) {
         tasks.push({
           title: `Creating new app (named: ${analysis.testAppName}) for tests in: ${analysis.testAppLocation}`,
           task: async (ctx, task) => {
-            if (analysis.isTS) {
-              task.output =
-                '⚠️  Native typescript from ember-cli ignores --skip-npm.' +
-                tsIssue;
-            }
-
             await createTestApp(analysis, task, args);
           },
         });
@@ -175,13 +167,9 @@ async function analyze(args) {
  */
 async function createTestApp(analysis, task, options) {
   task.output = '';
-  /**
-   * NOTE: using `--typescript` forces skip-npm to be ignored due to how the --typescript support is implemented in ember-cli
-   */
-  await execa(
-    'npx',
+
+  await runEmber(
     [
-      'ember-cli@^4.10.0',
       'new',
       analysis.testAppName,
       '--skip-git',
@@ -198,20 +186,6 @@ async function createTestApp(analysis, task, options) {
   );
 
   let testApp = path.join(analysis.directory, analysis.testAppLocation);
-
-  /**
-   * Because of the --typescript problem, let's delete node_modules and the generated lockfile.
-   * they're likely wrong / broken anyway.
-   */
-  task.output = 'Deleting artifacts from --typescript bug.' + tsIssue;
-  await fs.rm(path.join(testApp, 'node_modules'), {
-    force: true,
-    recursive: true,
-  });
-  await fs.rm(path.join(testApp, 'package-lock.json'), {
-    force: true,
-    recursive: true,
-  });
 
   /**
    * Because this is an addon, we want to add `@embroider/test-setup`

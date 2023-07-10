@@ -1,11 +1,11 @@
 /**
  * @typedef {import('./analysis/index').AddonInfo} Info
  */
-import { execaCommand } from 'execa';
 import fse from 'fs-extra';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+import { runEmber } from './ember.js';
 import { createTmp } from './prepare.js';
 
 /**
@@ -20,26 +20,28 @@ export async function installV2Blueprint(info) {
     : info.isNpm
     ? '--npm'
     : '';
-  let ts = info.isTS ? '--typescript' : '';
+  let ts = info.isTS ? '--typescript' : undefined;
 
   // we'll create the addon here instead of using a directory based on the actual name, as this is temporary anyway
   // and prevents issues with scoped package names getting in some way dasherized by ember-cli
   let addonDir = 'addon';
 
-  await execaCommand(
-    `npx ember-cli@^4.10.0 addon ${info.name}` +
-      ` --dir=${addonDir}` +
-      ` --blueprint @embroider/addon-blueprint` +
-      // ` --blueprint ../addon-blueprint` +
-      ` --test-app-location=${info.testAppLocation}` +
-      ` --test-app-name=${info.testAppName}` +
-      ` --addon-location=${info.addonLocation}` +
-      ` ${packager}` +
-      ` ${ts}` +
+  await runEmber(
+    [
+      'addon',
+      info.name,
+      `--dir=${addonDir}`,
+      '--blueprint=@embroider/addon-blueprint',
+      `--test-app-location=${info.testAppLocation}`,
+      `--test-app-name=${info.testAppName}`,
+      `--addon-location=${info.addonLocation}`,
+      packager,
+      ts,
       // Installation will only happen as needed, and with the correct package manager
-      ` --skip-npm` +
+      '--skip-npm',
       // We want to use the existing git
-      ` --skip-git`,
+      '--skip-git',
+    ].filter(Boolean),
     {
       cwd: tmp,
     }
