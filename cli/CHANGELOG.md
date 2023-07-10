@@ -1,5 +1,19 @@
 # ember-addon-migrator
 
+## 2.5.0
+
+### Minor Changes
+
+- [#90](https://github.com/NullVoxPopuli/ember-addon-migrator/pull/90) [`b79405b`](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/b79405bfd17a94db126b755b8426972c8eeb3586) Thanks [@simonihmig](https://github.com/simonihmig)! - Use latest Ember CLI when generating from blueprints
+
+  We use the version of Ember CLI that we depend on (currently latest `5.2.0-beta.0`) instead of what the user has when delegating to other blueprints (app, v2 addon), so we get to use the latest blueprint features. In particular this relates to the improved `--typescript` support that was introduced in that version of Ember CLI.
+
+### Patch Changes
+
+- [#88](https://github.com/NullVoxPopuli/ember-addon-migrator/pull/88) [`d2e09f3`](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/d2e09f3ebecc09b96f1bbb5dc4652cec2158f9e6) Thanks [@simonihmig](https://github.com/simonihmig)! - Fix copying test files
+
+  At a previous iteration a regression was introduced, that copied the test files into the test-app, but including their full path. This is fixed now.
+
 ## 2.4.0
 
 ### Minor Changes
