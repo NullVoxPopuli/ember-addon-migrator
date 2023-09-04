@@ -24,7 +24,7 @@ export async function install(info, options = {}) {
   }
 
   try {
-    await execa(info.packageManager, ['install'], opts);
+    await execa(info.packageManager, ['install', '--no-frozen-lockfile'], opts);
   } catch (e) {
     if (!(e instanceof Error)) throw e;
 
