@@ -38,7 +38,7 @@ export async function install(info, options = {}) {
 export async function updateRootFiles(info) {
   /**
    * If we're in a bigger monorepo, we need to remove the
-   * known monorepeo root files, because they likely exist elsewhere.
+   * known monorepo root files, because they likely exist elsewhere.
    */
   if (info.isBiggerMonorepo) {
     await fse.rm(path.join(info.directory, 'package.json'));

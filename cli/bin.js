@@ -154,6 +154,13 @@ yarg
         type: 'string',
         default: process.cwd(),
       });
+      yargs.option('exclude-tests', {
+        alias: 'in-place',
+        describe:
+          'Do not try to migrate tests. Useful when having run the extract-tests command before',
+        type: 'boolean',
+        default: false,
+      });
       yargs.option('analysis-only', {
         describe: 'inspect the analysis object, skipping migration entirely',
         type: 'boolean',

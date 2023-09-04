@@ -11,4 +11,5 @@ export interface Options extends TestAppOptions {
   testAppLocation: string;
   testAppName: string;
   directory: string;
+  excludeTests: boolean;
 }

@@ -53,20 +53,22 @@ export default async function run(options) {
             },
             {
               title: 'Installing the V2 Addon Blueprint',
-              task: () => installV2Blueprint(analysis),
+              task: () => installV2Blueprint(analysis, options),
             },
             {
               title: `Updating addon's root files`,
+              skip: () => options.excludeTests,
               task: () => updateRootFiles(analysis),
             },
             {
               title: 'Migrating addon files',
               task: () => {
-                return migrateAddon(analysis);
+                return migrateAddon(analysis, options);
               },
             },
             {
               title: 'Migrating test files',
+              skip: () => options.excludeTests,
               task: () => migrateTestApp(analysis, options),
             },
           ]);
@@ -86,6 +88,7 @@ export default async function run(options) {
             },
             {
               title: `lint:fix on test app`,
+              skip: () => options.excludeTests,
               task: () => lintFix(analysis, analysis.testAppLocation),
             },
           ]);

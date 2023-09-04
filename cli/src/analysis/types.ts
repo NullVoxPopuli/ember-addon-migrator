@@ -6,6 +6,7 @@ export interface Options {
   testAppLocation: string;
   testAppName: string;
   directory: string;
+  excludeTests: boolean;
 }
 
 interface Volta {

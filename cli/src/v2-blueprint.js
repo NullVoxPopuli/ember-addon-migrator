@@ -10,8 +10,9 @@ import { createTmp } from './prepare.js';
 
 /**
  * @param {Info} info
+ * @param {import('./types').Options} options
  */
-export async function installV2Blueprint(info) {
+export async function installV2Blueprint(info, options) {
   let tmp = await createTmp('v2-addon-creation--');
   let packager = info.isPnpm
     ? '--pnpm'
@@ -41,6 +42,7 @@ export async function installV2Blueprint(info) {
       '--skip-npm',
       // We want to use the existing git
       '--skip-git',
+      options.excludeTests ? '--addon-only' : undefined,
     ].filter(Boolean),
     {
       cwd: tmp,

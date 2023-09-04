@@ -13,8 +13,9 @@ import { prepare } from './prepare.js';
 
 /**
  * @param {Info} info
+ * @param {import('./types').Options} options
  */
-export async function migrateAddon(info) {
+export async function migrateAddon(info, options) {
   let addonFolder = path.join(info.tmpLocation, 'addon');
   let testSupportFolder = path.join(info.tmpLocation, 'addon-test-support');
 
@@ -136,7 +137,7 @@ async function updateAddonPackageJson(info) {
   }
 
   await fs.writeFile(
-    `${info.addonLocation}/package.json`,
+    path.join(info.addonLocation, 'package.json'),
     JSON.stringify(pJson, null, 2)
   );
 }

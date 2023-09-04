@@ -250,6 +250,10 @@ export class AddonInfo {
    *   (because <directory> usually ends with some form of the addon-name)
    */
   get addonLocation() {
+    if (this.#options.excludeTests) {
+      return '';
+    }
+
     if (this.isBiggerMonorepo) {
       return this.#options.addonLocation || 'package';
     }
