@@ -2,26 +2,31 @@ import { execa } from 'execa';
 import fse from 'fs-extra';
 import { beforeAll, describe, expect, test } from 'vitest';
 
-import { assertEmberTest, migrate } from '../assertions.js';
+import { assertEmberTest, extractTests, migrate } from '../assertions.js';
 import {
   type Project,
   addonFrom,
   build,
   findFixtures,
+  install,
   lintAddon,
   lintTestApp,
+  makeMonorepo,
 } from '../helpers.js';
 
 let fixtures = await findFixtures();
 
 for (let fixtureName of fixtures) {
-  describe(`default command on fixture: ${fixtureName}`, () => {
+  describe(`extract-tests + --exclude-tests on fixture: ${fixtureName}`, () => {
     let project: Project;
 
     beforeAll(async () => {
       project = await addonFrom(fixtureName);
-      await migrate(project.rootPath);
-      await build(project.addonPath);
+      await extractTests(project.rootPath);
+      await makeMonorepo(project.rootPath);
+      await install(project.rootPath);
+      await migrate(project.packagePath, ['--exclude-tests']);
+      await build(project.packagePath);
     });
 
     test('verify tmp project', async () => {
@@ -34,8 +39,8 @@ for (let fixtureName of fixtures) {
         `rootPath: ${project.rootPath}`
       ).toBe(true);
       expect(
-        await fse.pathExists(project.addonPath),
-        `addonPath: ${project.addonPath}`
+        await fse.pathExists(project.packagePath),
+        `addonPath: ${project.packagePath}`
       ).toBe(true);
       expect(
         await fse.pathExists(project.testAppPath),
@@ -44,7 +49,7 @@ for (let fixtureName of fixtures) {
     });
 
     test('lint addon', async () => {
-      let result = await lintAddon(project.addonPath);
+      let result = await lintAddon(project.packagePath);
 
       expect(result).toMatchObject({ exitCode: 0 });
     });

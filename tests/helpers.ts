@@ -95,35 +95,35 @@ export async function addonFrom(fixture: string): Promise<Project> {
   return project;
 }
 
-export async function install(project: Pick<Project, 'rootPath'>) {
+export async function install(rootPath: string) {
   await execa('pnpm', ['install', '--no-frozen-lockfile'], {
-    cwd: project.rootPath,
+    cwd: rootPath,
     env: { JOBS: '1' },
   });
 }
 
-export async function build(project: Project) {
+export async function build(addonPath: string) {
   let buildResult = await execa('pnpm', ['build'], {
-    cwd: project.addonPath,
+    cwd: addonPath,
     env: { JOBS: '1' },
   });
 
   return buildResult;
 }
 
-export async function emberTest(project: Pick<Project, 'testAppPath'>) {
+export async function emberTest(testAppPath: string) {
   return await execa('pnpm', ['ember', 'test', '--test-port', '0'], {
-    cwd: project.testAppPath,
+    cwd: testAppPath,
     env: { JOBS: '1' },
   });
 }
 
-export async function lintAddon(project: Project) {
-  return await execa('pnpm', ['lint'], { cwd: project.addonPath });
+export async function lintAddon(addonPath: string) {
+  return await execa('pnpm', ['lint'], { cwd: addonPath });
 }
 
-export async function lintTestApp(project: Project) {
-  return await execa('pnpm', ['lint'], { cwd: project.testAppPath });
+export async function lintTestApp(testAppPath: string) {
+  return await execa('pnpm', ['lint'], { cwd: testAppPath });
 }
 
 /**
@@ -144,4 +144,26 @@ export async function disableNoEmitOnError(cwd: string) {
 
     await fse.writeFile(tsconfigPath, result);
   }
+}
+
+export async function makeMonorepo(rootPath: string) {
+  await fse.writeFile(
+    path.join(rootPath, 'package.json'),
+    JSON.stringify(
+      {
+        name: 'root',
+        private: true,
+        version: '0.0.0',
+        // Some transient deps bring in eslint7, which messes up tsc somehow
+        pnpm: { overrides: { '@types/eslint': '^8.0.0' } },
+      },
+      null,
+      2
+    )
+  );
+  await fse.writeFile(
+    path.join(rootPath, 'pnpm-workspace.yaml'),
+    `packages:\n` + `- package\n` + `- test-app\n`
+  );
+  await fse.writeFile(path.join(rootPath, '.gitignore'), `node_modules/`);
 }

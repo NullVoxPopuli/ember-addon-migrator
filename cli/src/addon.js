@@ -136,7 +136,7 @@ async function updateAddonPackageJson(info) {
   }
 
   await fs.writeFile(
-    `${info.addonLocation}/package.json`,
+    path.join(info.addonLocation, 'package.json'),
     JSON.stringify(pJson, null, 2)
   );
 }

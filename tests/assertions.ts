@@ -1,14 +1,16 @@
 import { execa } from 'execa';
 import { expect } from 'vitest';
 
-import { type Project, binPath, emberTest } from './helpers.js';
+import { binPath, emberTest } from './helpers.js';
 
-export async function migrate(project: Pick<Project, 'rootPath'>) {
+export async function migrate(rootPath: string, flags: Array<string> = []) {
   console.debug('To Debug:');
-  console.debug(`  within: ${project.rootPath}`);
-  console.debug(`node ${binPath}`);
+  console.debug(`  within: ${rootPath}`);
+  console.debug(`node ${binPath} ${flags.join(' ')}`);
 
-  let { stdout } = await execa('node', [binPath], { cwd: project.rootPath });
+  let { stdout } = await execa('node', [binPath, ...flags], {
+    cwd: rootPath,
+  });
 
   expect(stdout).toMatch(
     `🎉 Congratulations! Your addon is now formatted as a V2 addon!`
@@ -16,15 +18,15 @@ export async function migrate(project: Pick<Project, 'rootPath'>) {
 }
 
 export async function makeMonorepo(
-  project: Pick<Project, 'rootPath'>,
+  rootPath: string,
   flags: Array<string> = []
 ) {
   console.debug('To Debug:');
-  console.debug(`  within: ${project.rootPath}`);
+  console.debug(`  within: ${rootPath}`);
   console.debug(`node ${binPath} make-monorepo ${flags.join(' ')}`);
 
   let { stdout } = await execa('node', [binPath, 'make-monorepo', ...flags], {
-    cwd: project.rootPath,
+    cwd: rootPath,
   });
 
   expect(stdout).toMatch(
@@ -33,15 +35,15 @@ export async function makeMonorepo(
 }
 
 export async function extractTests(
-  project: Pick<Project, 'rootPath'>,
+  rootPath: string,
   flags: Array<'--in-place' | string> = []
 ) {
   console.debug('To Debug:');
-  console.debug(`  within: ${project.rootPath}`);
+  console.debug(`  within: ${rootPath}`);
   console.debug(`node ${binPath} extract-tests ${flags.join(' ')}`);
 
   let { stdout } = await execa('node', [binPath, 'extract-tests', ...flags], {
-    cwd: project.rootPath,
+    cwd: rootPath,
   });
 
   expect(stdout).toMatch(
@@ -49,8 +51,8 @@ export async function extractTests(
   );
 }
 
-export async function assertEmberTest(project: Pick<Project, 'testAppPath'>) {
-  let { stdout, exitCode } = await emberTest(project);
+export async function assertEmberTest(testAppPath: string) {
+  let { stdout, exitCode } = await emberTest(testAppPath);
 
   // subset of full stdout
   // can't use snapshot testing due to time taken printed
