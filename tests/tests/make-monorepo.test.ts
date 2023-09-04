@@ -17,8 +17,8 @@ describe(`make-monorepo on fixture: ${fixtureName}`, () => {
     assert(fixtureName, 'No fixtures found');
 
     project = await addonFrom(fixtureName);
-    await makeMonorepo(project);
-    await install(project);
+    await makeMonorepo(project.rootPath);
+    await install(project.rootPath);
   });
 
   test('verify tmp project', async () => {
@@ -45,6 +45,6 @@ describe(`make-monorepo on fixture: ${fixtureName}`, () => {
   });
 
   test('tests pass', async () => {
-    assertEmberTest({ testAppPath: project.addonPath });
+    assertEmberTest(project.addonPath);
   });
 });
