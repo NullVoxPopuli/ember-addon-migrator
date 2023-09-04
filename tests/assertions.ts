@@ -1,7 +1,7 @@
 import { execa } from 'execa';
 import { expect } from 'vitest';
 
-import { type Project, binPath, emberTest } from './helpers.js';
+import { binPath, emberTest } from './helpers.js';
 
 export async function migrate(rootPath: string, flags: Array<string> = []) {
   console.debug('To Debug:');

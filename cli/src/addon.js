@@ -13,9 +13,8 @@ import { prepare } from './prepare.js';
 
 /**
  * @param {Info} info
- * @param {import('./types').Options} options
  */
-export async function migrateAddon(info, options) {
+export async function migrateAddon(info) {
   let addonFolder = path.join(info.tmpLocation, 'addon');
   let testSupportFolder = path.join(info.tmpLocation, 'addon-test-support');
 

@@ -22,11 +22,10 @@ for (let fixtureName of fixtures) {
 
     beforeAll(async () => {
       project = await addonFrom(fixtureName);
-      await extractTests(project.rootPath, ['--no-in-place']);
+      await extractTests(project.rootPath);
       await makeMonorepo(project.rootPath);
       await install(project.rootPath);
       await migrate(project.packagePath, ['--exclude-tests']);
-      await install(project.rootPath);
       await build(project.packagePath);
     });
 
