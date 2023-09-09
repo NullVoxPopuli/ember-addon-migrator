@@ -1,5 +1,16 @@
 # ember-addon-migrator
 
+## 2.6.0
+
+### Minor Changes
+
+- [#91](https://github.com/NullVoxPopuli/ember-addon-migrator/pull/91) [`668c903`](https://github.com/NullVoxPopuli/ember-addon-migrator/commit/668c9039abff5beaa8dec45bd4a866498e2e13af) Thanks [@simonihmig](https://github.com/simonihmig)! - Add `--exclude-tests`` to support two-phased migration
+
+  With this flag added, you can migrate an existing v1 addon with a previously extracted test-app. This lets you you can apply a migration in two phases:
+
+  1. `npx ember-addon-migrator extract-tests`
+  2. `npx ember-addon-migrator --exclude-tests`
+
 ## 2.5.0
 
 ### Minor Changes
