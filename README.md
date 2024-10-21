@@ -1,3 +1,7 @@
+# WARNING: this is out of date, and needs updates.
+
+I no longer convert v1 addons to v2 addons, so I stopped updating it, but I'll take PRs to fix anything that folks find.
+
 # ember-addon-migrator
 
 Migrate your V1 addons to V2 addons
